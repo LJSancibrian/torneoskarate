@@ -1,0 +1,230 @@
+<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<style>
+
+</style>
+<section class="portfolio mt-3" id="portfolio">
+    <div class="container-fluid">
+        <div class="row ">
+            <div class="title text-center w-100">
+                <h2>KATA</h2>
+                <p>En la modalidad de KATA se valora la puntuación obtenida en cada ronda por cada árbitro asistente.</p>
+                <div class="border"></div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="pricing-table pt-0">
+    <div class="container-fluid">
+        <ul class="nav nav-pills justify-content-center" id="torneotabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" role="tab" id="info-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#info">Info</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" role="tab" id="competiciones-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#competiciones">Competiciones</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="medallero-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#medallero" role="tab">Medallero</a>
+            </li>
+        </ul>
+        <div class="blog-slider">
+            <div class="blog-slider__content w-100 p-0 pb-3">
+                <div class="price-title">
+                    <strong class="value p-0"><?php echo $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto'); ?></strong>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered text-center fixed2" id="tablavistakata" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
+                        <thead>
+                            <tr>
+                                <th class="bg-white text-primary"></th>
+                                <th class="bg-white text-primary"> <button class="btn btn-info btn-block" data-clasificacion="<?php echo $competicion->competicion_torneo_id; ?>">Ver la clasificación</button></th>
+                                <th class="bg-white text-primary" colspan="3">Ronda 1</th>
+                                <th class="bg-white text-primary" colspan="3">Ronda 2</th>
+                                <?php /*<th class="bg-white text-primary" colspan="6">Ronda 3</th>*/ ?>
+                                <th class="bg-white text-primary">Total</th>
+                                <th class="bg-white text-primary">Media</th>
+                            </tr>
+
+                            <tr>
+                                <th class="">#</th>
+                                <th class="text-left columnfixed">Deportista</th>
+                                <th>P1</th>
+                                <th>P2</th>
+                                <?php /*<th>P3</th>
+                                <th>P4</th>
+                                <th>P5</th> */ ?>
+                                <th>T1</th>
+                                <th>P1</th>
+                                <th>P2</th>
+                                <?php /*<th>P3</th>
+                                <th>P4</th>
+                                <th>P5</th> */ ?>
+                                <th>T2</th>
+                                <?php /*<th>P1</th>
+                                <th>P2</th>
+                                <th>P3</th>
+                                <?php /*<th>P4</th>
+                                <th>P5</th> 
+                                <th>M3</th>*/ ?>
+                                <th>Total</th>
+                                <th>Media</th>
+                            </tr>
+                        </thead>
+                        <?php /* <tfoot>
+                            <tr>
+                                <th class="">#</th>
+                                <th class="text-left columnfixed">Deportista</th>
+                                <th>P1</th>
+                                <th>P2</th>
+                                <th>P3</th>
+                                <th>P4</th>
+                                <th>P5</th>
+                                <th>M1</th>
+                                <th>P1</th>
+                                <th>P2</th>
+                                <th>P3</th>
+                                <th>P4</th>
+                                <th>P5</th> 
+                                <th>M2</th>
+                                <th>P1</th>
+                                <th>P2</th>
+                                <th>P3</th>
+                                <th>P4</th>
+                                <th>P5</th>
+                                <th>M3</th>
+                                <th>Total</th>
+                                <th>Media</th>
+                            </tr>
+                            <tr>
+                                <th class="bg-white text-primary"></th>
+                                <th class="bg-white text-primary"> <button class="btn btn-info btn-block" data-clasificacion="<?php echo $competicion->competicion_torneo_id; ?>">Ver la clasificación</button></th>
+                                <th class="bg-white text-primary" colspan="4">Ronda 1</th>
+                                <th class="bg-white text-primary" colspan="4">Ronda 2</th>
+                                <th class="bg-white text-primary" colspan="6">Ronda 3</th> 
+                                <th class="bg-white text-primary">Total</th>
+                                <th class="bg-white text-primary">Media</th>
+                            </tr>
+                        </tfoot>
+                        */ ?>
+                        <tbody>
+                            <?php foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
+                                <tr data-user_id="<?php echo $value->user_id; ?>">
+                                    <td class=""><?php echo $value->orden; ?></td>
+                                    <td class="text-left text-nowrap">
+                                        <?php echo $value->first_name; ?> <?php echo $value->last_name; ?>
+                                    </td>
+                                    <td data-ronda="1" data-j="1"></td>
+                                    <td data-ronda="1" data-j="2"></td>
+                                    <?php /*<td data-ronda="1" data-j="3"></td>
+                                    <td data-ronda="1" data-j="4"></td>
+                                    <td data-ronda="1" data-j="5"></td>*/ ?>
+                                    <td data-media="1" class="bg-success text-white">0</td>
+                                    <td data-ronda="2" data-j="1"></td>
+                                    <td data-ronda="2" data-j="2"></td>
+                                    <?php /*<td data-ronda="2" data-j="3"></td>
+                                    <td data-ronda="1" data-j="4"></td>
+                                    <td data-ronda="1" data-j="5"></td>*/ ?>
+                                    <td data-media="2" class="bg-success text-white">0</td>
+                                    <?php /*<td data-ronda="3" data-j="1"></td>
+                                    <td data-ronda="3" data-j="2"></td>
+                                    <td data-ronda="3" data-j="3"></td>
+                                    <td data-ronda="3" data-j="4"></td>
+                                    <td data-ronda="3" data-j="5"></td>
+                                    <th data-media="3" class="bg-success text-white">0</td> */ ?>
+                                    <td data-total></td>
+                                    <td data-media-total class="bg-primary text-white">0</td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h4 class="mt-5">RONDA FINAL</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered text-center" style="max-width:500px;" id="tablakatafinal" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-white text-primary">#</th>
+                                        <th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
+                                        <th class="bg-white text-primary" colspan="3">Ronda Final</th>
+                                        <th class="bg-white text-primary">Total</th>
+                                        <th class="bg-white text-primary">Media</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="">#</th>
+                                        <th colspan="2" class="text-left columnfixed">Deportista</th>
+                                        <th>J1</th>
+                                        <th>J2</th>
+                                        <th>J3</th>
+                                        <th>Total</th>
+                                        <th>Media</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($finalistas as $key => $value) { ?>
+                                        <tr data-user_id="<?php echo $value->user_id; ?>">
+                                            <td class=""><?php echo $value->orden; ?></td>
+                                            <td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
+                                            <td data-ronda="3" data-j="1"></td>
+                                            <td data-ronda="3" data-j="2"></td>
+                                            <td data-ronda="3" data-j="3"></td>
+                                            <td data-total></td>
+                                            <td data-media-total class="bg-primary text-white">0</td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <h4 class="mt-5">CLASIFICACIÓN FINAL</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered" id="clasificaionkatafinal">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th class="columnfixed">Deportista</th>
+                                        <th>Equipo</th>
+                                        <th>Puntos</th>
+                                        <th>Media</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clasificacion_final_competicion"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="clasificacionkata_modal" tabindex="-1" aria-labelledby="clasificacionkata_modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="card-title fw-mediumbold">Clasificación</div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped w-100">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th class="columnfixed">Deportista</th>
+                                <th>Equipo</th>
+                                <th>Puntos</th>
+                                <th>Media</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clasificacion_competicion"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

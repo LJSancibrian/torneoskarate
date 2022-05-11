@@ -1,0 +1,90 @@
+
+
+/*=================================================================
+  Pricing section
+==================================================================*/
+
+.pricing-table {
+  padding:100px 0;
+  /*background: url('../images/pricing-bg.jpg');*/
+  position: relative;
+  .title {
+    p {
+      color: $light;
+    }
+  }
+  &:before {
+    /*background: rgba(0, 0, 0, 0.62);*/
+    position: absolute;
+    /*z-index: 999;*/
+    content: '';
+    top: 0;
+    left: 0;
+    right:0;
+    bottom:0;
+  }
+  .container {
+    position: relative;
+    z-index: 999;
+  }
+  .pricing-item {
+    padding: 1.5rem; 
+    background: $light;
+    border: 1px solid $primary-color;
+    margin-bottom: 20px;
+    a.btn-main {
+      text-transform: uppercase;
+      margin-top: 20px;
+    }
+     li {
+      font-weight: 400;
+      padding: 10px 0;
+      color:#666;
+      i {
+        margin-right: 6px;
+      }
+    }
+  }
+  .price-title {
+    padding: 0;
+    margin-bottom: 1rem;
+     > h3 {
+      font-weight: 700;
+      margin: 0 0 5px;
+      font-size: 15px;
+      text-transform: uppercase;
+    }
+    > p {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      margin-top: 5px;
+    }
+    .value {
+      color: $primary-color;
+      font-size: 35px;
+      padding: 10px 0;
+      text-transform: uppercase;
+    }
+  }
+  ul{
+    /*font-size: 25px;*/
+    padding-left: 1rem;
+    li a{
+      position: relative;
+    }
+    li a:before{
+     /* content: "\f3d1";
+      font-family: 'themefisher-font' !important;
+      margin-top: 5px;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    position: absolute;*/
+    left: -1rem;
+    }
+  }
+}

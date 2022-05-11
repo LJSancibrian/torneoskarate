@@ -1,0 +1,45 @@
+body.wait *, body.wait
+{
+    cursor: wait !important;
+}
+
+div.dataTables_wrapper div.dataTables_processing {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: auto;
+    margin-left: -100px;
+    margin-top: -26px;
+    text-align: center;
+    padding: 1em;
+    background: #0000ff82;
+    color: #ffffff;
+    font-size: 2rem;
+}
+
+@media screen and (max-width: 767px) {
+
+	.table-mobile-block thead{
+		display: none;
+	}
+	.table-mobile-block tr, .table-mobile-block td{
+		display: block;
+	}
+
+	.table-mobile-block tr{
+		border: 2px solid;
+		padding: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.table-mobile-block td:before{
+		content: attr(thead) ":";
+		margin-right: 1rem;
+		width: 100px;
+		font-weight: bold;
+		text-transform: uppercase;;
+	}
+}
+
+
+

@@ -1,0 +1,48 @@
+.logo {
+	margin-top: 10px;
+	display: inline-block;
+}
+.logo-white, .logo-default{
+    height: 43px;
+    width: auto
+}
+.logo-white{
+	filter: brightness(0) invert(1);
+}
+.single-page-header {
+	/*background-image: url('../images/about/about-header.jpg');*/
+	background-size: cover;
+	background-position: center;
+	padding:140px 0 70px;
+	text-align: center;
+	color:$light;
+	position: relative;
+	&:before {
+		background: rgba(0, 0, 0, 0.5);
+		position: absolute;
+		content: '';
+		top:0;
+		right:0;
+		left:0;
+		bottom:0;
+	}
+	h2.page-header{
+		font-size: clamp(25px, calc(50px + (53 - 25) * ((100vw - 420px) / (1200 - 420))), 75px);
+		text-transform:uppercase;
+		font-weight: 800;
+		color: $light !important;
+		margin-bottom: 1.7rem;
+	}
+	h3.page-header{
+		font-size: clamp(20px, calc(37px + (53 - 25) * ((100vw - 420px) / (1200 - 420))), 55px);
+		text-transform:uppercase;
+		font-weight: 800;
+		color: $light !important;
+	}
+	h4.page-header{
+		font-size: clamp(15px, calc(25px + (53 - 25) * ((100vw - 420px) / (1200 - 420))), 30px);
+		text-transform:uppercase;
+		font-weight: 800;
+		color: $light !important;
+	}
+}

@@ -1,0 +1,128 @@
+
+  .hantei:after {
+    content: "\f111";
+    color: green;
+    font-family: 'Font Awesome 5 Solid';
+    position: absolute;
+    border: black;
+    border-width: 0 1px 2px 0;
+    text-shadow: 1px 1px black;
+    margin: 0 10px;
+  }
+  .senshu:after {
+    content: "\f111";
+    color: yellow;
+    font-family: 'Font Awesome 5 Solid';
+    position: absolute;
+    border: black;
+    border-width: 0 1px 2px 0;
+    text-shadow: 1px 1px black;
+    margin: 0 10px;
+  }
+  
+
+  .match {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .match li{
+    min-height: 56px; 
+  }
+  
+  .round .match:nth-child(odd):not(:last-child):after, .match:nth-child(even):not(:first-child):after {
+      height: 61%;
+  }
+  .round .match:nth-child(odd):not(:last-child):after {
+    
+    display: block;
+    width: 15px;
+    border-top: 8px solid #808080;
+    border-right: 8px solid #808080;
+    content: '';
+    position: absolute;
+    top: 47%;
+    right: -19px;
+    border-top-right-radius: 15px;
+  }
+  
+  .round .match:nth-child(even):not(:first-child):after {
+    
+    display: block;
+    width: 15px;
+    border-bottom: 8px solid #808080;
+    border-right: 8px solid #808080;
+    content: '';
+    position: absolute;
+    bottom: 47%;
+    right: -19px;
+    border-bottom-right-radius: 15px;
+  }
+  
+  
+  .round .match {
+    margin-top: 15px;
+  }
+  
+  .round~.round .match {
+    margin-top: 81px;
+  }
+  
+  .round~.round .match~.match {
+    margin-top: 148px;
+  }
+  
+  .round~.round .match:nth-child(odd):not(:last-child):after, .round~.round .match:nth-child(even):not(:first-child):after {
+    height: 120%;
+  }
+  
+  .round~.round~.round .match {
+    margin-top: 210px;
+  }
+  
+  .round~.round~.round .match~.match {
+    margin-top: 404px;
+  }
+  
+  .round~.round~.round .match:nth-child(odd):not(:last-child):after, .round~.round~.round .match:nth-child(even):not(:first-child):after {
+    height: 258px;
+  }
+  
+  .round~.round~.round~.round .match {
+    margin-top: 465px;
+  }
+  
+  .round~.round~.round~.round .match~.match {
+    margin-top: 918px;
+  }
+  
+  .round~.round~.round~.round .match:nth-child(odd):not(:last-child):after,.round~.round~.round~.round .match:nth-child(even):not(:first-child):after {
+    height: 515px;
+  }
+  
+  .round~.round~.round~.round~.round .match {
+    margin-top: 974px;
+  }
+
+  .round:last-child .match:last-child{
+    margin-top: 2rem;
+  }
+
+  .round:last-child .match:first-child:after{
+    content: "";
+    height: auto;
+    font-size: 1.3rem;
+    position: absolute;
+  }
+  .round:last-child .match:last-child:after {
+    content: "Final Consolación";
+    height: auto;
+    font-size: 1.3rem;
+    position: absolute;
+    border: 0;
+    top: -2rem;
+    left: 0;
+    width: 100%;
+}
+.round:last-child .match:first-child:after {
+  border: 0;
+}
