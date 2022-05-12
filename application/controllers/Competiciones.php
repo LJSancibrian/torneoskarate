@@ -969,11 +969,15 @@ class Competiciones extends CI_Controller
         } else {
             $plantilla = 'pdfcompeticionkumite';
             $matches = $this->database->getMatchesTreePdf($competicion_torneo_id,[1,2]);
+            $grupos = [];
+            foreach ($matches as $key => $match) {
+                $grupos[$match->grupo][] = $match;
+            }
             //printr($matches);
             $eliminatorias = $this->database->getEliminatoriasTree($competicion_torneo_id);
             $data['torneo'] = $torneo;
             $data['competicion'] = $competicion;
-            $data['matches'] = $matches;
+            $data['matches'] = $grupos;
             $data['eliminatorias'] = $eliminatorias;
             $data['page_header']    =   $torneo->titulo . ': ' . $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
         }

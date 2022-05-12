@@ -603,8 +603,8 @@ class Database extends CI_Model
         } else {
             $this->db->where('grupo >', 0);
         }
-        $this->db->order_by('ronda', 'asc');
         $this->db->order_by('grupo', 'asc');
+        $this->db->order_by('ronda', 'asc');
         $matches = $this->db->get('matches')->result();
         foreach ($matches as $key3 => $match) {
             $rojo = $this->ion_auth->user($match->user_rojo)->row();
