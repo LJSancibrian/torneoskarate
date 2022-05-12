@@ -183,6 +183,9 @@ class Competiciones extends CI_Controller
         $this->form_validation->set_rules('juez', 'Juez', 'trim|required');
         $this->form_validation->set_rules('puntos', 'Puntos', 'trim|required');
         validForm();
+
+        $this->utilidades->competicionEditable(input('competicion_torneo_id'));
+
         $guardado = $this->database->actualizarPuntosKata(input('competicion_torneo_id'), input('user_id'), input('ronda'), input('juez'), input('puntos'));
         if (is_numeric($guardado)) {
             $response = [
@@ -571,6 +574,7 @@ class Competiciones extends CI_Controller
                     $refresh = 1;
                 }
             }
+
             $response = [
                 'error'     => 0,
                 'match' => $this->database->getMatch(input('match_id')),
@@ -1135,4 +1139,107 @@ class Competiciones extends CI_Controller
             }
         }
     }*/
+
+    /*
+    CREATE TABLE `puntos_liga_municipal` ( 
+        `lm_id` INT(21) NOT NULL AUTO_INCREMENT ,
+        `lm` YEAR NOT NULL , `user_id` INT(21) NOT NULL ,
+        `nombre` VARCHAR(50) NOT NULL ,
+        `apellidos` VARCHAR(100) NOT NULL ,
+        `torneo_id` INT(11) NOT NULL ,
+        `competicion_torneo_id` INT(11) NOT NULL ,
+        `categoria` VARCHAR(50) NOT NULL , `modalidad` VARCHAR(25) NOT NULL ,
+        `genero` VARCHAR(1) NOT NULL ,
+        `nivel` VARCHAR(25) NOT NULL ,
+        `posicion` INT(3) NOT NULL ,
+        `puntos` INT(3) NOT NULL ,
+        PRIMARY KEY (`lm_id`)
+    ) ENGINE = InnoDB;
+    */
+    public function FinalizarCompeticion($competicion_torneo_id)
+    {
+        asistentePage();
+        $competicion = $this->database->getCompeticion($competicion_torneo_id);
+        if (!isset($competicion) || $competicion == false) {
+            show_404();
+        }
+        $torneo = $this->database->buscarDato('torneos', 'torneo_id', $competicion->torneo_id);
+        if (!isset($torneo) || $torneo == false || $torneo->deletedAt != '0000-00-00 00:00:00') {
+            show_404();
+        }
+
+        $this->guardarClasificacionLM($competicion_torneo_id);
+        $params = [
+            'estado' => 2,
+            'updatedAt' => date('Y-m-d H:i:s')
+        ];
+        $this->database->actualizar('torneos_competiciones', $params, 'competicion_torneo_id', $competicion_torneo_id);
+        redirect('torneos/competiciones/'.$torneo->slug, 'refresh');
+
+    }
+
+    public function guardarClasificacionLM($competicion_torneo_id)
+    {
+        adminPage();
+        $data = [];
+        $competicion = $this->database->getCompeticion($competicion_torneo_id);
+        if (!isset($competicion) || $competicion == false) {
+            show_404();
+        }
+        if($competicion->modalidad == 'kata'){
+            $orden = $this->database->clasificacionFinalKata($competicion_torneo_id,[1,2,3]);
+        }elseif($competicion->modalidad == 'kumite'){
+            $orden = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
+        }else{
+            show_404();
+        }
+        $i = 1;
+        foreach ($orden as $key => $value) {
+            $puntos =  ($i < 9) ? $this->config->item('puntoskata')[$i] : $this->config->item('puntoskata')[0];
+            if($competicion->modalidad == 'kumite'){
+                $puntos = $puntos + (5*$value->ganados) + $value->puntos;
+            }
+            $datos = [
+                'lm' => date('Y'),
+                'user_id' => $value->user_id,
+                'nombre' => $value->first_name,
+                'apellidos' => $value->last_name,
+                'torneo_id' => $competicion->torneo_id,
+                'competicion_torneo_id' => $competicion_torneo_id,
+                'categoria' => $competicion->categoria,
+                'modalidad' => $competicion->modalidad,
+                'genero' => $competicion->genero,
+                'nivel' => $competicion->nivel,
+                'posicion' => $i,
+                'puntos ' => $puntos,    
+            ];
+            
+            $this->db->where('user_id',$value->user_id);
+            $this->db->where('competicion_torneo_id',$competicion_torneo_id);
+            $ya_esta = $this->db->get('puntos_liga_municipal')->result();
+            //printr($ya_esta);
+            if(count($ya_esta) > 0){
+                $esta = $ya_esta[0];
+                $this->database->actualizar('puntos_liga_municipal', $datos, 'lm_id', $esta->lm_id);
+            }else{
+                $this->database->insert('puntos_liga_municipal',  $datos);
+            }  
+            $i++; 
+        }          
+    }
+
+    public function guardar_todas($torneo_id)
+    {
+        $torneo = $this->database->buscarDato('torneos', 'torneo_id', $torneo_id);
+        if (!isset($torneo) || $torneo == false || $torneo->deletedAt != '0000-00-00 00:00:00') {
+            show_404();
+        }
+
+        $competiciones = $this->database->buscarDato('torneos_competiciones', 'torneo_id', $torneo_id);
+        foreach ($competiciones as $key => $value) {
+            if($value->estado != 3 && $value->deletedAt == '0000-00-00 00:00:00'){
+                $this->guardarClasificacionLM($value->competicion_torneo_id);
+            }
+        }
+    }
 }

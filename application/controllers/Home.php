@@ -143,7 +143,53 @@ class Home extends CI_Controller
         show($data);
     }
 
+    public function LM2022()
+    {
+        validUrl();
+        $data = [];
+        $competiciones = $this->database->getCompeticionesLM(2022);
+        $competicioneskata = [];
+        $competicioneskumite = [];
+        $sibling = [];
+        foreach ($competiciones as $key => $value) {
+            if($value->modalidad == 'kata' && !in_array($value->sibling_id, $sibling) ){
+                $competicioneskata[] = $value;
+                $sibling[] = $value->competicion_torneo_id;
+               
+            }elseif($value->modalidad == 'kumite' && !in_array($value->sibling_id, $sibling) ){
+                $competicioneskumite[] = $value;
+                $sibling[] = $value->competicion_torneo_id;
+                if($value->sibling_id > 0) {
+                    $sibling[] =$value->sibling_id ;
+                };
+            }
+        }
+        $data['page_header']    =  'LIGA MUNICIPAL 2022<br>AYTO. PIÉLAGOS';
+        $data['kata'] = $competicioneskata;
+        $data['kumite'] = $competicioneskumite;
+        $data['view']           = 'public/vistalm2022';
+        show($data);
+    }
 
+    public function compLM2022($competicion_torneo_id)
+    {
+        validUrl();
+        $data = []; 
+        $competicion = $this->database->getCompeticion($competicion_torneo_id);
+        if (!isset($competicion) || $competicion == false) {
+            show_error('La competicion no existe');
+        }
+        // buscar las categorias hijas
+        $jornadas = $this->database->getSiblings($competicion_torneo_id, [$competicion_torneo_id]);
+        $clasificacion = $this->database->get_clasificacionLM($competicion_torneo_id);
+        $data['page_header']    =  $data['page_header']    =  $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel;
+        $data['competicion'] = $competicion;
+        $data['jornadas'] = $jornadas;
+        $data['clasificacion'] = $clasificacion;
+        $data['view']          = 'public/vistacompeticionlm2022';
+        show($data);
+
+    }
 
     /**************
      * 

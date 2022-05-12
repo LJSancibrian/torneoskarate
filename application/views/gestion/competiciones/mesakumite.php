@@ -162,6 +162,9 @@
                         </div>
                     <?php } ?>
                 </div>
+                <div class="card-header d-flex justify-content-between">
+                    <div class="card-title fw-mediumbold w-100"><a href="<?php echo base_url();?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
+                </div>
             </div>
         <?php } ?>
         </div>

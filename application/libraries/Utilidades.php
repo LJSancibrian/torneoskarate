@@ -216,4 +216,33 @@ class Utilidades
         return $string;
 	}
 
+    function competicionEditable($competicion_torneo_id){
+        $competicion = $this->u->database->getCompeticion($competicion_torneo_id);
+        if (!isset($competicion) || $competicion == false) {
+            if ($this->u->input->is_ajax_request()) {
+                $response = [
+                    'error'     => 1,
+                    'error_msn' => 'Competcición no encontrada',
+                    'csrf'      => $this->u->security->get_csrf_hash(),
+                ];
+                returnAjax($response);
+            }else{
+                show_error('Competición no encontrada');
+                exit();
+            }
+        }
+        if($competicion->estado == 2){
+            if ($this->u->input->is_ajax_request()) {
+                $response = [
+                    'error'     => 1,
+                    'error_msn' => 'Competcición no editable',
+                    'csrf'      => $this->u->security->get_csrf_hash(),
+                ];
+                returnAjax($response);
+            }else{
+                show_error('Competición no editable');
+                exit();
+            }
+        }
+    }
 }

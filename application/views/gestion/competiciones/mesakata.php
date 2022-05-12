@@ -116,10 +116,9 @@
         <button class="btn btn-icon btn-primary btn-round btn-sm" ver-competicion="<?php echo $competicion->competicion_torneo_id; ?>" ver-ronda="3">
             <i class="fas fa-desktop"></i>
         </button>
-        <button class="btn btn-icon btn-primary btn-round btn-xs" onclick="imprSelec('tablero-competicion-2', 'FINAL_<?php echo $competicion->modalidad.'_'.$competicion->categoria.'_'.$competicion->nivel;?>_<?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto');?>')" title="Generar tablero">
-                    <i class="fas fa-file-download"></i>
-                </button>
     </div>
+
+   
 
     <div class="card-body p-1 bg-white" id="tablero-competicion-2">
         <div class="d-flex flex-column flex-md-row">
@@ -178,6 +177,10 @@
             </div>
         </div>
         
+    </div>
+
+    <div class="card-header d-flex justify-content-between">
+        <div class="card-title fw-mediumbold w-100"><a href="<?php echo base_url();?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
     </div>
 </div>
 

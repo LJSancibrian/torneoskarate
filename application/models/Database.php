@@ -1261,4 +1261,68 @@ class Database extends CI_Model
 
         return $players;
     }
+
+    public function getCompeticionesLM($year)
+    {
+        $this->db->where_in('torneo_id', $this->config->item('lm'.$year));
+        $this->db->where('estado !=', 3);
+        $this->db->where('deletedAt', '0000-00-00 00:00:00');
+        $this->db->order_by('competicion_torneo_id', 'asc');
+        return $this->db->get('torneos_competiciones')->result();
+    }
+
+    public function getSiblings($competicion_torneo_id, $array)
+    {
+        $this->db->where('sibling_id', $competicion_torneo_id);
+        $this->db->where('deletedAt', '0000-00-00 00:00:00');
+        $sibling_id = $this->db->get('torneos_competiciones')->row();
+        if($sibling_id){
+            $array[] = $sibling_id->competicion_torneo_id;
+            return $this->getSiblings($sibling_id->competicion_torneo_id, $array);
+        }else{
+            return $array;
+        }
+    }
+
+    public function get_clasificacionLM($competicion_torneo_id)
+    {
+        // obtenemos los hermanos de esta competicion
+        //printr($competicion_torneo_id);
+        $ids = $this->getSiblings($competicion_torneo_id, [$competicion_torneo_id]);
+        //printr($ids);
+
+        $this->db->select('user_id, nombre, apellidos');
+        $this->db->distinct('user_id');
+        $this->db->where_in('competicion_torneo_id', $ids);
+        $this->db->order_by('user_id', 'asc');
+        $competidores = $this->db->get('puntos_liga_municipal')->result();
+        foreach ($competidores as $key => $comp) {
+            $j = 1;
+            $total = 0;
+            $max = 0;
+            foreach ($ids as $k => $competicion_id) {
+                $this->db->select('puntos');
+                $this->db->where('user_id', $comp->user_id);
+                $this->db->where('competicion_torneo_id', $competicion_id);
+                $puntos = $this->db->get('puntos_liga_municipal')->row();
+                $jornada = 'jornada_'.$j;
+                $comp->$jornada = (isset($puntos)) ? $puntos->puntos : 0;
+                $total = $total + $comp->$jornada;
+                $max = ($max > $comp->$jornada) ? $max : $comp->$jornada;
+                $j++;
+            }
+            $comp->club = $this->getUserClub($this->ion_auth->user($comp->user_id)->row()->club_id)->nombre;
+            $comp->puntos_max = $max;
+            $comp->total = $total;
+        }
+
+        usort($competidores, function ($a, $b) {
+            $retval = $b->total <=> $a->total;
+            if ($retval == 0) {
+                $retval = $b->puntos_max <=> $a->puntos_max;
+            }
+            return $retval;
+        });
+        return $competidores;
+    }
 }

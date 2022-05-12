@@ -67,6 +67,8 @@ $route = [
     'verronda/(:any)' => 'Competiciones/verronda/$1',
     'verronda/(:any)/(:any)' => 'Competiciones/verronda/$1/$2',
 
+    'ligamunicipal2022' => 'Home/LM2022',
+    'ligamunicipal2022/(:any)' => 'Home/compLM2022/$1',
 
     'area-privada' => 'Area_privada',
     'mi-perfil' => 'Area_privada/perfil',
