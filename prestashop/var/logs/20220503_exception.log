@@ -1,0 +1,6 @@
+*ERROR* 	v1.7.8.5	2022/05/03 - 14:26:10: [ThemeRepository] Theme configuration file not found for theme at `C:\webs\prestashop/themes/pf_ministore/config/theme.yml`. at line 161 in file src/Core/Addon/Theme/ThemeRepository.php
+*ERROR* 	v1.7.8.5	2022/05/03 - 14:26:20: [ThemeRepository] Theme configuration file not found for theme at `C:\webs\prestashop/themes/pf_ministore/config/theme.yml`. at line 161 in file src/Core/Addon/Theme/ThemeRepository.php
+*ERROR* 	v1.7.8.5	2022/05/03 - 14:26:59: [ThemeRepository] Theme configuration file not found for theme at `C:\webs\prestashop/themes/pf_ministore/config/theme.yml`. at line 161 in file src/Core/Addon/Theme/ThemeRepository.php
+*ERROR* 	v1.7.8.5	2022/05/03 - 14:27:01: [ThemeRepository] Theme configuration file not found for theme at `C:\webs\prestashop/themes/pf_ministore/config/theme.yml`. at line 161 in file src/Core/Addon/Theme/ThemeRepository.php
+*ERROR* 	v1.7.8.5	2022/05/03 - 14:31:33: [ThemeRepository] Theme configuration file not found for theme at `C:\webs\prestashop/themes/pf_ministore/config/theme.yml`. at line 161 in file src/Core/Addon/Theme/ThemeRepository.php
+*ERROR* 	v1.7.8.5	2022/05/03 - 14:35:51: [ThemeRepository] Theme configuration file not found for theme at `C:\webs\prestashop/themes/pf_ministore/config/theme.yml`. at line 161 in file src/Core/Addon/Theme/ThemeRepository.php
