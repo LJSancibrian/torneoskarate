@@ -299,5 +299,5 @@ function clasificacionFinal() {
 $(document).ready(function(){
     clasificacionFinal()
     obtener_puntos_kata_competicion();
-    setInterval(function () { clasificacionFinal(); obtener_puntos_kata_competicion() }, 100000)
+    setInterval(function () { clasificacionFinal(); obtener_puntos_kata_competicion() }, 5000)
 });

@@ -123,6 +123,22 @@ $(document).on('click', '[data-minus]', function () {
     $('#puntostotales' + color).html(puntosnuevos)
 })
 
+$(document).on('click', '[name="senshu"]', function(){
+    var estado = $(this).prop('checked');
+    $('[name="senshu"]').prop('checked', false);
+    $(this).prop('checked', estado);
+});
+
+$(document).on('click', '[name="hantei"]', function(){
+    var estado = $(this).prop('checked');
+    $('[name="hantei"]').prop('checked', false);
+    $(this).prop('checked', estado);
+});
+
+$(".check-female").click(function(){
+    $("#female").prop("checked", true);
+});
+
 $(document).on('click', '#guardar-marcador', function () {
     var match_id = $('#marcadorauxiliar').find('[data-match-id]').attr('data-match-id');
     var ul = $('[data-match_id="' + match_id + '"]');
@@ -571,9 +587,5 @@ $(document).ready(function () {
 
 $(document).on('click', '#exportar_grupos', function(){
     var competicion_torneo_id = $(this).attr('data-competicion_torneo_id');
-    var grupos = '';
-    $('[name="exportpdf[]"]:checked').each(function(i,check){
-        grupos += $(check).val() + '-'
-    })
-    window.location.href = base_url + 'Competiciones/pdfdoc/'+competicion_torneo_id+'/'+grupos
+    window.open(base_url + 'Competiciones/pdfdoc/'+competicion_torneo_id, '_blank');
 })

@@ -708,6 +708,11 @@ $(document).on('click', '[data-guardar-orden-kumite]', function () {
     })
 })
 
+$(document).on('click', '#exportar_grupos', function(){
+    var competicion_torneo_id = $(this).attr('data-competicion_torneo_id');
+    window.open(base_url + 'Competiciones/pdfdoc/'+competicion_torneo_id, '_blank');
+})
+
 $(document).ready(function () {
     tabassortable();
     dibujar_cruces_grupos();

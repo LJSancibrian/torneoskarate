@@ -15,25 +15,19 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between">
         <div class="card-title fw-mediumbold">Tablero competición</div>
-        <button class="btn btn-icon btn-primary btn-round btn-sm" data-toggle-custom-template data-toggle="tooltip" title="Ver clasificacion">
+        <button class="btn btn-icon btn-primary btn-round btn-sm" data-ver-clasificacion data-toggle="tooltip" title="Ver clasificacion">
             <i class="fas fa-list"></i>
         </button>
 
-        <a href="<?php echo base_url();?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id;?>" class="btn btn-icon btn-primary btn-round btn-xs" title="Generar documento">
-            <i class="fas fa-file-export"></i>
+        <a href="<?php echo base_url();?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id;?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
+            <i class="fas fa-file-pdf"></i>
         </a>
-        <button class="btn btn-icon btn-primary btn-round btn-xs d-none" onclick="imprSelec('tablero-competicion', '<?php echo $competicion->modalidad.'_'.$competicion->categoria.'_'.$competicion->nivel;?>_<?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto');?>')" title="Generar tablero">
-                    <i class="fas fa-print"></i>
-                </button>
     </div>
     <div class="card-body p-1 bg-white" id="tablero-competicion">
         <div class="table-responsive">
             <table class="table table-striped table-bordered text-center" id="tablakata" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
                 <thead>
                     <tr>
-                        <?php if($this->ion_auth->in_group([1,2,3])){?>
-                            <th class="bg-white text-primary"><button type="button" class="btn btn-sm btn-secondary"><i class="fas fa-file-export"></i></button></th>
-                        <?php } ?>
                         <th class="bg-white text-primary">#</th>
                         <th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
                         <th class="bg-white text-primary" colspan="3">Ronda 1</th>
@@ -43,11 +37,6 @@
                         <th class="bg-white text-primary">Media</th>
                     </tr>
                     <tr>
-                        <?php if($this->ion_auth->in_group([1,2,3])){?>
-                            <th class="text-center">
-                                <input type="checkbox" name="all" data-toggle="tooltip" title="Marcar / desmarcar todos">
-                            </th>
-                        <?php } ?>
                         <th class="">#</th>
                         <th colspan="2" class="text-left columnfixed">Deportista</th>
                         <th>J1</th>
@@ -75,13 +64,6 @@
                 <tbody>
                     <?php foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
                         <tr data-user_id="<?php echo $value->user_id; ?>">
-                            <?php if($this->ion_auth->in_group([1,2,3])){?>
-                                <td class="text-center">
-                                
-                                <input type="checkbox" name="exportpdf[]" id="export_g_<?php echo $value->user_id; ?>" value="<?php echo $value->user_id; ?>">
-                                
-                                </td>
-                            <?php } ?>
                             <td class=""><?php echo $value->orden; ?></td>
                             <td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
                             <td data-ronda="1" data-j="1"></td>
@@ -188,34 +170,42 @@
 <?php echo form_open();
 echo form_close(); ?>
 
-<div class="custom-template">
-    <div class="title d-flex justify-content-between">Clasificación <button class="btn btn-info btn-sm btn-rounded" data-toggle-custom-template><i class="fas fa-arrow-right"></i></button></div>
-    <div class="custom-content">
-        <div class="m-3">
-            <div class="form-group">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="num_final-addon">Indicar el número de finalistas</span>
-                    </div>
-                    <input type="number" class="form-control" id="num_final" aria-describedby="num_final-addon">
-                    <div class="input-group-append">
-                        <button class="btn btn-secondary" type="button" id="guardar-finalistas">Guardar</button>
+
+<div class="modal fade" id="clasificaciongrupo" tabindex="-1" role="dialog" aria-labelledby="clasificaciongrupoLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Clasificación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="num_final-addon">Indicar el número de finalistas</span>
+                        </div>
+                        <input type="number" class="form-control" id="num_final" aria-describedby="num_final-addon">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" type="button" id="guardar-finalistas">Guardar</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="table-responsive" style="overflow: auto;height: calc( 100vh - 250px);">
-                <table class="table table-striped w-100" id="clasificaicon">
-                    <thead style="position: sticky; top: 0; z-index: 1;">
-                        <tr>
-                            <th>#</th>
-                            <th class="columnfixed">Deportista</th>
-                            <th>Equipo</th>
-                            <th>Puntos</th>
-                            <th>Media</th>
-                        </tr>
-                    </thead>
-                    <tbody id="clasificacion_competicion"></tbody>
-                </table>
+                <div class="table-responsive" style="overflow: auto;height: calc( 100vh - 250px);">
+                    <table class="table table-striped w-100" id="clasificaicon">
+                        <thead style="position: sticky; top: 0; z-index: 1;">
+                            <tr>
+                                <th>#</th>
+                                <th class="columnfixed">Deportista</th>
+                                <th>Equipo</th>
+                                <th>Puntos</th>
+                                <th>Media</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clasificacion_competicion"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

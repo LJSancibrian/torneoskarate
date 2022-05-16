@@ -13,6 +13,10 @@ $(document).on('click', '[data-inscripcion]', function () {
     }
 })
 
+$(document).on('click', '[data-ver-clasificacion]', function(){
+    cargar_puntos();
+    $('#clasificaciongrupo').modal('show')
+})
 $(document).on('focusout', '[data-ronda]', function () {
     var table_ID = $(this).closest('table').attr('id');
     if ($(this).text() == '') {
@@ -67,7 +71,8 @@ $(document).on('focusout', '[data-ronda]', function () {
             select.val(oldvalue);
             return;
         } else {
-            var totalronda = 0;
+            cargar_puntos();
+            /*var totalronda = 0;
             var jueces = 0;
             // para la ronda
             $.each($(tr).find('[data-ronda="' + ronda + '"]'), function (i, elem) {
@@ -90,7 +95,7 @@ $(document).on('focusout', '[data-ronda]', function () {
             var media = (totalronda / jueces).toFixed(2)
             $(tr).find('[data-total]').html(totalronda)
             $(tr).find('[data-media-total]').html(media)
-            clasificacion(table_ID);
+            clasificacion(table_ID);*/
         }
     }).always(function (jqXHR, textStatus) {
         if (textStatus != "success") {
@@ -301,7 +306,8 @@ function closeFullscreen() {
     }
 }
 
-$(document).ready(function () {
+
+function cargar_puntos(){
     var competicion_torneo_id = $('[data-competicion]').attr('data-competicion');
     var fd = new FormData();
     fd.append("competicion_torneo_id", competicion_torneo_id);
@@ -403,6 +409,9 @@ $(document).ready(function () {
 
     clasificacion('tablakata');
     clasificacion('finaltablakata');
+}
+$(document).ready(function () {
+    cargar_puntos();
 })
 
 $(document).on('change', '[name="all"]', function(){

@@ -5,10 +5,9 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between">
         <div class="card-title fw-mediumbold text-uppercase"><?php echo $competicion->modalidad.' '.$competicion->categoria.' '.$competicion->nivel;?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto');?></div>
-
-        <a <?php /*href="<?php echo base_url();?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id;?>" */?>class="btn btn-icon btn-primary btn-round btn-xs" title="Generar documento" id="exportar_grupos" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
-            <i class="fas fa-file"></i>
-</a>
+        <a href="<?php echo base_url();?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id;?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
+            <i class="fas fa-file-pdf"></i>
+        </a>
     </div>
     <div class="card-body" id="tablero-competicion">
 
@@ -28,12 +27,7 @@
                     <div class="card-header d-flex justify-content-start flex-wrap">
                         
 
-                        <h4 class="card-title">Grupo <?php echo $grupo->grupo; ?> <div class="form-check p-0">
-                            <label class="form-check-label mb-0">
-                                <input type="checkbox" class="form-check-input" name="exportpdf[]" id="export_g_<?php echo $grupo->grupo; ?>" value="<?php echo $grupo->grupo; ?>">
-                                <span class="form-check-sign "><i class="fas fa-file"></i></span>
-                            </label>
-                        </div></h4>
+                        <h4 class="card-title">Grupo <?php echo $grupo->grupo; ?></h4>
 
                         <button class="btn btn-primary btn-sm ml-3 mb-2" data-ver-clasificacion data-toggle="tooltip" title="Ver clasificacion" data-grupo="<?php echo $grupo->grupo; ?>" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
                             <i class="fas fa-list"></i> Clasificación
@@ -192,13 +186,13 @@
                             </div>
                             <div class="col-12 mt-3">
                                 <div class="border border-white form-check p-0 p-2 text-white">
-                                    <label class="form-radio-label mb-0">
-                                        <input class="form-radio-input" type="radio" name="senshu" value="rojo">
-                                        <span class="form-radio-sign text-white">SENSHU</span>
+                                    <label class="form-check-label mb-0">
+                                        <input class="form-check-input" type="checkbox" name="senshu" value="rojo">
+                                        <span class="form-check-sign text-white">SENSHU</span>
                                     </label>
-                                    <label class="form-radio-label mb-0">
-                                        <input class="form-radio-input" type="radio" name="hantei" value="azul">
-                                        <span class="form-radio-sign text-white">HANTEI</span>
+                                    <label class="form-check-label mb-0">
+                                        <input class="form-check-input" type="checkbox" name="hantei" value="azul">
+                                        <span class="form-check-sign text-white">HANTEI</span>
                                     </label>
                                 </div>
                             </div>
@@ -222,12 +216,12 @@
                             <div class="col-12 text-right mt-3">
                                 <div class="border border-white form-check p-0 p-2 text-white">
                                     <label class="form-check-label mb-0">
-                                        <input class="form-radio-input" type="radio" name="senshu" value="azul">
-                                        <span class="form-radio-sign  text-white">SENSHU</span>
+                                        <input class="form-check-input" type="checkbox" name="senshu" value="azul">
+                                        <span class="form-check-sign  text-white">SENSHU</span>
                                     </label>
                                     <label class="form-check-label mb-0">
-                                        <input class="form-radio-input" type="radio" name="hantei" value="azul">
-                                        <span class="form-radio-sign  text-white">HANTEI</span>
+                                        <input class="form-check-input" type="checkbox" name="hantei" value="azul">
+                                        <span class="form-check-sign  text-white">HANTEI</span>
                                     </label>
                                 </div>
                             </div>

@@ -25,9 +25,9 @@
                 <button class="btn btn-icon btn-primary btn-round btn-xs" data-generar-tablero="<?php echo $competicion->competicion_torneo_id; ?>" data-toggle="tooltip" title="Generar tablero">
                     <i class="fas fa-random"></i>
                 </button>
-                <button class="btn btn-icon btn-primary btn-round btn-xs" onclick="imprSelec('tablero-competicion', '<?php echo $competicion->modalidad.'_'.$competicion->categoria.'_'.$competicion->nivel;?>_<?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto');?>')" title="Generar tablero">
-                    <i class="fas fa-print"></i>
-                </button>
+                <a href="<?php echo base_url();?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id;?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
+                    <i class="fas fa-file-pdf"></i>
+                </a>
             </div>
             <div class="card-body bg-white" id="tablero-competicion">
                 <div class="table-responsive">

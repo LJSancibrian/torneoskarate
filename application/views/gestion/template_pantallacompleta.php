@@ -1,20 +1,4 @@
 <?php $this->load->view('gestion/common/head'); ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <style>
     html {
         height: 100%;
@@ -59,7 +43,7 @@
 
 
 
-<body>
+<body id="clasificaicon" onClick="toggleFullScreen()">
 
         <div id="entatami" style="display:none"></div>
         

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
 <head>
-    <title>
+    <title><?php echo strtoupper($competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel); ?> - <?php echo strtoupper(($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto')); ?>
     </title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -105,7 +105,8 @@
         </tr>
     </table>
 
-    <?php foreach ($matches as $key => $grupo) {?>
+    <?php if(isset($matches)){
+        foreach ($matches as $key => $grupo) {?>
         <div class="page_break" style="border: 1px solid #008081; padding-left:10px; padding-right: 10px;">
             <h2>Grupo <?php echo $key;?></h2>
             <table class="table">
@@ -174,7 +175,7 @@
             </table>
             <span>V: Victorias. PF: Puntos a favor. PC: Puntos en contra. S: Shenshu. H: Hantei. CF: Clasificación final.</span>
         </div>
-    <?php } ?> 
+    <?php } }?> 
 
     <div class="page_break" style="border: 1px solid #008081; padding-left:10px; padding-right: 10px;">
         <h2>Eliminatorias</h2>
