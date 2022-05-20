@@ -64,11 +64,20 @@ $(document).on('click', '[data-generar-tablero]', function() {
                 var grupos = [];
                 if (totalinscritos < 5) {
                     // se genera una tabla y se añaden a ella
-                    grupos.push('A')
-                } else if (totalinscritos < 11) {
-                    // se generan dos tablas y se añaden a ella de forma intercalada
-                    grupos.push('A')
-                    grupos.push('B')
+                    grupos.push(1)
+                        /*} else if (totalinscritos < 11) {
+                            // se generan dos tablas y se añaden a ella de forma intercalada
+                            grupos.push('A')
+                            grupos.push('B')*/
+                } else if (totalinscritos == 12) {
+                    var ngrupos = totalinscritos / 3;
+                    ngrupos = Math.ceil(ngrupos)
+                        // letra del grupo = (index + 9).toString(36).toUpperCase()
+                    for (let index = 0; index < ngrupos; index++) {
+                        //var letter = (index + 10).toString(36).toUpperCase()
+                        var letter = index + 1
+                        grupos.push(letter)
+                    }
                 } else {
                     // son 9 o mas 10,
                     // calculo para tablas es el numero de inscritos dividido entre 4 (participantes en cada grupo) y redondeado a mayores 
@@ -76,10 +85,12 @@ $(document).on('click', '[data-generar-tablero]', function() {
                     ngrupos = Math.ceil(ngrupos)
                         // letra del grupo = (index + 9).toString(36).toUpperCase()
                     for (let index = 0; index < ngrupos; index++) {
-                        var letter = (index + 10).toString(36).toUpperCase()
+                        //var letter = (index + 10).toString(36).toUpperCase()
+                        var letter = index + 1
                         grupos.push(letter)
                     }
                 }
+                console.log(grupos)
                 $('[id^="grupokumite_"]').remove();
                 for (let index = 0; index < grupos.length; index++) {
                     var html = `<div class="border-bottom d-flex flex-row justify-content-start my-3" id="grupokumite_${grupos[index]}" grupo="${grupos[index]}">
@@ -504,6 +515,45 @@ function dibulareliminatorias() {
                     var estematch = [];
                     for (let clasif = 1; clasif <= 2; clasif++) {
                         var fighter = {};
+                        fighter.name = '';
+                        fighter.id = '';
+                        estematch.push(fighter);
+                        //clasificados_en_combate++;
+                    }
+                    ronda.push(estematch);
+                }
+                // asignar los ganadores de grupo a cada combate, 
+                for (let i = 0; i < matches; i++) {
+                    var match = ronda[i];
+                    match[0].name = 'Ganador Grupo ' + primerosgrupo
+                    match[0].id = 'g|' + primerosgrupo
+                    primerosgrupo--;
+                }
+                // se recorren, para el resto de ganadores
+                for (let i = 0; i < matches; i++) {
+                    if (primerosgrupo > 0) {
+                        var match = ronda[i];
+                        match[1].name = 'Ganador Grupo ' + primerosgrupo
+                        match[1].id = 'g|' + primerosgrupo
+                        primerosgrupo--;
+                    }
+                }
+                // se recorre para los segundos
+                for (let i = 0; i < matches; i++) {
+                    if (segundosgrupos > 0) {
+                        var match = ronda[i];
+                        if (match[1].name == '') {
+                            match[1].name = segundosgrupos + 'º Segundo de grupo'
+                            match[1].id = 'm2|' + segundosgrupos
+                            segundosgrupos--;
+                        }
+                    }
+                }
+                /*
+                for (let i = 0; i < matches; i++) {
+                    var estematch = [];
+                    for (let clasif = 1; clasif <= 2; clasif++) {
+                        var fighter = {};
                         if (clasificados_en_combate > grupos + 1) {
                             clasificado = 2;
                         } else {
@@ -525,6 +575,7 @@ function dibulareliminatorias() {
                     }
                     ronda.push(estematch);
                 }
+                */
             } else {
                 var idr = 'r' + index;
                 var ganadorcombateanterior = 1;
@@ -583,7 +634,7 @@ $(document).on('click', '[data-guardar-orden-kumite]', function() {
             $.each($('tr[data-user]'), function(i, elem) {
                 var incripcion = {};
                 var grupo = $(elem).closest('[grupo]').attr('grupo')
-                grupo = grupo.toLowerCase().charCodeAt(0) - 97 + 1;
+                    //grupo = grupo.toLowerCase().charCodeAt(0) - 97 + 1;
                 incripcion.grupo = grupo
                 var inscripcion_id = $(elem).attr('data-inscripcion_id');
                 incripcion.inscripcion_id = inscripcion_id;
@@ -593,7 +644,7 @@ $(document).on('click', '[data-guardar-orden-kumite]', function() {
                 var match = {};
                 var ncombate = $(elem).attr('data-ncombate');
                 var grupo = $(elem).closest('[grupo]').attr('grupo')
-                grupo = grupo.toLowerCase().charCodeAt(0) - 97 + 1;
+                    //grupo = grupo.toLowerCase().charCodeAt(0) - 97 + 1;
                 var ronda = $(elem).closest('[data-ronda]').attr('data-ronda');
                 var rojo = $(elem).find('[data-color="rojo"]');
                 var azul = $(elem).find('[data-color="azul"]');

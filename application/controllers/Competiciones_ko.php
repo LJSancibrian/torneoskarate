@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Competiciones extends CI_Controller
+class Competiciones_ko extends CI_Controller
 {
 
     public function __construct()
@@ -9,7 +9,71 @@ class Competiciones extends CI_Controller
         parent::__construct();
         $this->base = 'gestion/template';
     }
+    public function index()
+    {
+        asistentePage();
+       // validUrl();
+        $data['page_header']    = 'Competiciones especiales';
+        $data['table_title'] = 'Lista de competiciones especiales registrados en la plataforma';
+        if ($this->user->group->id < 4) {
+            $data['table_button']   = [
+                'name' => 'crear_torneo',
+                'content' => '<i class="fa fa-plus mr-3"></i> Nueva competición',
+                'extra' => [
+                    'data-tooltip' => TRUE,
+                    'data-editar-competicion' => 'nuevo',
+                    'title' => 'Crear nueva competición',
+                    'data-original-title' => 'Crear  nueva competición',
+                    'class' => 'btn btn-sm btn-primary ml-auto'
+                ]
+            ];
+            $data['default_filter'] = '0';
+            $data['view']           = ['gestion/common/tabla_datatable', 'gestion/competiciones/competicionespecial_form_modal'];
 
+            $data['js_files']       = [assets_url() . 'admin/js/vistas/competiciones_especiales.js'];
+        } else {
+            $data['view']           = ['gestion/common/tabla_datatable'];
+            $data['js_files']       = [assets_url() . 'admin/js/vistas/competiciones_especiales.js'];
+        }
+        /*$data['c_kata'] = $this->database->torneoCategoriasInscripciones(0, 'KATA');
+        $data['c_kumite'] = $this->database->torneoCategoriasInscripciones(0, 'KUMITE');*/
+        /*$data['tabactive'] = 'competiciones-tab';
+        if ($this->user->group->id < 4) {
+            //$data['view'] = ['gestion/torneos/base'];
+            $data['js_files'][] = assets_url() . 'admin/js/vistas/torneo_competiciones.js';
+        } else {
+            //$data['view'] = ['gestion/torneos/base_aux'];
+            $data['js_files'][] = assets_url() . 'admin/js/vistas/torneo_competiciones_aux.js';
+        }*/
+        show($data);
+    }
+
+    public function nuevo_competicion_form()
+    {
+        adminPage();
+        isAjax();
+        $this->form_validation->set_rules('categoria', 'Nombre', 'trim|required');
+        $this->form_validation->set_rules('modalidad', 'Modalidad', 'trim|required');
+        $this->form_validation->set_rules('genero', 'Género', 'trim|required');
+        $this->form_validation->set_rules('nivel', 'Nivel', 'trim|required');
+        validForm();
+        $data = [
+            'categoria' => $this->input->post('categoria'),
+            'modalidad' => $this->input->post('modalidad'),
+            'genero'  => $this->input->post('genero'),
+            'nivel'        => $this->input->post('nivel'),
+        ];
+        $torneo_id = $this->database->insert('torneos_competiciones', $data);
+        $response = [
+            'error'     => 0,
+            'msn' => 'Datos añadidas',
+            'csrf'      => $this->security->get_csrf_hash(),
+        ];
+        echo json_encode($response);
+        exit();
+    }
+
+    
     public function gestion($competicion_torneo_id)
     {
         adminPage();
@@ -19,34 +83,52 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == false) {
             show_404();
         }
-        if ($competicion->torneo_id > 0) {
-            $torneo = $this->database->buscarDato('torneos', 'torneo_id', $competicion->torneo_id);
-            if (!isset($torneo) || $torneo == false || $torneo->deletedAt != '0000-00-00 00:00:00') {
-                show_404();
-            }
-            $data['torneo'] = $torneo;
-        }
         $inscripciones = $this->database->inscritosCompeticion($competicion_torneo_id);
-        // valorar si es kata o kumite
-        if ($competicion->modalidad == 'KATA' || $competicion->modalidad == 'kata') {
-            $data['view'] = ['gestion/competiciones/tablerokata'];
-        } else {
-            $data['view'] = ['gestion/competiciones/tablerokumite'];
-        }
-
+        $data['view'] = ['gestion/competiciones/tablero_ko'];
         $data['competicion'] = $competicion;
         $data['inscripciones'] = $inscripciones;
         $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
-        $data['page_header']    =   (isset($torneo)) ? $torneo->titulo . ': Competición' : $competicion->categoria . ' ' . $competicion->modalidad;
+        $data['page_header']    =    $competicion->categoria .' '.$competicion->modalidad;
         $data['css_files']       = [
             assets_url() . 'plugins/jquery.gracket/style.css',
         ];
         $data['js_files']       = [
             assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
-            assets_url() . 'admin/js/vistas/competicionestorneosnuevo.js',
+            assets_url() . 'admin/js/vistas/competiciones_torneos_ko.js',
         ];
         show($data);
     }
+
+
+
+
+
+
+
+    public function del_competiciones()
+    {
+        adminPage();
+        isAjax();
+        $this->form_validation->set_rules('competicion_torneo_id', 'Competición', 'trim|required');
+        validForm();
+        $deleted = $this->database->actualizar('torneos_competiciones', ['deletedAt' => date('Y-m-d H:i:s')], 'competicion_torneo_id', $this->input->post('competicion_torneo_id'));
+        if ($deleted != $this->input->post('competicion_torneo_id')) {
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'Acción no realizada',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        } else {
+            $response = [
+                'error'     => 0,
+                'msn' => 'Datos eliminados',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        }
+    }
+
 
     // KATA
     public function mesakata($competicion_torneo_id = '')
@@ -83,7 +165,7 @@ class Competiciones extends CI_Controller
         isAjax();
         $this->form_validation->set_rules('competicion_torneo_id', 'Competición', 'trim|required');
         validForm();
-
+        
         $competicion = $this->database->getCompeticion(input('competicion_torneo_id'));
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
@@ -242,9 +324,9 @@ class Competiciones extends CI_Controller
         $data['torneo'] = $torneo;
         $data['competicion'] = $competicion;
         $data['tabactive'] = 'competiciones-tab';
-        $data['general'] = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3]);
+        $data['general'] = $this->database->clasificacionFinalKata($competicion_torneo_id,[1,2,3]);
         $data['view'] = ['gestion/competiciones/clasificacionkata'];
-        $data['page_header']    =   $torneo->titulo . ': ' . 'Clasificación' . $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
+        $data['page_header']    =   $torneo->titulo . ': ' . 'Clasificación' .$competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
         $data['js_files']       = [
             assets_url() . 'admin/js/vistas/clasificacioncompeticion.js',
         ];
@@ -256,7 +338,7 @@ class Competiciones extends CI_Controller
         isAjax();
         $this->form_validation->set_rules('competicion_torneo_id', 'Competición', 'trim|required');
         validForm();
-        $clasificacion = $this->database->clasificacionKata(input('competicion_torneo_id'), [1, 2]);
+        $clasificacion = $this->database->clasificacionKata(input('competicion_torneo_id'),[1,2]);
         $response = [
             'error'     => 0,
             'clasificacion' => $clasificacion,
@@ -297,11 +379,11 @@ class Competiciones extends CI_Controller
         isAjax();
         $this->form_validation->set_rules('competicion_torneo_id', 'Competición', 'trim|required');
         validForm();
-        $clasificacion = $this->database->clasificacionFinalKata(input('competicion_torneo_id'), [1, 2, 3]);
+        $clasificacion = $this->database->clasificacionFinalKata(input('competicion_torneo_id'), [1,2,3]);
         $clasificacionfinal = [];
         foreach ($clasificacion as $key => $value) {
-            if ($value->rondas[3] != null) {
-                $clasificacionfinal[] = [
+            if($value->rondas[3] != null){
+                $clasificacionfinal[]= [
                     'first_name' => $value->first_name,
                     'last_name' => $value->last_name,
                     'nombre' => $value->nombre,
@@ -435,11 +517,11 @@ class Competiciones extends CI_Controller
         // buscar los datos del pedido para ver si se usa plantilla
         $plantilla = 'pdfcompeticion';
         $html     = $this->load->view($plantilla, $data, true);
-        $filename = $competicion->modalidad . '_' . $competicion->categoria . '_' . $competicion->nivel;
+        $filename = $competicion->modalidad.'_'.$competicion->categoria.'_'.$competicion->nivel;
         $genero = ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto');
-        $filename = $filename . '_' . $genero;
+        $filename = $filename.'_'.$genero;
 
-        $this->pdf->generate($html, $filename, true, 0, [0, 0, 600, 744]);
+        $this->pdf->generate($html, $filename,true, 0,[0,0,600,744]);
         /*$output              = $this->u->pdf->generate($html, time(), false, 0);
         $new_file      = FCPATH . "assets/bonos/pdf/" . $filename . ".pdf";
         file_put_contents($new_file, $output);*/
@@ -520,9 +602,9 @@ class Competiciones extends CI_Controller
         }
         $accion = $this->database->actualizar('matches', $params, 'match_id', input('match_id'));
         if ($accion == input('match_id')) {
-            if ($match->grupo == 0) {
+            if($match->grupo == 0){
                 $siguienteeliminatoria = $this->database->getEliminatoriaSiguiente($match);
-                if ($siguienteeliminatoria != FALSE) {
+                if($siguienteeliminatoria != FALSE){
                     $match = $this->database->getMatch(input('match_id'));
                     $posicionEliminatoria = $this->database->posicionEliminatoria($match);
                     if ($match->winner == $match->user_rojo) {
@@ -535,7 +617,7 @@ class Competiciones extends CI_Controller
                         $inscripcion_lost = $match->inscripcion_rojo;
                     }
                     $parent_text = 'r' . $match->ronda . '|' . $posicionEliminatoria;
-                    $parent_lost = 'r' . $match->ronda . '|' . $posicionEliminatoria . '-';
+                    $parent_lost = 'r' . $match->ronda . '|' . $posicionEliminatoria.'-';
                     foreach ($siguienteeliminatoria as $key => $siguienteelimin) {
                         if ($siguienteelimin->parent_rojo == $parent_text) {
                             $data = [
@@ -553,7 +635,7 @@ class Competiciones extends CI_Controller
                             ];
                             $this->database->actualizar('matches', $data, 'match_id', $siguienteelimin->match_id);
                         }
-
+    
                         // perdedor
                         if ($siguienteelimin->parent_rojo == $parent_lost) {
                             $data = [
@@ -571,8 +653,9 @@ class Competiciones extends CI_Controller
                             ];
                             $this->database->actualizar('matches', $data, 'match_id', $siguienteelimin->match_id);
                         }
+    
                     }
-
+                    
                     $refresh = 1;
                 }
             }
@@ -582,7 +665,7 @@ class Competiciones extends CI_Controller
                 'match' => $this->database->getMatch(input('match_id')),
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
-            if (isset($refresh) && $refresh == 1) {
+            if(isset($refresh) && $refresh == 1){
                 $response['redirect'] = 'refresh';
             }
             returnAjax($response);
@@ -693,8 +776,8 @@ class Competiciones extends CI_Controller
         // se buscan las eliminatorias que contengan m2 en algun parent
         $matchesconsegundos = $this->database->getEliminatoriasConSegundos(input('competicion_torneo_id'));
         // si existe, se buscan las clasificaciones, se buscan lso segundos, y se retornan sus ids.
-
-        if (count($matchesconsegundos) > 0) {
+        
+        if(count($matchesconsegundos) > 0){
             $segundosgrupos = $this->database->getSegundosClasificados(input('competicion_torneo_id'));
             usort($segundosgrupos, function ($a, $b) {
                 $retval = $b->ganados <=> $a->ganados;
@@ -799,13 +882,13 @@ class Competiciones extends CI_Controller
                 $rojo = $this->ion_auth->user($match->user_rojo)->row();
                 $club = $this->database->getUserClub($rojo->club_id)->nombre;
                 $match->rojo = (object)[];
-                $match->rojo->nombre = $rojo->first_name . ' ' . $rojo->last_name . '<br><small>' . $club . '</small>';
+                $match->rojo->nombre = $rojo->first_name . ' ' . $rojo->last_name.'<br><small>'.$club.'</small>';
             }
             if ($match->user_azul > 0) {
                 $azul = $this->ion_auth->user($match->user_azul)->row();
                 $club = $this->database->getUserClub($azul->club_id)->nombre;
                 $match->azul = (object)[];
-                $match->azul->nombre = $azul->first_name . ' ' . $azul->last_name . '<br><small>' . $club . '</small>';
+                $match->azul->nombre = $azul->first_name . ' ' . $azul->last_name.'<br><small>'.$club.'</small>';
             }
         }
         $response = [
@@ -833,11 +916,11 @@ class Competiciones extends CI_Controller
         $data['tabactive'] = 'competiciones-tab';
         $data['clasificacion'] = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
         $data['view'] = ['gestion/competiciones/clasificacionkumite'];
-        $data['page_header']    =   $torneo->titulo . ': ' . 'Clasificación' . $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
+        $data['page_header']    =   $torneo->titulo . ': ' . 'Clasificación' .$competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
         $data['js_files']       = [
             assets_url() . 'admin/js/vistas/clasificacioncompeticion.js',
         ];
-        show($data);
+        show($data);   
     }
 
     public function eliminatoriasCompeticionKumite($competicion_torneo_id = '')
@@ -858,7 +941,7 @@ class Competiciones extends CI_Controller
         $data['matches'] = $this->database->getMatchesTree($competicion_torneo_id);
         $data['eliminatorias'] = $this->database->getEliminatoriasTree($competicion_torneo_id);
         $data['view'] = ['gestion/competiciones/cuadrokumite'];
-        $data['page_header']    =   $torneo->titulo . ': ' . 'Clasificación' . $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
+        $data['page_header']    =   $torneo->titulo . ': ' . 'Clasificación' .$competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
         $data['css_files']       = [
             assets_url() . 'plugins/jquery.gracket/style.css',
         ];
@@ -867,7 +950,7 @@ class Competiciones extends CI_Controller
             base_url() . 'assets/public/js/vistacompeticionkumite.js',
             assets_url() . 'admin/js/vistas/clasificacioncompeticion.js',
         ];
-        show($data);
+        show($data);   
     }
 
 
@@ -986,12 +1069,12 @@ class Competiciones extends CI_Controller
 
         $this->load->library('pdf');
         $html     = $this->load->view($plantilla, $data, true);
-        $filename = $competicion->modalidad . '_' . $competicion->categoria . '_' . $competicion->nivel;
+        $filename = $competicion->modalidad.'_'.$competicion->categoria.'_'.$competicion->nivel;
         $genero = ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto');
-        $filename = $filename . '_' . $genero;
-        $this->pdf->generate($html, $filename, true, 0);
+        $filename = $filename.'_'.$genero;
+        $this->pdf->generate($html, $filename,true, 0);
     }
-
+    
     /*public function adecuar_kumite()
     {
         $data = [
@@ -1180,7 +1263,8 @@ class Competiciones extends CI_Controller
             'updatedAt' => date('Y-m-d H:i:s')
         ];
         $this->database->actualizar('torneos_competiciones', $params, 'competicion_torneo_id', $competicion_torneo_id);
-        redirect('torneos/competiciones/' . $torneo->slug, 'refresh');
+        redirect('torneos/competiciones/'.$torneo->slug, 'refresh');
+
     }
 
     public function guardarClasificacionLM($competicion_torneo_id)
@@ -1191,18 +1275,18 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == false) {
             show_404();
         }
-        if ($competicion->modalidad == 'kata') {
-            $orden = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3]);
-        } elseif ($competicion->modalidad == 'kumite') {
+        if($competicion->modalidad == 'kata'){
+            $orden = $this->database->clasificacionFinalKata($competicion_torneo_id,[1,2,3]);
+        }elseif($competicion->modalidad == 'kumite'){
             $orden = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
-        } else {
+        }else{
             show_404();
         }
         $i = 1;
         foreach ($orden as $key => $value) {
             $puntos =  ($i < 9) ? $this->config->item('puntoskata')[$i] : $this->config->item('puntoskata')[0];
-            if ($competicion->modalidad == 'kumite') {
-                $puntos = $puntos + (5 * $value->ganados) + $value->puntos;
+            if($competicion->modalidad == 'kumite'){
+                $puntos = $puntos + (5*$value->ganados) + $value->puntos;
             }
             $datos = [
                 'lm' => date('Y'),
@@ -1216,21 +1300,21 @@ class Competiciones extends CI_Controller
                 'genero' => $competicion->genero,
                 'nivel' => $competicion->nivel,
                 'posicion' => $i,
-                'puntos ' => $puntos,
+                'puntos ' => $puntos,    
             ];
-
-            $this->db->where('user_id', $value->user_id);
-            $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+            
+            $this->db->where('user_id',$value->user_id);
+            $this->db->where('competicion_torneo_id',$competicion_torneo_id);
             $ya_esta = $this->db->get('puntos_liga_municipal')->result();
             //printr($ya_esta);
-            if (count($ya_esta) > 0) {
+            if(count($ya_esta) > 0){
                 $esta = $ya_esta[0];
                 $this->database->actualizar('puntos_liga_municipal', $datos, 'lm_id', $esta->lm_id);
-            } else {
+            }else{
                 $this->database->insert('puntos_liga_municipal',  $datos);
-            }
-            $i++;
-        }
+            }  
+            $i++; 
+        }          
     }
 
     public function guardar_todas($torneo_id)
@@ -1242,57 +1326,9 @@ class Competiciones extends CI_Controller
 
         $competiciones = $this->database->buscarDato('torneos_competiciones', 'torneo_id', $torneo_id);
         foreach ($competiciones as $key => $value) {
-            if ($value->estado != 3 && $value->deletedAt == '0000-00-00 00:00:00') {
+            if($value->estado != 3 && $value->deletedAt == '0000-00-00 00:00:00'){
                 $this->guardarClasificacionLM($value->competicion_torneo_id);
             }
         }
-    }
-
-    public function generar_cuadro()
-    {
-        $competicion = 'Eliminatorias KO';
-        $players = [
-            "Maggy Frazier", "Sara Curtis", "Chelsea Frank", "Lucy Walsh", "Eagan Dotson", "Wynne Carlson", "Lars Cherry", "Maia Galloway", "Willow Mayo", "Karleigh Sullivan", "Bert Reeves", "Jenette Mays", "Quinn Wilson", "Donna Burt", "Sebastian Ramsey", "Nora Shaw", "Yuli Wynn", "Hilda Delgado", "Flynn Boyer", "Aurora Hughes", "Wyoming Holt", "Imogene Mcbride", "Kadeem Livingston", "Lyle Fuller", "Juliet Banks", "Tyrone Powers", "Jesse Lucas", "Chelsea Pope"
-        ];
-        $n_players = count($players);
-        if ($n_players < 3) {
-            $n_matches = 1;
-            $rondas = 1;
-        } elseif ($n_players < 5) {
-            $n_matches = 2;
-            $rondas = 2;
-        } elseif ($n_players < 9) {
-            $n_matches = 4;
-            $rondas = 3;
-        } elseif ($n_players < 17) {
-            $n_matches = 8;
-            $rondas = 4;
-        } elseif ($n_players < 33) {
-            $n_matches = 16;
-            $rondas = 5;
-        }
-        $ronda = [];
-        for ($m = 0; $m < $n_matches; $m++) {
-            if (count($players) > 0) {
-                $ronda[$m][0] = $players[0];
-                array_shift($players);
-            }
-        }
-        for ($m = 0; $m < $n_matches; $m++) {
-            if (count($players) > 0) {
-                $ronda[$m][1] = $players[0];
-                array_shift($players);
-            }
-        }
-        $data['matches'] = $ronda;
-        $data['rondas'] = $rondas;
-        $data['competicion'] = $competicion;
-        $plantilla = 'pdfcompeticionko';
-        $this->load->library('pdf');
-        $html     = $this->load->view($plantilla, $data, true);
-        $filename = $competicion;
-        $this->pdf->generate($html, $filename, true, 0);
-
-        printr($ronda);
     }
 }

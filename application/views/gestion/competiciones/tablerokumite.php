@@ -43,11 +43,11 @@
                                 echo '</tbody></table></div>';
                             }
                             echo '
-                            <div class="border-bottom d-flex flex-row justify-content-start my-3" id="grupokumite_' . chr(64 + $inscripcion->grupo) . '" grupo="' . chr(64 + $inscripcion->grupo) . '">
-                                <table class="table table-striped table-bordered text-center w-auto" id="tablakumite_' . chr(64 + $inscripcion->grupo) . '">
+                            <div class="border-bottom d-flex flex-row justify-content-start my-3" id="grupokumite_' . $inscripcion->grupo . '" grupo="' .$inscripcion->grupo . '">
+                                <table class="table table-striped table-bordered text-center w-auto" id="tablakumite_' .$inscripcion->grupo . '">
                                     <thead>
                                         <tr>
-                                            <th colspan="4" class="bg-white text-primary font-weigth-bold">GRUPO ' . chr(64 + $inscripcion->grupo) . '</th>
+                                            <th colspan="4" class="bg-white text-primary font-weigth-bold">GRUPO ' . $inscripcion->grupo . '</th>
                                         </tr>
                                     </thead>
                                     <thead>
