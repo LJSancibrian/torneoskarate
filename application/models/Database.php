@@ -907,9 +907,12 @@ class Database extends CI_Model
             if ($retval == 0) {
                 $retval = $b->puntos <=> $a->puntos;
                 if ($retval == 0) {
-                    $retval = $b->senshu <=> $a->senshu;
+                    $retval = $a->puntos_contra <=> $b->puntos_contra;
                     if ($retval == 0) {
-                        $retval = $b->hantei <=> $a->hantei;
+                        $retval = $b->senshu <=> $a->senshu;
+                        if ($retval == 0) {
+                            $retval = $b->hantei <=> $a->hantei;
+                        }
                     }
                 }
             }
@@ -1083,7 +1086,9 @@ class Database extends CI_Model
         $this->db->where('grupo', 0);
         $this->db->group_start();
         $this->db->like('parent_rojo', 'g' . $grupo . '|');
+        $this->db->or_like('parent_rojo', 'g|' . $grupo );
         $this->db->or_like('parent_azul', 'g' . $grupo . '|');
+        $this->db->or_like('parent_azul', 'g|' . $grupo);
         $this->db->group_end();
         $matches = $this->db->get('matches')->result();
         return $matches;
@@ -1203,17 +1208,30 @@ class Database extends CI_Model
 
     public function clasificacionGlobalKumite($competicion_torneo_id)
     {
-        /*$this->db->where('grupo', 0);
+        $this->db->where('grupo', 0);
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
         $this->db->order_by('ronda', 'desc');
         $this->db->order_by('parent_rojo', 'asc');
         $finales = $this->db->get('matches')->result();
 
-        $usersid = [];
-        foreach ($finales as $key => $match) {
-            $usersid[] = $match->user_rojo;
-            $usersid[] = $match->user_azul;
-        }*/
+        $clasificacion = [];
+        $anadidos = [];
+        foreach ($finales as $key => $value) {
+            if ($value->winner > 0 && $value->user_rojo > 0 && $value->user_azul > 0) {
+                $ganador = $this->ion_auth->user($value->winner)->row();
+                if (!in_array($value->winner, $anadidos)) {
+                    $anadidos[] = $value->winner;
+                }
+                if ($value->winner != $value->user_rojo) {
+                    $segundo = $this->ion_auth->user($value->user_rojo)->row();
+                } else {
+                    $segundo = $this->ion_auth->user($value->user_azul)->row();
+                }
+                if (!in_array($segundo->id, $anadidos)) {
+                    $anadidos[] = $segundo->id;
+                }
+            }
+        }
 
         $this->no_deleted(['torneos_inscripciones']);
         $this->db->select('torneos_inscripciones.inscripcion_id, torneos_inscripciones.user_id, users.first_name, users.last_name, clubs.nombre');
@@ -1244,15 +1262,26 @@ class Database extends CI_Model
             $player->ganados = $totaluser->ganados;
             $player->senshu = $totaluser->senshu;
             $player->hantei = $totaluser->hantei;
+            if(in_array($player->user_id, $anadidos)){
+                $player->finalista = array_search($player->user_id, $anadidos);
+            }else{
+                $player->finalista = 100;
+            }
         }
         usort($players, function ($a, $b) {
-            $retval = $b->ganados <=> $a->ganados;
+            $retval = $a->finalista <=> $b->finalista;
             if ($retval == 0) {
-                $retval = $b->puntos <=> $a->puntos;
+                $retval = $b->ganados <=> $a->ganados;
                 if ($retval == 0) {
-                    $retval = $b->senshu <=> $a->senshu;
+                    $retval = $b->puntos <=> $a->puntos;
                     if ($retval == 0) {
-                        $retval = $b->hantei <=> $a->hantei;
+                        $retval = $a->puntos_contra <=> $b->puntos_contra;
+                        if ($retval == 0) {
+                            $retval = $b->senshu <=> $a->senshu;
+                            if ($retval == 0) {
+                                $retval = $b->hantei <=> $a->hantei;
+                            }
+                        }
                     }
                 }
             }

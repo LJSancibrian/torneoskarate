@@ -72,7 +72,6 @@ class Home extends CI_Controller
             $data['competicioneskumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
             foreach ($data['competicioneskumite'] as $key => $competicionkata) {
                 $clasificacion = $this->database->clasificacionKumite($competicionkata->competicion_torneo_id);
-                //var_dump($clasificacion);
                 if (!empty($clasificacion) && count($clasificacion) > 0) {
                     $data['competicioneskumite'][$key]->clasificacionfinal = $clasificacion;
                 } else {

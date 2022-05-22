@@ -612,6 +612,7 @@ class Competiciones extends CI_Controller
             returnAjax($response);
         }
         $players = $this->database->clasificacionGrupoKumite(input('competicion_torneo_id'), input('grupo'));
+        //printr($players);
         $response = [
             'error' => 0,
             'users' => $players,
@@ -637,7 +638,9 @@ class Competiciones extends CI_Controller
             returnAjax($response);
         }
         $players = $this->database->clasificacionGrupoKumite(input('competicion_torneo_id'), input('grupo'));
+        //printr($players);
         $matches = $this->database->getEliminatoriasGrupo(input('competicion_torneo_id'), input('grupo'));
+        //printr($this->db->last_query());
         $cambios = 0;
         foreach ($matches as $key => $value) {
             if (strpos($value->parent_rojo, 'g' . input('grupo') . '|') !== FALSE) {
@@ -665,7 +668,58 @@ class Competiciones extends CI_Controller
                     };
                 }
             }
+            if (strpos($value->parent_rojo, 'g|' . input('grupo')) !== FALSE) {
+                $explode = explode('|', $value->parent_rojo);
+                $posicion = end($explode);
+                if(isset($players[$posicion - 1])){
+                    $player = $players[$posicion - 1];
+                    if (isset($player)) {
+                        $params = [
+                            'tabla' => 'torneos_inscripciones',
+                            'where' => [
+                                'deletedAt' => '0000-00-00 00:00:00',
+                                'competicion_torneo_id' => input('competicion_torneo_id'),
+                                'user_id' => $player->user_id
+                            ]
+                        ];
+                        $inscripcion = $this->database->getWhere($params, 'nopage');
+                        $inscripcion = $inscripcion[0];
+                        $data = [
+                            'user_rojo' => $player->user_id,
+                            'inscripcion_rojo' => $inscripcion->inscripcion_id,
+                            'updatedAt' => date('Y-m-d H:i:s')
+                        ];
+                        if ($this->database->actualizar('matches', $data, 'match_id', $value->match_id) == $value->match_id) {
+                            $cambios++;
+                        };
+                    }
+                }
+            }
             if (strpos($value->parent_azul, 'g' . input('grupo') . '|') !== FALSE) {
+                $explode = explode('|', $value->parent_azul);
+                $posicion = end($explode);
+                $player = $players[$posicion - 1];
+                if (isset($player)) {
+                    $params = [
+                        'tabla' => 'torneos_inscripciones',
+                        'where' => [
+                            'competicion_torneo_id' => input('competicion_torneo_id'),
+                            'user_id' => $player->user_id
+                        ]
+                    ];
+                    $inscripcion = $this->database->getWhere($params, 'nopage');
+                    $inscripcion = $inscripcion[0];
+                    $data = [
+                        'user_azul' => $player->user_id,
+                        'inscripcion_azul' => $inscripcion->inscripcion_id,
+                        'updatedAt' => date('Y-m-d H:i:s')
+                    ];
+                    if ($this->database->actualizar('matches', $data, 'match_id', $value->match_id) == $value->match_id) {
+                        $cambios++;
+                    };
+                }
+            }
+            if (strpos($value->parent_azul, 'g|' . input('grupo')) !== FALSE) {
                 $explode = explode('|', $value->parent_azul);
                 $posicion = end($explode);
                 $player = $players[$posicion - 1];
@@ -1242,7 +1296,7 @@ class Competiciones extends CI_Controller
 
         $competiciones = $this->database->buscarDato('torneos_competiciones', 'torneo_id', $torneo_id);
         foreach ($competiciones as $key => $value) {
-            if ($value->estado != 3 && $value->deletedAt == '0000-00-00 00:00:00') {
+            if ($value->estado == 2 && $value->deletedAt == '0000-00-00 00:00:00') {
                 $this->guardarClasificacionLM($value->competicion_torneo_id);
             }
         }
