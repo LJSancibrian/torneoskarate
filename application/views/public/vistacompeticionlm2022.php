@@ -27,8 +27,13 @@
                                 <th class="">#</th>
                                 <th class="text-left columnfixed">Deportista</th>
                                 <?php $j = 1;
+                                $jornada2 = [75,76,77,78];
                                 foreach ($jornadas as $key => $value) {
-                                    echo '<th>Jornada ' . $j . '</th>';
+                                    if(!in_array($competicion->competicion_torneo_id, $jornada2)){
+                                        echo '<th>Jornada ' . $j . '</th>';
+                                    }else{
+                                        echo '<th>Jornada 2</th>';
+                                    }
                                     $j++;
                                 } ?>
                                 <th>Total</th>

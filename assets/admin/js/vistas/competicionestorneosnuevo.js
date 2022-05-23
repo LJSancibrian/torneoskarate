@@ -420,11 +420,11 @@ function dibulareliminatorias() {
     if (grupos == 2) {
         var ronda = [
             [
-                { name: "Primero A", id: "g1|1" },
+                { name: "Primero 1", id: "g1|1" },
                 { name: "Segundo B", id: "g2|2" }
             ],
             [
-                { name: "Primero B", id: "g2|1" },
+                { name: "Primero 2", id: "g2|1" },
                 { name: "Segundo A", id: "g1|2" }
             ]
         ];
@@ -444,11 +444,11 @@ function dibulareliminatorias() {
     if (grupos == 3) {
         var ronda = [
             [
-                { name: "Primero A", id: "g1|1" },
-                { name: "Primero B", id: "g2|1" }
+                { name: "Primero 1", id: "g1|1" },
+                { name: "Primero 2", id: "g2|1" }
             ],
             [
-                { name: "Primero c", id: "g3|1" },
+                { name: "Primero 3", id: "g3|1" },
                 { name: "Mejor Segundo", id: "m2|1" }
             ]
         ];
@@ -468,12 +468,12 @@ function dibulareliminatorias() {
     if (grupos == 4) {
         var ronda = [
             [
-                { name: "Primero A", id: "g1|1" },
-                { name: "Primero B", id: "g2|1" }
+                { name: "Primero 1", id: "g1|1" },
+                { name: "Primero 2", id: "g2|1" }
             ],
             [
-                { name: "Primero C", id: "g3|1" },
-                { name: "Primero D", id: "g4|1" }
+                { name: "Primero 3", id: "g3|1" },
+                { name: "Primero 4", id: "g4|1" }
             ]
         ];
         rounds.push(ronda);
@@ -518,23 +518,22 @@ function dibulareliminatorias() {
                         fighter.name = '';
                         fighter.id = '';
                         estematch.push(fighter);
-                        //clasificados_en_combate++;
                     }
                     ronda.push(estematch);
                 }
                 // asignar los ganadores de grupo a cada combate, 
                 for (let i = 0; i < matches; i++) {
                     var match = ronda[i];
-                    match[0].name = 'Ganador Grupo ' + primerosgrupo
-                    match[0].id = 'g|' + primerosgrupo
+                    match[0].name = 'Primero ' + primerosgrupo
+                    match[0].id = 'g' + primerosgrupo + '|1'
                     primerosgrupo--;
                 }
                 // se recorren, para el resto de ganadores
                 for (let i = 0; i < matches; i++) {
                     if (primerosgrupo > 0) {
                         var match = ronda[i];
-                        match[1].name = 'Ganador Grupo ' + primerosgrupo
-                        match[1].id = 'g|' + primerosgrupo
+                        match[1].name = 'Primero ' + primerosgrupo
+                        match[1].id = 'g' + primerosgrupo + '|1'
                         primerosgrupo--;
                     }
                 }
@@ -543,7 +542,7 @@ function dibulareliminatorias() {
                     if (segundosgrupos > 0) {
                         var match = ronda[i];
                         if (match[1].name == '') {
-                            match[1].name = segundosgrupos + 'º Segundo de grupo'
+                            match[1].name = segundosgrupos + 'º Segundo'
                             match[1].id = 'm2|' + segundosgrupos
                             segundosgrupos--;
                         }
@@ -583,7 +582,7 @@ function dibulareliminatorias() {
                     var estematch = [];
                     for (let clasif = 1; clasif <= 2; clasif++) {
                         var fighter = {};
-                        fighter.name = 'Ganador ' + ganadorcombateanterior + ' Ronda' + index;
+                        fighter.name = 'Ganador ' + ganadorcombateanterior;
                         fighter.id = idr + '|' + ganadorcombateanterior;
                         estematch.push(fighter);
                         ganadorcombateanterior++
@@ -595,7 +594,7 @@ function dibulareliminatorias() {
                         var lastmatch = [];
                         for (let clasif = 1; clasif <= 2; clasif++) {
                             var fighter = {};
-                            fighter.name = 'Perdedor ' + ganadorcombateanterior + ' Ronda' + index;
+                            fighter.name = 'Perdedor ' + ganadorcombateanterior;
                             fighter.id = idr + '|' + ganadorcombateanterior + '-';
                             lastmatch.push(fighter);
                             ganadorcombateanterior++

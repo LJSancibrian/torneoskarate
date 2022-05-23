@@ -1214,29 +1214,111 @@ class Database extends CI_Model
         $this->db->order_by('parent_rojo', 'asc');
         $finales = $this->db->get('matches')->result();
 
-        $clasificacion = [];
+        $eliminatorias_players = [];
         $anadidos = [];
         foreach ($finales as $key => $value) {
             if ($value->winner > 0 && $value->user_rojo > 0 && $value->user_azul > 0) {
-                $ganador = $this->ion_auth->user($value->winner)->row();
                 if (!in_array($value->winner, $anadidos)) {
                     $anadidos[] = $value->winner;
+                    $player_id = $value->winner;
+                    $player = $this->ion_auth->user($player_id)->row();
+                    $club = $this->getUserClub($player->club_id);
+                    $player->nombre = $club->nombre;
+                    $player->user_id = $value->winner;
+                    $this->db->select(
+                        'SUM(CASE WHEN user_rojo=' . $player_id . ' THEN puntos_rojo ELSE puntos_azul END) AS puntos,
+                        SUM(CASE WHEN user_rojo=' . $player_id . ' THEN puntos_azul ELSE puntos_rojo END) AS puntos_contra,
+                        SUM(CASE WHEN winner=' . $player_id . ' THEN 1 ELSE 0 END) AS ganados,
+                        SUM(CASE WHEN (user_rojo=' . $player_id . ' AND senshu="rojo") OR  (user_azul=' . $player_id . ' AND senshu="azul") THEN 1 ELSE 0 END) AS senshu,
+                        SUM(CASE WHEN (user_rojo=' . $player_id . ' AND hantei="rojo") OR  (user_azul=' . $player_id . ' AND hantei="azul") THEN 1 ELSE 0 END) AS hantei,
+                        '
+                    );
+                    $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+                    $this->db->group_start();
+                    $this->db->where('user_rojo', $player_id);
+                    $this->db->or_where('user_azul', $player_id);
+                    $this->db->group_end();
+                    $totaluser = $this->db->get('matches')->row();
+                    $player->puntos = $totaluser->puntos;
+                    $player->puntos_contra = $totaluser->puntos_contra;
+                    $player->ganados = $totaluser->ganados;
+                    $player->senshu = $totaluser->senshu;
+                    $player->hantei = $totaluser->hantei;
+                    $player->ronda = $value->ronda;
+                    $eliminatorias_players[] = $player;
                 }
                 if ($value->winner != $value->user_rojo) {
-                    $segundo = $this->ion_auth->user($value->user_rojo)->row();
+                    $segundo =  $value->user_rojo;
                 } else {
-                    $segundo = $this->ion_auth->user($value->user_azul)->row();
+                    $segundo = $value->user_azul;
                 }
-                if (!in_array($segundo->id, $anadidos)) {
-                    $anadidos[] = $segundo->id;
+                if (!in_array($segundo, $anadidos)) {
+                    $anadidos[] = $segundo;
+                    $player_id = $segundo;
+                    $player = $this->ion_auth->user($player_id)->row();
+                    $club = $this->getUserClub($player->club_id);
+                    $player->nombre = $club->nombre;
+                    $player->user_id = $segundo;
+                    $this->db->select(
+                        'SUM(CASE WHEN user_rojo=' . $player_id . ' THEN puntos_rojo ELSE puntos_azul END) AS puntos,
+                        SUM(CASE WHEN user_rojo=' . $player_id . ' THEN puntos_azul ELSE puntos_rojo END) AS puntos_contra,
+                        SUM(CASE WHEN winner=' . $player_id . ' THEN 1 ELSE 0 END) AS ganados,
+                        SUM(CASE WHEN (user_rojo=' . $player_id . ' AND senshu="rojo") OR  (user_azul=' . $player_id . ' AND senshu="azul") THEN 1 ELSE 0 END) AS senshu,
+                        SUM(CASE WHEN (user_rojo=' . $player_id . ' AND hantei="rojo") OR  (user_azul=' . $player_id . ' AND hantei="azul") THEN 1 ELSE 0 END) AS hantei,
+                        '
+                    );
+                    $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+                    $this->db->group_start();
+                    $this->db->where('user_rojo', $player_id);
+                    $this->db->or_where('user_azul', $player_id);
+                    $this->db->group_end();
+                    $totaluser = $this->db->get('matches')->row();
+                    $player->puntos = $totaluser->puntos;
+                    $player->puntos_contra = $totaluser->puntos_contra;
+                    $player->ganados = $totaluser->ganados;
+                    $player->senshu = $totaluser->senshu;
+                    $player->hantei = $totaluser->hantei;
+                    $player->ronda = $value->ronda;
+                    $eliminatorias_players[] = $player;
                 }
             }
+            
+        }
+        $finalistas = [];
+        foreach ($eliminatorias_players as $key => $value) {
+           if($key < 4){
+                $finalistas[] =  $value;
+               unset($eliminatorias_players[$key]);
+           }
+        }
+        
+        if(count($eliminatorias_players) > 0){
+            usort($eliminatorias_players, function ($a, $b) {
+                $retval = $b->ronda <=> $a->ronda;
+                if ($retval == 0) {
+                    $retval = $b->ganados <=> $a->ganados;
+                    if ($retval == 0) {
+                        $retval = $b->puntos <=> $a->puntos;
+                        if ($retval == 0) {
+                            $retval = $a->puntos_contra <=> $b->puntos_contra;
+                            if ($retval == 0) {
+                                $retval = $b->senshu <=> $a->senshu;
+                                if ($retval == 0) {
+                                    $retval = $b->hantei <=> $a->hantei;
+                                }
+                            }
+                        }
+                    }
+                }
+                return $retval;
+            }); 
+            $finalistas = array_merge($finalistas, $eliminatorias_players);
         }
 
         $this->no_deleted(['torneos_inscripciones']);
         $this->db->select('torneos_inscripciones.inscripcion_id, torneos_inscripciones.user_id, users.first_name, users.last_name, clubs.nombre');
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
-        //$this->db->where_not_in('users.id', $usersid);
+        $this->db->where_not_in('users.id', $anadidos);
         $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
         $this->db->join('clubs', 'users.club_id = clubs.club_id');
         $players = $this->db->get('torneos_inscripciones')->result();
@@ -1256,7 +1338,9 @@ class Database extends CI_Model
             $this->db->where('user_rojo', $player->user_id);
             $this->db->or_where('user_azul', $player->user_id);
             $this->db->group_end();
+
             $totaluser = $this->db->get('matches')->row();
+
             $player->puntos = $totaluser->puntos;
             $player->puntos_contra = $totaluser->puntos_contra;
             $player->ganados = $totaluser->ganados;
@@ -1288,7 +1372,8 @@ class Database extends CI_Model
             return $retval;
         });
 
-        return $players;
+        $return = array_merge($finalistas, $players);
+        return $return;
     }
 
     public function getCompeticionesLM($year)
