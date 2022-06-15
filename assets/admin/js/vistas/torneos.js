@@ -3,6 +3,9 @@ var titledoc = 'equipos';
 tabla = $("#table_datatable").DataTable({
     processing: true,
     serverSide: true,
+    order: [
+        [3, 'desc']
+    ],
     columns: [{ //0
         title: "CODIGO",
         name: "slug",
@@ -15,7 +18,7 @@ tabla = $("#table_datatable").DataTable({
         title: "Modalidades",
         name: "tipo",
         data: "tipo",
-        render: function (data, type, row) {
+        render: function(data, type, row) {
             if (row.tipo == 1) {
                 html = '<span class="badge badge-info">Kata</span>';
             } else if (row.tipo == 2) {
@@ -37,7 +40,7 @@ tabla = $("#table_datatable").DataTable({
         title: "Estado",
         name: "estado",
         data: "estado",
-        render: function (data, type, row) {
+        render: function(data, type, row) {
             if (row.estado == 1) {
                 html = '<span class="badge badge-warning">Activo</span>';
             } else {
@@ -50,7 +53,7 @@ tabla = $("#table_datatable").DataTable({
         title: "Acción",
         data: "bonoID",
         className: "text-truncate",
-        render: function (data, type, row) {
+        render: function(data, type, row) {
             html = '<div class="form-button-action">';
             html += '<button type="button" data-tooltip title="" class="btn btn-sm btn-outline-primary" data-original-title="Vista rápida del torneo" data-ver-torneo="' + row.torneo_id + '" data-slug="' + row.slug + '"><i class="fas fa-trophy"></i></button>';
             html += '<button type="button" data-tooltip title="" class="btn btn-sm btn-outline-primary" data-original-title="Editar datos del torneo" data-editar-torneo="' + row.torneo_id + '" data-slug="' + row.slug + '"><i class="fa fa-edit"></i></a>';
@@ -58,7 +61,7 @@ tabla = $("#table_datatable").DataTable({
             html += '</div>';
             return html
         }
-    },],
+    }, ],
     columnDefs: [{
         targets: [0, 1, 2, 3, 4, 5, 6],
         visible: true
@@ -73,25 +76,25 @@ tabla = $("#table_datatable").DataTable({
         url: base_url + 'Torneos/getTorneos',
         type: "GET",
         datatype: "json",
-        data: function (data) {
+        data: function(data) {
             var estado = $("#table_datatable").data('default');
             if (estado != '') {
                 data.estado = estado;
             }
         }
     },
-    createdRow: function (row, data, dataIndex) {
+    createdRow: function(row, data, dataIndex) {
         if (dataIndex > 0) {
             $(row).find('[data-tooltip]').tooltip();
         } else {
             $(row).find('[data-tooltip]').tooltip({ boundary: 'window' });
         }
     },
-    drawCallback: function (settings) { },
-    initComplete: function () { }
+    drawCallback: function(settings) {},
+    initComplete: function() {}
 });
 
-$(document).on('click', '[data-ver-torneo]', function () {
+$(document).on('click', '[data-ver-torneo]', function() {
     torneo_id = $(this).attr('data-ver-torneo')
     slug = $(this).attr('data-slug')
     var fd = new FormData();
@@ -104,7 +107,7 @@ $(document).on('click', '[data-ver-torneo]', function () {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function (response) {
+    }).done(function(response) {
         if (response === '' || typeof response == 'undefined') {
             window.location.reload();
         }
@@ -113,7 +116,7 @@ $(document).on('click', '[data-ver-torneo]', function () {
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function (i, value) {
+                $.each(response.error_validation, function(i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -156,20 +159,20 @@ $(document).on('click', '[data-ver-torneo]', function () {
                 }
             })
         }
-    }).always(function (jqXHR, textStatus) {
+    }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function () { }
+                willClose: function() {}
             })
         }
     });
 });
 
-$(document).on('click', '[data-editar-torneo]', function () {
+$(document).on('click', '[data-editar-torneo]', function() {
     var torneo_id = $(this).attr('data-editar-torneo')
     if (torneo_id == 'nuevo') {
         $('#modal_crear_torneo form').trigger('reset');
@@ -189,13 +192,13 @@ $(document).on('click', '[data-editar-torneo]', function () {
             contentType: false,
             processData: false,
             data: fd
-        }).done(function (response) {
+        }).done(function(response) {
             var response = JSON.parse(response);
             $('[name="csrf_token"]').val(response.csrf)
             if (response.error > 0) {
                 var errorhtml = ''
                 if (response.hasOwnProperty('error_validation')) {
-                    $.each(response.error_validation, function (i, value) {
+                    $.each(response.error_validation, function(i, value) {
                         errorhtml += value + '<br>'
                     })
                 }
@@ -227,14 +230,14 @@ $(document).on('click', '[data-editar-torneo]', function () {
                     $('#estado').attr('checked', 'checked');
                 }
             }
-        }).always(function (jqXHR, textStatus) {
+        }).always(function(jqXHR, textStatus) {
             if (textStatus != "success") {
                 swal.fire({
                     icon: 'error',
                     title: 'Ha ocurrido un error AJAX',
                     html: jqXHR.statusText,
                     timer: 5000,
-                    willClose: function () { }
+                    willClose: function() {}
                 })
             }
         });
@@ -242,7 +245,7 @@ $(document).on('click', '[data-editar-torneo]', function () {
 });
 
 // enviar el formulairo
-$('#submit-torneo-form').click(function () {
+$('#submit-torneo-form').click(function() {
     var torneo_id = $('[name="torneo_id"]').val()
     if (torneo_id == 'nuevo') {
         var stitle = '¿Crear torneo con los datos indicados?';
@@ -283,13 +286,13 @@ $('#submit-torneo-form').click(function () {
                 contentType: false,
                 processData: false,
                 data: fd
-            }).done(function (response) {
+            }).done(function(response) {
                 var response = JSON.parse(response);
                 $('[name="csrf_token"]').val(response.csrf)
                 if (response.error > 0) {
                     var errorhtml = ''
                     if (response.hasOwnProperty('error_validation')) {
-                        $.each(response.error_validation, function (i, value) {
+                        $.each(response.error_validation, function(i, value) {
                             errorhtml += value + '<br>'
                         })
                     }
@@ -307,7 +310,7 @@ $('#submit-torneo-form').click(function () {
                         icon: 'success',
                         title: 'Correcto',
                         html: response.msn,
-                        willClose: function () {
+                        willClose: function() {
                             if (response.hasOwnProperty('redirect')) {
                                 window.location.href = response.redirect
                             } else {
@@ -317,14 +320,14 @@ $('#submit-torneo-form').click(function () {
                         }
                     })
                 }
-            }).always(function (jqXHR, textStatus) {
+            }).always(function(jqXHR, textStatus) {
                 if (textStatus != "success") {
                     swal.fire({
                         icon: 'error',
                         title: 'Ha ocurrido un error AJAX',
                         html: jqXHR.statusText,
                         timer: 5000,
-                        willClose: function () { }
+                        willClose: function() {}
                     })
                 }
             });
@@ -332,7 +335,7 @@ $('#submit-torneo-form').click(function () {
     });
 });
 
-$(document).on('click', '[data-gestion-torneo]', function () {
+$(document).on('click', '[data-gestion-torneo]', function() {
     torneo_id = $(this).attr('data-gestion-torneo')
     slug = $(this).attr('data-slug')
 

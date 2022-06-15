@@ -1,4 +1,4 @@
-$(document).on('click', '[data-match_id]', function () {
+$(document).on('click', '[data-match_id]', function() {
     var match = $(this)
     var match_id = match.attr('data-match_id');
 
@@ -11,13 +11,13 @@ $(document).on('click', '[data-match_id]', function () {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function (response) {
+    }).done(function(response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function (i, value) {
+                $.each(response.error_validation, function(i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -28,7 +28,7 @@ $(document).on('click', '[data-match_id]', function () {
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function () {
+                willClose: function() {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -43,34 +43,46 @@ $(document).on('click', '[data-match_id]', function () {
             //return;
             var thismath = response.match;
             $('#marcadorauxiliar').find('[data-match-id]').attr('data-match-id', thismath.match_id)
-            $('#user_rojo').html(thismath.rojo.nombre)
-            $('#user_azul').html(thismath.azul.nombre)
+            var nombre_rojo = (thismath.hasOwnProperty('rojo')) ? thismath.rojo.nombre : '';
+            var nombre_azul = (thismath.hasOwnProperty('azul')) ? thismath.azul.nombre : '';
+            $('#user_rojo').html(nombre_rojo)
+            $('#user_azul').html(nombre_azul)
             $('#puntostotalesrojo').html(thismath.puntos_rojo)
             $('#puntostotalesazul').html(thismath.puntos_azul)
             $('#marcadorauxiliar [type="radio"]').prop("checked", false);
             var senshu = '';
-            if(thismath.senshu != ''){
-                $('[name="senshu"][value="'+thismath.senshu+'"]').prop('checked', true)
+            if (thismath.senshu != '') {
+                $('[name="senshu"][value="' + thismath.senshu + '"]').prop('checked', true)
             }
-            if(thismath.hantei != ''){
-                $('[name="hantei"][value="'+thismath.hantei+'"]').prop('checked', true)
+            if (thismath.hantei != '') {
+                $('[name="hantei"][value="' + thismath.hantei + '"]').prop('checked', true)
+            }
+            if (thismath.hasOwnProperty('rojo')) {
+                $('[data-match-rojo]').show();
+            } else {
+                $('[data-match-rojo]').hide();
+            }
+            if (thismath.hasOwnProperty('azul')) {
+                $('[data-match-azul]').show();
+            } else {
+                $('[data-match-azul]').hide();
             }
             $('#marcadorauxiliar').modal('show');
         }
-    }).always(function (jqXHR, textStatus) {
+    }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function () { }
+                willClose: function() {}
             })
         }
     });
 
 
-    
+
     // si es ul 
     var user_rojo = match.find('[data-user]')[0];
     var user_azul = match.find('[data-user]')[1];
@@ -78,7 +90,7 @@ $(document).on('click', '[data-match_id]', function () {
     var user_azul_name = $(user_azul).children(":first").html()
     var user_rojo_puntos = $(user_rojo).children(":last").html()
     var user_azul_puntos = $(user_azul).children(":last").html()
-    // si es div
+        // si es div
     $('#marcadorauxiliar').find('[data-match-id]').attr('data-match-id', match_id)
     $('#user_rojo').html(user_rojo_name)
     $('#user_azul').html(user_azul_name)
@@ -86,60 +98,60 @@ $(document).on('click', '[data-match_id]', function () {
     $('#puntostotalesazul').html(user_azul_puntos)
     $('#marcadorauxiliar [type="tadio"]').prop("checked", false);
     var senshu = '';
-    if($(user_rojo).children(":last").hasClass('senshu')){
+    if ($(user_rojo).children(":last").hasClass('senshu')) {
         var senshu = 'rojo';
     }
-    if($(user_azul).children(":last").hasClass('senshu')){
+    if ($(user_azul).children(":last").hasClass('senshu')) {
         var senshu = 'azul';
     }
-    if(senshu != ''){
-        $('[name="senshu"][value="'+senshu+'"]').prop('checked', true)
+    if (senshu != '') {
+        $('[name="senshu"][value="' + senshu + '"]').prop('checked', true)
     }
     var hantei = '';
-    if($(user_rojo).children(":last").hasClass('hantei')){
+    if ($(user_rojo).children(":last").hasClass('hantei')) {
         var hantei = 'rojo';
     }
-    if($(user_azul).children(":last").hasClass('hantei')){
+    if ($(user_azul).children(":last").hasClass('hantei')) {
         var hantei = 'azul';
     }
-    if(hantei != ''){
-        $('[name="hantei"][value="'+hantei+'"]').prop('checked', true)
+    if (hantei != '') {
+        $('[name="hantei"][value="' + hantei + '"]').prop('checked', true)
     }
-    
+
     $('#marcadorauxiliar').modal('show');
 });
 
-$(document).on('click', '[data-plus]', function () {
+$(document).on('click', '[data-plus]', function() {
     var color = $(this).attr('data-plus')
     var puntos = $('#puntostotales' + color).html()
     var puntosnuevos = (parseFloat(puntos) + 1 < 0) ? 0 : parseFloat(puntos) + 1
     $('#puntostotales' + color).html(puntosnuevos)
 })
 
-$(document).on('click', '[data-minus]', function () {
+$(document).on('click', '[data-minus]', function() {
     var color = $(this).attr('data-minus')
     var puntos = $('#puntostotales' + color).html()
     var puntosnuevos = (parseFloat(puntos) - 1 < 0) ? 0 : parseFloat(puntos) - 1
     $('#puntostotales' + color).html(puntosnuevos)
 })
 
-$(document).on('click', '[name="senshu"]', function(){
+$(document).on('click', '[name="senshu"]', function() {
     var estado = $(this).prop('checked');
     $('[name="senshu"]').prop('checked', false);
     $(this).prop('checked', estado);
 });
 
-$(document).on('click', '[name="hantei"]', function(){
+$(document).on('click', '[name="hantei"]', function() {
     var estado = $(this).prop('checked');
     $('[name="hantei"]').prop('checked', false);
     $(this).prop('checked', estado);
 });
 
-$(".check-female").click(function(){
+$(".check-female").click(function() {
     $("#female").prop("checked", true);
 });
 
-$(document).on('click', '#guardar-marcador', function () {
+$(document).on('click', '#guardar-marcador', function() {
     var match_id = $('#marcadorauxiliar').find('[data-match-id]').attr('data-match-id');
     var ul = $('[data-match_id="' + match_id + '"]');
     var user_rojo = ul.find('[data-user]')[0];
@@ -188,13 +200,13 @@ $(document).on('click', '#guardar-marcador', function () {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function (response) {
+    }).done(function(response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function (i, value) {
+                $.each(response.error_validation, function(i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -205,7 +217,7 @@ $(document).on('click', '#guardar-marcador', function () {
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function () {
+                willClose: function() {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -219,15 +231,15 @@ $(document).on('click', '#guardar-marcador', function () {
         } else {
             // actualizar el combate
             var match = response.match
-            /*var ul = $('[data-match_id="' + match.match_id + '"]');
-            ul.find('[data-user="' + match.user_rojo + '"]').children(":last").html(match.puntos_rojo).removeClass('bg-white').addClass('text-white')
-            ul.find('[data-user="' + match.user_azul + '"]').children(":last").html(match.puntos_azul).removeClass('bg-white').addClass('text-white')
-            //ul.attr('style', 'pointer-events: none')*/
+                /*var ul = $('[data-match_id="' + match.match_id + '"]');
+                ul.find('[data-user="' + match.user_rojo + '"]').children(":last").html(match.puntos_rojo).removeClass('bg-white').addClass('text-white')
+                ul.find('[data-user="' + match.user_azul + '"]').children(":last").html(match.puntos_azul).removeClass('bg-white').addClass('text-white')
+                //ul.attr('style', 'pointer-events: none')*/
             swal.fire({
                 icon: 'success',
                 title: 'OK',
                 html: errorhtml,
-                willClose: function () {
+                willClose: function() {
                     $('#marcadorauxiliar').modal('hide');
                     updateClasificacionGrupo(match.competicion_torneo_id, match.grupo)
                     location.reload()
@@ -241,21 +253,21 @@ $(document).on('click', '#guardar-marcador', function () {
                 }
             });
         }
-    }).always(function (jqXHR, textStatus) {
+    }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function () { }
+                willClose: function() {}
             })
         }
     });
 
 })
 
-$(document).on('click', '[data-ver-clasificacion]', function () {
+$(document).on('click', '[data-ver-clasificacion]', function() {
     var competicion_torneo_id = $(this).attr('data-competicion_torneo_id');
     var grupo = $(this).attr('data-grupo');
     $('#clasificacionModalTable tbody').attr('data-competicion_torneo_id', competicion_torneo_id);
@@ -275,13 +287,13 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function (response) {
+    }).done(function(response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function (i, value) {
+                $.each(response.error_validation, function(i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -292,7 +304,7 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function () {
+                willClose: function() {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -307,7 +319,7 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
             var tbody = $('#clasificacionModalTable tbody[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
             tbody.slideUp();
             tbody.html('');
-            $.each(response.users, function (i, user) {
+            $.each(response.users, function(i, user) {
                 var posicion = i + 1;
                 var deportista = user.first_name + ' ' + user.last_name;
                 var club = user.nombre;
@@ -327,10 +339,10 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
             })
             tbody.slideDown();
 
-            var tbodyg = $('#tablakumite_'+grupo+' tbody[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
+            var tbodyg = $('#tablakumite_' + grupo + ' tbody[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
             tbodyg.slideUp();
             tbodyg.html('');
-            $.each(response.users, function (i, user) {
+            $.each(response.users, function(i, user) {
                 var posicion = i + 1;
                 var deportista = user.first_name + ' ' + user.last_name;
                 var club = user.nombre;
@@ -345,14 +357,14 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
             })
             tbodyg.slideDown();
         }
-    }).always(function (jqXHR, textStatus) {
+    }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function () { }
+                willClose: function() {}
             })
         }
     });
@@ -370,13 +382,13 @@ function updateClasificacionGrupoUsers(competicion_torneo_id, grupo) {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function (response) {
+    }).done(function(response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function (i, value) {
+                $.each(response.error_validation, function(i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -387,7 +399,7 @@ function updateClasificacionGrupoUsers(competicion_torneo_id, grupo) {
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function () {
+                willClose: function() {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -402,10 +414,10 @@ function updateClasificacionGrupoUsers(competicion_torneo_id, grupo) {
             var tbody = $('tbody.user[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
             tbody.slideUp();
             tbody.html('');
-            $.each(response.users, function (i, user) {
+            $.each(response.users, function(i, user) {
                 var posicion = i + 1;
                 var deportista = user.first_name + ' ' + user.last_name;
-                var tr = '<tr data-user_ud="'+user.user_id+'">';
+                var tr = '<tr data-user_ud="' + user.user_id + '">';
                 tr += '<td>' + posicion + '</td>';
                 tr += '<td>' + deportista + '</td>';
                 tr += '</th>';
@@ -413,14 +425,14 @@ function updateClasificacionGrupoUsers(competicion_torneo_id, grupo) {
             })
             tbody.slideDown();
         }
-    }).always(function (jqXHR, textStatus) {
+    }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function () { }
+                willClose: function() {}
             })
         }
     });
@@ -439,49 +451,49 @@ function dibujar_cruces_grupos() {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function (response) {
+    }).done(function(response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
-        if(response.data.length > 0){
+        if (response.data.length > 0) {
             $(".brackets").html('')
             $(".brackets").slideDown(300)
             $(".brackets").gracket({ src: response.data });
-            
-        }else{
+
+        } else {
             $(".brackets").slideDown(300)
         }
 
-    }).always(function (jqXHR, textStatus) {
+    }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function () { }
+                willClose: function() {}
             })
         }
     });
     TestData = [
-       /* [
-            [
-                { "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1, "displaySeed": "D1", "score": 47 }, 
-                { "name": "Andrew Miller", "id": "andrew-miller", "seed": 2 }
-            ],
-            [{ "name": "James Coutry", "id": "james-coutry", "seed": 3 }, { "name": "Sam Merrill", "id": "sam-merrill", "seed": 4 }],
-            [{ "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }, { "name": "Everett Zettersten", "id": "everett-zettersten", "seed": 6 }],
-            [{ "name": "John Scott", "id": "john-scott", "seed": 7 }, { "name": "Teddy Koufus", "id": "teddy-koufus", "seed": 8 }],
-            [{ "name": "Arnold Palmer", "id": "arnold-palmer", "seed": 9 }, { "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }],
-            [{ "name": "Jesse James", "id": "jesse-james", "seed": 1 }, { "name": "Scott Anderson", "id": "scott-anderson", "seed": 12 }],
-            [{ "name": "Josh Groben", "id": "josh-groben", "seed": 13 }, { "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }],
-            [{ "name": "Jake Coutry", "id": "jake-coutry", "seed": 15 }, { "name": "Spencer Zettersten", "id": "spencer-zettersten", "seed": 16 }]
-        ],
-        [
-            [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }, { "name": "James Coutry", "id": "james-coutry", "seed": 3 }],
-            [{ "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }, { "name": "Teddy Koufus", "id": "teddy-koufus", "seed": 8 }],
-            [{ "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }, { "name": "Scott Anderson", "id": "scott-anderson", "seed": 12 }],
-            [{ "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }, { "name": "Jake Coutry", "id": "jake-coutry", "seed": 15 }]
-        ],*/
+        /* [
+             [
+                 { "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1, "displaySeed": "D1", "score": 47 }, 
+                 { "name": "Andrew Miller", "id": "andrew-miller", "seed": 2 }
+             ],
+             [{ "name": "James Coutry", "id": "james-coutry", "seed": 3 }, { "name": "Sam Merrill", "id": "sam-merrill", "seed": 4 }],
+             [{ "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }, { "name": "Everett Zettersten", "id": "everett-zettersten", "seed": 6 }],
+             [{ "name": "John Scott", "id": "john-scott", "seed": 7 }, { "name": "Teddy Koufus", "id": "teddy-koufus", "seed": 8 }],
+             [{ "name": "Arnold Palmer", "id": "arnold-palmer", "seed": 9 }, { "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }],
+             [{ "name": "Jesse James", "id": "jesse-james", "seed": 1 }, { "name": "Scott Anderson", "id": "scott-anderson", "seed": 12 }],
+             [{ "name": "Josh Groben", "id": "josh-groben", "seed": 13 }, { "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }],
+             [{ "name": "Jake Coutry", "id": "jake-coutry", "seed": 15 }, { "name": "Spencer Zettersten", "id": "spencer-zettersten", "seed": 16 }]
+         ],
+         [
+             [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }, { "name": "James Coutry", "id": "james-coutry", "seed": 3 }],
+             [{ "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }, { "name": "Teddy Koufus", "id": "teddy-koufus", "seed": 8 }],
+             [{ "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }, { "name": "Scott Anderson", "id": "scott-anderson", "seed": 12 }],
+             [{ "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }, { "name": "Jake Coutry", "id": "jake-coutry", "seed": 15 }]
+         ],*/
         [
             [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }, { "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }],
             [{ "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }, { "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }]
@@ -493,16 +505,16 @@ function dibujar_cruces_grupos() {
             [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }]
         ]
     ];
-    
+
     // initializer
-   
+
 
 }
 
-function guardarClasificaciones(){
+function guardarClasificaciones() {
 
 }
-$(document).on('click', '[data-guardar-clasificaicon]', function(){
+$(document).on('click', '[data-guardar-clasificaicon]', function() {
     var competicion_torneo_id = $(this).attr('data-guardar-clasificaicon');
     var grupo = $(this).attr('data-grupo');
     var fd = new FormData();
@@ -515,13 +527,13 @@ $(document).on('click', '[data-guardar-clasificaicon]', function(){
         contentType: false,
         processData: false,
         data: fd
-    }).done(function (response) {
+    }).done(function(response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function (i, value) {
+                $.each(response.error_validation, function(i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -532,7 +544,7 @@ $(document).on('click', '[data-guardar-clasificaicon]', function(){
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function () {
+                willClose: function() {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -548,7 +560,7 @@ $(document).on('click', '[data-guardar-clasificaicon]', function(){
                 icon: 'success',
                 title: 'OK',
                 html: response.msn,
-                willClose: function () {
+                willClose: function() {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -561,31 +573,31 @@ $(document).on('click', '[data-guardar-clasificaicon]', function(){
             return;
         }
 
-    }).always(function (jqXHR, textStatus) {
+    }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function () { }
+                willClose: function() {}
             })
         }
     });
 })
 
-$(document).ready(function () {
-    $('tbody.user[data-competicion_torneo_id]').each(function (index, elem) {
+$(document).ready(function() {
+    $('tbody.user[data-competicion_torneo_id]').each(function(index, elem) {
         var competicion_torneo_id = $(elem).attr('data-competicion_torneo_id');
         var grupo = $(elem).attr('data-grupo');
         updateClasificacionGrupoUsers(competicion_torneo_id, grupo)
     })
-    if($('#faseeliminatorias').length){
+    if ($('#faseeliminatorias').length) {
         dibujar_cruces_grupos()
     }
 })
 
-$(document).on('click', '#exportar_grupos', function(){
+$(document).on('click', '#exportar_grupos', function() {
     var competicion_torneo_id = $(this).attr('data-competicion_torneo_id');
-    window.open(base_url + 'Competiciones/pdfdoc/'+competicion_torneo_id, '_blank');
+    window.open(base_url + 'Competiciones/pdfdoc/' + competicion_torneo_id, '_blank');
 })

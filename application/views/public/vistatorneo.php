@@ -206,7 +206,7 @@
                                                         <p></p>
                                                     </div>
                                                     <?php foreach ($competicioneskumite as $key => $competicion) { 
-                                                        if($competicion->estado < 3 && isset($competicion->clasificacionfinal) && count($competicion->clasificacionfinal) > 0){?>
+                                                        if($competicion->estado < 3 ){?>
                                                         <div class="mb-3">
                                                             <h5 class="text-uppercase"><?php echo $competicion->categoria;?> <?php echo $competicion->nivel;?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto');?></h5>
                                                             <table class="table table-striped table-bordered" id="medallero_<?php echo $competicion->competicion_torneo_id;?>" data-medallero="<?php echo $competicion->competicion_torneo_id;?>">

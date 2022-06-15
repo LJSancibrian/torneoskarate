@@ -46,9 +46,6 @@ class Home extends CI_Controller
             $data['torneos_pasados'] = $torneos_pasados;
         }
         $data['view']           = 'public/girdtorneos';
-        //$data['view']           = 'public/post';
-        //$data['js_files']       = [assets_url() . 'admin/js/vistas/equipos.js'];
-        //printr($proximos_torneos);
         show($data);
     }
 
@@ -65,13 +62,18 @@ class Home extends CI_Controller
         if ($torneo->tipo != 2) {
             $data['competicioneskata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
             foreach ($data['competicioneskata'] as $key => $competicionkata) {
-                $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionFinalKata($competicionkata->competicion_torneo_id, [1,2,3]);
+                if($competicionkata->tipo == 'puntos'){
+                    $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionFinalKata($competicionkata->competicion_torneo_id, [1,2,3]);
+                }else{
+                    $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionGlobalKumite($competicionkata->competicion_torneo_id, [1,2,3]);
+                } 
             }
         }
+       
         if ($torneo->tipo != 1) {
             $data['competicioneskumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
-            foreach ($data['competicioneskumite'] as $key => $competicionkata) {
-                $clasificacion = $this->database->clasificacionKumite($competicionkata->competicion_torneo_id);
+            foreach ($data['competicioneskumite'] as $key => $competicionkumite) {
+                $clasificacion = $this->database->clasificacionKumite($competicionkumite->competicion_torneo_id);
                 if (!empty($clasificacion) && count($clasificacion) > 0) {
                     $data['competicioneskumite'][$key]->clasificacionfinal = $clasificacion;
                 } else {
@@ -95,7 +97,6 @@ class Home extends CI_Controller
         $finalkata = $this->database->clasificacionFinalKata($competicion_torneo_id, [1,2,3]);
         $kata = $this->database->clasificacionKata($competicion_torneo_id, [1,2]);
 
-        printr([$kata, $finalkata]);
     }
 
     public function vercompeticion($slug, $competicion_torneo_id)
@@ -113,7 +114,7 @@ class Home extends CI_Controller
             show_error('La competición no existe en el torneo.');
         }
 
-        if ($competicion->modalidad == 'KATA' || $competicion->modalidad == 'kata') {
+        if ($competicion->tipo == 'puntos') {
             $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
             $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
             $data['view'] = 'public/vistacompeticionkata';
@@ -121,7 +122,7 @@ class Home extends CI_Controller
                 base_url() . 'assets/public/js/vistacompeticionkata.js',
             ];
         }
-        if ($competicion->modalidad == 'KUMITE' || $competicion->modalidad == 'kumite') {
+        if ($competicion->tipo == 'liguilla' || $competicion->tipo == 'eliminatoria') {
             $data['view'] = 'public/vistacompeticionkumite';
             $data['matches'] = $this->database->getMatchesTree($competicion_torneo_id);
             $data['eliminatorias'] = $this->database->getEliminatoriasTree($competicion_torneo_id);
@@ -136,9 +137,6 @@ class Home extends CI_Controller
         $data['page_header']    =  $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel;
         $data['torneo'] = $torneo;
         $data['competicion'] = $competicion;
-
-
-        //printr($data['ordenparticipacion']);
         show($data);
     }
 

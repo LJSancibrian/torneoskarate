@@ -33,9 +33,7 @@ class Torneos extends CI_Controller
                     'class' => 'btn btn-sm btn-primary ml-auto'
                 ]
             ];
-            /*$data['default_filter'] = '2';*/
             $data['view']           = ['gestion/common/tabla_datatable', 'gestion/torneos/torneos_form_modal'];
-
             $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos.js'];
         } else {
             $data['view']           = ['gestion/common/tabla_datatable'];
@@ -339,6 +337,8 @@ class Torneos extends CI_Controller
         if ($this->user->group->id < 4) {
             $data['tabactive'] = 'inscripciones-tab';
             $data['clubs'] = $this->database->torneoClubs($torneo->torneo_id);
+            $data['deportistas'] = $this->database->getDeportistas();
+            //printr( $data['deportistas']);
             if ($torneo->tipo != 2) {
                 $data['m_kata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
             }
@@ -346,9 +346,14 @@ class Torneos extends CI_Controller
                 $data['m_kumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
             } 
             $data['view'] = ['gestion/torneos/base'];
-            $data['js_files'][] = assets_url() . 'admin/js/vistas/torneo_inscripciones.js';
+            $data['css_files'] = [
+                'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css'
+            ];
+            $data['js_files'] = [
+                'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
+                assets_url() . 'admin/js/vistas/torneo_inscripciones.js'
+            ];
         } else {
-
             $club = $this->database->userClub();
             $data['competicioneskata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
             $data['competicioneskumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
@@ -838,6 +843,7 @@ class Torneos extends CI_Controller
             'torneos_competiciones.categoria',
             'torneos_competiciones.nivel',
             $tabla . '.estado',
+            '(SELECT COUNT(*) FROM `torneos_inscripciones` WHERE competicion_torneo_id = torneos_competiciones.competicion_torneo_id) AS n_inscripciones',
             $tabla . '.*'
         ];
         $join     = [
@@ -972,6 +978,7 @@ class Torneos extends CI_Controller
             $params = [
                 'torneo_id' => input('torneo_id'),
                 'user_id' => input('user_id'),
+                'estado' => (input('estado') != '') ? input('estado') : 0,
                 'competicion_torneo_id' => input('competicion_nueva_torneo_id')
             ];
             $inscripcion = $this->database->insert('torneos_inscripciones', $params);
@@ -1016,7 +1023,7 @@ class Torneos extends CI_Controller
                 'torneo_id' => input('torneo_id'),
                 'user_id' => input('user_id'),
                 'competicion_torneo_id' => (input('competicion_nueva_torneo_id') == 0) ? input('competicion_previa_torneo_id') : input('competicion_nueva_torneo_id'),
-                'estado' => 0,
+                'estado' => (input('estado') != '') ? input('estado') : 0,
                 'deletedAt' => (input('competicion_nueva_torneo_id') == 0) ? date('Y-m-d H:i:s') : $inscripcion_previa[0]->deletedAt,
             ];
             $actualizar = $this->database->actualizar('torneos_inscripciones', $params, 'inscripcion_id', $inscripcion_previa[0]->inscripcion_id);
@@ -1121,6 +1128,7 @@ class Torneos extends CI_Controller
 
     public function copiar_categorias($torneo_origen, $torneo_destino)
     {
+        adminPage();
         $this->db->where('torneo_id', $torneo_origen);
         $this->db->where('deletedAt', '0000-00-00 00:00:00');
         $categorias = $this->db->get('torneos_competiciones')->result();
@@ -1137,4 +1145,32 @@ class Torneos extends CI_Controller
             $competicion_torneo_id = $this->database->insert('torneos_competiciones', $data);
         }
     }
+
+    public function copiar_inscripciones($torneo_origen, $torneo_destino)
+    {
+        adminPage();
+        $this->db->where('torneo_id', $torneo_origen);
+        $this->db->where('deletedAt', '0000-00-00 00:00:00');
+        $inscripciones = $this->db->get('torneos_inscripciones')->result();
+
+        foreach ($inscripciones as $key => $inscripcion) {
+            // busca la copeticion
+            $this->db->where('competicion_torneo_id', $inscripcion->competicion_torneo_id);
+            $competicion = $this->db->get('torneos_competiciones')->row();
+            $sibling_id = $competicion->sibling_id;
+
+            $this->db->where('sibling_id', $sibling_id);
+            $this->db->where('torneo_id', $torneo_destino);
+            $competicion_destino = $this->db->get('torneos_competiciones')->row();
+
+            $params = [
+                'torneo_id' => $torneo_destino,
+                'user_id' => $inscripcion->user_id,
+                'competicion_torneo_id' => $competicion_destino->competicion_torneo_id,
+                'estado' => 1
+            ];
+            $inscripcion_final = $this->database->insert('torneos_inscripciones', $params);
+        }
+    }
+
 }

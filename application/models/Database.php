@@ -96,6 +96,17 @@ class Database extends CI_Model
         }
     }
 
+    public function getDeportistas()
+    {
+        $this->no_deleted(['clubs']);
+        $this->db->select('users.id, users.first_name, users.last_name, clubs.nombre');
+        $this->db->where('users.active', 1);
+        $this->db->where('users_groups.group_id', 6);
+        $this->db->join('users_groups', 'users.id = users_groups.user_id');
+        $this->db->join('clubs', 'users.club_id = clubs.club_id');
+        return $this->db->get('users')->result();
+    }
+
     public function getClubs()
     {
         $this->no_deleted();
@@ -721,7 +732,8 @@ class Database extends CI_Model
         }
         foreach ($matches_old as $key => $value) {
             if (!in_array($value->match_id, $matches_new)) {
-                $this->db->remove('matches', ['match_id', $value->match_id]);
+                $this->db->where('match_id', $value->match_id);
+                $this->db->delete('matches');
             }
         }
     }
@@ -1318,7 +1330,9 @@ class Database extends CI_Model
         $this->no_deleted(['torneos_inscripciones']);
         $this->db->select('torneos_inscripciones.inscripcion_id, torneos_inscripciones.user_id, users.first_name, users.last_name, clubs.nombre');
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
-        $this->db->where_not_in('users.id', $anadidos);
+        if(count($anadidos) > 0){
+            $this->db->where_not_in('users.id', $anadidos);
+        }
         $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
         $this->db->join('clubs', 'users.club_id = clubs.club_id');
         $players = $this->db->get('torneos_inscripciones')->result();
@@ -1389,13 +1403,21 @@ class Database extends CI_Model
     {
         $this->db->where('sibling_id', $competicion_torneo_id);
         $this->db->where('deletedAt', '0000-00-00 00:00:00');
-        $sibling_id = $this->db->get('torneos_competiciones')->row();
-        if($sibling_id){
+        $this->db->order_by('competicion_torneo_id', 'asc');
+        $sibling_ids = $this->db->get('torneos_competiciones')->result();
+        $array = [];
+        $array[] = $competicion_torneo_id; 
+        foreach ($sibling_ids as $key => $sibling_id) {
+            $array[] = $sibling_id->competicion_torneo_id;
+        }
+        return $array;
+
+       /* if($sibling_id){
             $array[] = $sibling_id->competicion_torneo_id;
             return $this->getSiblings($sibling_id->competicion_torneo_id, $array);
         }else{
             return $array;
-        }
+        }*/
     }
 
     public function get_clasificacionLM($competicion_torneo_id)
@@ -1438,5 +1460,15 @@ class Database extends CI_Model
             return $retval;
         });
         return $competidores;
+    }
+
+
+    public function limpiar_tipo_competicion($competicion_torneo_id){
+        $competicion = $this->database->getCompeticion($competicion_torneo_id);
+        if($competicion->tipo == 'puntos'){
+            // se borran los matches con la competicion indicada
+            $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+            $this->db->delete('matches');
+        }
     }
 }

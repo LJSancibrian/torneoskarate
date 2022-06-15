@@ -118,13 +118,14 @@
 						</a>
 
 				</li>
+				<?php /* ?>
 				<li class="nav-item <?php echo ($this->uri->segment(1) == 'Competiciones_ko') ? 'active submenu' : '';?>">
 					<a href="<?php echo base_url();?>Competiciones_ko">
 							<i class="fas fa-trophy"></i>
 							<p>Competiciones KO</p>
 				</a>
 				</li>
-				<?php /* ?>
+				
 				<li class="nav-item">
 					<a class="nav-link" data-toggle="collapse" href="#collapseTorneos">
 						<i class="fas fa-trophy"></i>
@@ -181,7 +182,7 @@
 					</div>
 				</li>
 
-				<?php/*
+				<?php /*
 				<li class="nav-item">
 					<a class="nav-link" data-toggle="collapse" href="#collapseEventos">
 						<i class="far fa-calendar"></i>

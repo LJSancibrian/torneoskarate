@@ -1,9 +1,40 @@
 <div class="card mt--3">
     <div class="card-header">
-        <div class="d-flex align-items-center">
-
-        </div>
+        <div class="d-flex align-items-center"></div>
         <div class="card-body">
+            <div class="row border-bottom mb-3" id="add_inscripcion_form">
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <label for="" class="col-12 mb-2">Deportista:</label>
+                    <select name="deportista_id" id="deportista_id" class="form-control select2">
+                        <option value=""></option>
+                        <?php foreach ($deportistas as $key => $dep) { ?>
+                            <option value="<?php echo $dep->id;?>"><?php echo $dep->first_name.' '.$dep->last_name.' - '.$dep->nombre;?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <label for="" class="col-12 mb-2">Competición:</label>
+                    <select name="competicion_nueva_torneo_id" id="competicion_nueva_torneo_id" class="form-control select2">
+                        <option value=""></option>
+                        <?php if(isset($m_kata)){foreach ($m_kata as $key => $categoria) {?>
+                            <option value="<?php echo $categoria->competicion_torneo_id;?>">
+                            <?php echo $categoria->modalidad;?> <?php echo $categoria->categoria;?> <?php echo $categoria->genero;?> <?php echo $categoria->nivel;?>
+                            </option>
+                        <?php } }?>
+
+                        <?php if(isset($m_kumite)){foreach ($m_kumite as $key => $categoria) {?>
+                            <option value="<?php echo $categoria->competicion_torneo_id;?>">
+                            <?php echo $categoria->modalidad;?> <?php echo $categoria->categoria;?> <?php echo $categoria->genero;?> <?php echo $categoria->nivel;?>
+                            </option>
+                        <?php } }?>
+                    </select>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <button class="btn btn-default" type="button" id="add_inscripcion">Añadir inscripción</button>
+                </div>
+            </div>
+        
+       
             <div class="row border-bottom mb-3" id="filtros_inscripciones">
                 <label for="" class="col-12 mb-2">Filtrar por:</label>
                 <div class="col-12 col-sm-6 col-md-3 mb-3">
