@@ -163,7 +163,7 @@ $(document).on('click', '#guardar-marcador', function() {
     var senshu = $('[name="senshu"]:checked').val()
     var hantei = $('[name="hantei"]:checked').val()
     var winner = 0;
-    if (puntos_rojo == puntos_azul) {
+    if (puntos_rojo - puntos_azul == 0) {
         if (senshu == 'rojo') {
             winner = user_rojo
         } else {
@@ -177,13 +177,15 @@ $(document).on('click', '#guardar-marcador', function() {
                 }
             }
         }
-    } else {
-        if (puntos_rojo > puntos_azul) {
-            winner = user_rojo
-        } else {
-            winner = user_azul
-        }
     }
+    if (puntos_rojo - puntos_azul < 0) {
+        winner = user_azul
+    }
+
+    if (puntos_rojo - puntos_azul > 0) {
+        winner = user_rojo
+    }
+
     var fd = new FormData();
     fd.append("match_id", match_id);
     fd.append("puntos_rojo", puntos_rojo);
@@ -600,4 +602,20 @@ $(document).ready(function() {
 $(document).on('click', '#exportar_grupos', function() {
     var competicion_torneo_id = $(this).attr('data-competicion_torneo_id');
     window.open(base_url + 'Competiciones/pdfdoc/' + competicion_torneo_id, '_blank');
+})
+
+$(document).on('click', '[data-finalizar-competicion]', function(event) {
+    event.preventDefault();
+    var url = $(this).attr('href');
+    swal.fire({
+        icon: 'info',
+        title: '¿Finalizar la competición?<br>Con la competición finalizada, ya no se podrán cambiar los datos.',
+        showCancelButton: true,
+        confirmButtonText: 'Finalizar',
+        cancelButtonText: 'Cerrar',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url
+        }
+    })
 })

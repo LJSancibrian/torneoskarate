@@ -6,8 +6,8 @@
     <div class="container-fluid">
         <div class="row ">
             <div class="title text-center w-100">
-                <h2>KATA</h2>
-                <p>En la modalidad de KATA se valora la puntuación obtenida en cada ronda por cada árbitro asistente.</p>
+                <h2 class="text-uppercase"><?php echo $competicion->modalidad;?></h2>
+                <p>Se valora la puntuación obtenida en cada ronda por cada árbitro asistente.</p>
                 <div class="border"></div>
             </div>
         </div>

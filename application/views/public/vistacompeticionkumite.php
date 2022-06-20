@@ -3,8 +3,12 @@
     <div class="container-fluid">
         <div class="row ">
             <div class="title text-center w-100">
-                <h2>Kumite</h2>
-                <p>Fase inicial de grupos y fase eliminatoria con los clasificados de cada grupo.</p>
+                <h2 class="text-uppercase"><?php echo $competicion->modalidad;?></h2>
+                <?php if($competicion->tipo == 'liguilla'){?>
+                    <p>Fase inicial de grupos y fase eliminatoria con los clasificados de cada grupo.</p>
+                <?php } else{ ?>
+                    <p>Competición eliminatoria. El ganador pasa a la siguiente ronda.</p>
+                <?php  } ?>
                 <div class="border"></div>
             </div>
         </div>

@@ -36,15 +36,18 @@ class Competiciones extends CI_Controller
         }
         */
         $data['view'] = ['gestion/competiciones/tablerogeneral'];
+        $data['deportistas'] = $this->database->getDeportistas();
         $data['competicion'] = $competicion;
         $data['inscripciones'] = $inscripciones;
         $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
         $data['page_header']    =   (isset($torneo)) ? $torneo->titulo . ': Competición' : $competicion->categoria . ' ' . $competicion->modalidad;
        // printr($data['matches']);
         $data['css_files']       = [
+            'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
             assets_url() . 'plugins/jquery.gracket/style.css',
         ];
         $data['js_files']       = [
+            'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
             assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
             assets_url() . 'admin/js/vistas/competicionestorneosj3.js',
         ];
@@ -103,6 +106,7 @@ class Competiciones extends CI_Controller
                 assets_url() . 'admin/js/vistas/mesacompeticionkumite.js',
             ];
         }
+        //printr($eliminatorias);
         $data['page_header']    =   $torneo->titulo . ': ' . $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
         show($data);
     }
@@ -323,6 +327,45 @@ class Competiciones extends CI_Controller
         $torneo = $this->database->buscarDato('torneos', 'torneo_id', $competicion->torneo_id);
         if (!isset($torneo) || $torneo == false || $torneo->deletedAt != '0000-00-00 00:00:00') {
             show_404();
+        }
+        if($competicion_torneo_id == 128){
+            // copiar en competiciones 121 y 119
+            // buscar las inscripciones y las copia
+
+            // busca los matches cd la 128 y les copia 
+            $this->db->where('competicion_torneo_id', 128);
+            $inscripciones = $this->db->get('torneos_inscripciones')->result();
+            foreach ($inscripciones as $key => $inscripcion) {
+                unset($inscripcion->inscripcion_id);
+                $inscripcion->competicion_torneo_id = 121;
+                $this->db->insert('torneos_inscripciones', $inscripcion);
+                $inscripcion->competicion_torneo_id = 119;
+                $this->db->insert('torneos_inscripciones', $inscripcion);
+            }
+
+            $this->db->where('competicion_torneo_id', 128);
+            $matches = $this->db->get('matches')->result();
+            foreach ($matches as $key => $match) {
+                unset($match->match_id);
+                $match->competicion_torneo_id = 121;
+                $this->db->insert('matches', $match);
+                $match->competicion_torneo_id = 119;
+                $this->db->insert('matches', $match);
+            }
+
+            $params = [
+                'estado' => 2,
+                'updatedAt' => date('Y-m-d H:i:s')
+            ];
+            $this->database->actualizar('torneos_competiciones', $params, 'competicion_torneo_id', 121);
+            $params = [
+                'estado' => 2,
+                'updatedAt' => date('Y-m-d H:i:s')
+            ];
+            $this->database->actualizar('torneos_competiciones', $params, 'competicion_torneo_id', 119);
+
+            $this->guardarClasificacionLM(121);
+            $this->guardarClasificacionLM(119);
         }
 
         $this->guardarClasificacionLM($competicion_torneo_id);

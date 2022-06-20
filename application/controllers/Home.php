@@ -439,8 +439,50 @@ class Home extends CI_Controller
         phpinfo();
     }
 
-    public function cuadro()
+    
+    public function create_finalesLM()
     {
-        $this->load->view('cuadro');
+        //adminPage();
+        $competiciones = $this->database->getCompeticionesLM(2022);
+       // printr($competiciones);
+        $competicioneskata = [];
+        $competicioneskumite = [];
+        $sibling = [];
+        foreach ($competiciones as $key => $value) {
+            if($value->modalidad == 'kata' && !in_array($value->sibling_id, $sibling) ){
+                $competicioneskata[] = $value;
+                $sibling[] = $value->competicion_torneo_id;
+                if($value->nivel == 'C' || $value->nivel == 'D'){ //open mixto d
+                    $data = [
+                        'sibling_id' => ($value->sibling_id == 0) ? $value->competicion_torneo_id : $value->sibling_id,
+                        'tipo' => 'eliminatoria',
+                        'torneo_id' => 4,
+                        'modalidad' =>  $value->modalidad,
+                        'categoria' =>  'GRAN FINAL '.$value->categoria,
+                        'genero' =>  $value->genero,
+                        'nivel' =>  $value->nivel,
+                    ];
+                    $competicion_torneo_id = $this->database->insert('torneos_competiciones', $data);
+                }
+            }elseif($value->modalidad == 'kumite' && !in_array($value->sibling_id, $sibling) ){
+                $competicioneskumite[] = $value;
+                $sibling[] = $value->competicion_torneo_id;
+                if($value->sibling_id > 0) {
+                    $sibling[] =$value->sibling_id ;
+                };
+                if($value->nivel != 'A' && $value->nivel != 'TEAM' && $value->nivel != '-'){
+                    $data = [
+                        'sibling_id' => ($value->sibling_id == 0) ? $value->competicion_torneo_id : $value->sibling_id,
+                        'tipo' => 'eliminatoria',
+                        'torneo_id' => 4,
+                        'modalidad' =>  $value->modalidad,
+                        'categoria' =>  'GRAN FINAL '.$value->categoria,
+                        'genero' =>  $value->genero,
+                        'nivel' =>  $value->nivel,
+                    ];
+                    $competicion_torneo_id = $this->database->insert('torneos_competiciones', $data);
+                }
+            }
+        }
     }
 }

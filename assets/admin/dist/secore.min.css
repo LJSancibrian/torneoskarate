@@ -14598,7 +14598,7 @@ body[data-background-color="dark"] .board {
     position: absolute;
 }
 
-.round:last-child .match:last-child:after {
+.round:last-child:not(:first-child) .match:last-child:after {
     content: "Final Consolación";
     height: auto;
     font-size: 1.3rem;

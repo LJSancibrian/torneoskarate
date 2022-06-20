@@ -37,6 +37,27 @@
                     </li>
                 </ul>
             </div>
+
+            <div class="card-body bg-white border-top">
+                <div class="row" id="add_inscripcion_form">
+                    <label for="" class="col-12 col-md-3 text-right">Añadir inscripción:</label>
+                    <div class="col-12 col-md-6">
+                        <select name="deportista_id" id="deportista_id" class="form-control select2">
+                            <option value=""></option>
+                            <?php foreach ($deportistas as $key => $dep) { ?>
+                                <option value="<?php echo $dep->id; ?>"><?php echo $dep->first_name . ' ' . $dep->last_name . ' - ' . $dep->nombre; ?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3 mb-3">
+                        <button class="btn btn-default btn-sm" type="button" id="add_inscripcion">Añadir inscripción</button>
+                    </div>
+                    <?php echo form_open();
+                    echo form_hidden('competicion_nueva_torneo_id', $competicion->competicion_torneo_id);
+                    echo form_hidden('torneo_id', $competicion->torneo_id);
+                    echo form_close(); ?>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -44,6 +65,8 @@
         <div class="card" id="div_principal">
             <div class="card-header d-flex justify-content-between">
                 <div class="card-title fw-mediumbold text-uppercase"><?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?></div>
+
+                <a href="<?php echo base_url();?>Competiciones/mesa/<?php echo $competicion->competicion_torneo_id;?>" data-toggle="tooltip"  title="Manejar mesa" class="btn btn-icon btn-primary btn-round btn-sm" data-original-title="Manejar mesa"><i class="fas fa-chalkboard-teacher"></i></a>
 
                 <a href="<?php echo base_url(); ?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id; ?>" target="_blank" class="btn btn-icon btn-primary btn-round btn-sm" title="Generar PDF" target="_blank">
                     <i class="fas fa-file-pdf"></i>

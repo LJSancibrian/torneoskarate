@@ -22,7 +22,7 @@ tabla_deportistas = $("#table_datatable").DataTable({
         title: "Género",
         name: "genero",
         data: "genero",
-        render: function (data, type, row) {
+        render: function(data, type, row) {
             if (row.genero == 1) {
                 html = '<span class="badge badge-success">Masculino</span>';
             } else {
@@ -34,7 +34,7 @@ tabla_deportistas = $("#table_datatable").DataTable({
         title: "Estado",
         name: "active",
         data: "active",
-        render: function (data, type, row) {
+        render: function(data, type, row) {
             if (row.active == 1) {
                 html = '<span class="badge badge-success">Activo</span>';
             } else {
@@ -51,14 +51,14 @@ tabla_deportistas = $("#table_datatable").DataTable({
         title: "Acción",
         data: "bonoID",
         className: "text-truncate",
-        render: function (data, type, row) {
+        render: function(data, type, row) {
             html = '<div class="form-button-action">';
             html += '<button type="button" data-tooltip title="" class="btn btn-sm btn-outline-primary" data-original-title="Ver deportista" data-ver-deportista="' + row.id + '" data-slug="' + row.usercode + '"><i class="fa fa-user"></i></a>';
             html += '<button type="button" data-tooltip title="" class="btn btn-sm btn-outline-primary" data-original-title="Editar deportista" data-editar-deportista="' + row.id + '" data-slug="' + row.usercode + '"><i class="fa fa-edit"></i></a>';
             html += '</div>';
             return html
         }
-    },],
+    }, ],
     columnDefs: [{
         targets: [0, 1, 2, 3, 4, 5, 6, 7],
         visible: true
@@ -73,7 +73,7 @@ tabla_deportistas = $("#table_datatable").DataTable({
         url: base_url + 'Equipos/getDeportistas',
         type: "GET",
         datatype: "json",
-        data: function (data) {
+        data: function(data) {
             var club_id = $("#table_datatable").data('club-id');
             if (club_id != '') {
                 data.club_id = club_id;
@@ -81,21 +81,21 @@ tabla_deportistas = $("#table_datatable").DataTable({
         }
     },
     buttons: [
-        {name: 'excel', extend: 'excel', filename: 'deportistas_registrados', sheetName: 'Results', title: 'deportistas_registrados'},
-        {name: 'csv',   extend: 'csv', filename: 'deportistas_registrados', title: 'deportistas_registrados'}
+        { name: 'excel', extend: 'excel', filename: 'deportistas_registrados', sheetName: 'Results', title: 'deportistas_registrados' },
+        { name: 'csv', extend: 'csv', filename: 'deportistas_registrados', title: 'deportistas_registrados' }
     ],
-    createdRow: function (row, data, dataIndex) {
+    createdRow: function(row, data, dataIndex) {
         if (dataIndex > 0) {
             $(row).find('[data-tooltip]').tooltip();
         } else {
             $(row).find('[data-tooltip]').tooltip({ boundary: 'window' });
         }
     },
-    drawCallback: function (settings) { },
-    initComplete: function () { }
+    drawCallback: function(settings) {},
+    initComplete: function() {}
 });
 
-$(document).on('click', '[data-ver-deportista]', function () {
+$(document).on('click', '[data-ver-deportista]', function() {
     deportista_id = $(this).attr('data-ver-deportista')
     slug = $(this).attr('data-slug')
     var fd = new FormData();
@@ -108,13 +108,13 @@ $(document).on('click', '[data-ver-deportista]', function () {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function (response) {
+    }).done(function(response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function (i, value) {
+                $.each(response.error_validation, function(i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -170,20 +170,20 @@ $(document).on('click', '[data-ver-deportista]', function () {
                 }
             })
         }
-    }).always(function (jqXHR, textStatus) {
+    }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function () { }
+                willClose: function() {}
             })
         }
     });
 });
 
-$(document).on('click', '[data-editar-deportista]', function () {
+$(document).on('click', '[data-editar-deportista]', function() {
     deportista_id = $(this).attr('data-editar-deportista')
     slug = $(this).attr('data-slug')
     var fd = new FormData();
@@ -196,13 +196,13 @@ $(document).on('click', '[data-editar-deportista]', function () {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function (response) {
+    }).done(function(response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function (i, value) {
+                $.each(response.error_validation, function(i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -224,7 +224,7 @@ $(document).on('click', '[data-editar-deportista]', function () {
             $('[name="last_name_d"]').val(deportista.last_name);
             $('[name="dob"]').val(deportista.dob);
             $('[name="genero"]').val(deportista.genero);
-            $('[name="nivel"] option[value="'+deportista.nivel+'"]').attr('selected','selected');
+            $('[name="nivel"] option[value="' + deportista.nivel + '"]').attr('selected', 'selected');
             $('[name="peso"]').val(deportista.peso);
             $('[name="email_d"]').val(deportista.email);
             $('[name="phone_d"]').val(deportista.phone);
@@ -234,28 +234,28 @@ $(document).on('click', '[data-editar-deportista]', function () {
             } else {
                 $('[name="active_d"]').removeAttr('checked');
             }
-            if($('select[name="club_id"]').length > 0){
-                $('select[name="club_id"] option').removeAttr('selected','selected');
-                $('select[name="club_id"] option[value="'+deportista.club_id+'"]').attr('selected','selected');
+            if ($('select[name="club_id"]').length > 0) {
+                $('select[name="club_id"] option').removeAttr('selected', 'selected');
+                $('select[name="club_id"] option[value="' + deportista.club_id + '"]').attr('selected', 'selected');
             }
             $('[name="dni_d"]').val(deportista.dni);
             $('#carga_individual .modal-title .fw-mediumbold').html('Editar deportista')
             $('#carga_individual').modal('show');
         }
-    }).always(function (jqXHR, textStatus) {
+    }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function () { }
+                willClose: function() {}
             })
         }
     });
 });
 
-$('#submit-deportista-form').click(function () {
+$('#submit-deportista-form').click(function() {
     swal.fire({
         icon: 'question',
         title: 'Confirmar acción',
@@ -271,7 +271,8 @@ $('#submit-deportista-form').click(function () {
                 var action = base_url + 'Equipos/editar_deportista_form';
             }
             var fd = new FormData();
-            fd.append("club_id", $('[name="club_id"]').val());
+            var club_id = $('[name="clubs_id"]').length > 0 ? $('[name="clubs_id"]').val() : $('[name="club_id"]').val();
+            fd.append("club_id", club_id);
             fd.append("user_id", $('[name="deportista_id"]').val());
             fd.append("first_name", $("#first_name_d").val());
             fd.append("last_name", $("#last_name_d").val());
@@ -292,13 +293,13 @@ $('#submit-deportista-form').click(function () {
                 contentType: false,
                 processData: false,
                 data: fd
-            }).done(function (response) {
+            }).done(function(response) {
                 var response = JSON.parse(response);
                 $('[name="csrf_token"]').val(response.csrf)
                 if (response.error > 0) {
                     var errorhtml = ''
                     if (response.hasOwnProperty('error_validation')) {
-                        $.each(response.error_validation, function (i, value) {
+                        $.each(response.error_validation, function(i, value) {
                             errorhtml += value + '<br>'
                         })
                     }
@@ -316,20 +317,20 @@ $('#submit-deportista-form').click(function () {
                         icon: 'success',
                         title: 'Correcto',
                         html: response.msn,
-                        willClose: function () {
+                        willClose: function() {
                             tabla_deportistas.draw();
                             $('#carga_individual').modal('hide');
                         }
                     })
                 }
-            }).always(function (jqXHR, textStatus) {
+            }).always(function(jqXHR, textStatus) {
                 if (textStatus != "success") {
                     swal.fire({
                         icon: 'error',
                         title: 'Ha ocurrido un error AJAX',
                         html: jqXHR.statusText,
                         timer: 5000,
-                        willClose: function () { }
+                        willClose: function() {}
                     })
                 }
             });
@@ -338,7 +339,7 @@ $('#submit-deportista-form').click(function () {
 })
 
 // boton añadir deportista: opciones de 
-$('[data-carga-deportista]').click(function () {
+$('[data-carga-deportista]').click(function() {
     var tipo = $(this).attr('data-carga-deportista')
     if (tipo == 'individual') {
         $('#carga_individual form').trigger('reset');
@@ -346,13 +347,13 @@ $('[data-carga-deportista]').click(function () {
         $('[name="active_d"]').attr('checked', 'checked');
         $('#carga_individual .modal-title .fw-mediumbold').html('Nuevo deportista')
     }
-    if($('select[name="club_id"]').length > 0){
+    if ($('select[name="club_id"]').length > 0) {
         $('select[name="club_id"] option').removeAttr('selected');
     }
     $('#carga_' + tipo).modal('show')
 })
 
-$('#submit_deportistas_file_form').click(function () {
+$('#submit_deportistas_file_form').click(function() {
     swal.fire({
         icon: 'question',
         title: 'Confirmar acción',
@@ -366,7 +367,7 @@ $('#submit_deportistas_file_form').click(function () {
             var sweet_loader = '<div class="sweet_loader" style="animation: fa-spin .5s infinite linear;"><svg viewBox="0 0 140 140" width="140" height="140"><g class="outline"><path d="m 70 28 a 1 1 0 0 0 0 84 a 1 1 0 0 0 0 -84" stroke="rgba(0,0,0,0.1)" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></g><g class="circle"><path d="m 70 28 a 1 1 0 0 0 0 84 a 1 1 0 0 0 0 -84" stroke="#71BBFF" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dashoffset="200" stroke-dasharray="300"></path></g></svg></div>';
             swal.fire({
                 html: '<h4 class="h1">Procesando los datos</h4><p>Por favor, espere sin recargar la página.</p>',
-                onRender: function () {
+                onRender: function() {
                     $('.swal2-content').prepend(sweet_loader);
                 },
                 allowOutsideClick: false,
@@ -385,13 +386,13 @@ $('#submit_deportistas_file_form').click(function () {
                 contentType: false,
                 processData: false,
                 data: fd
-            }).done(function (response) {
+            }).done(function(response) {
                 var response = JSON.parse(response);
                 $('[name="csrf_token"]').val(response.csrf)
                 if (response.error > 0) {
                     var errorhtml = ''
                     if (response.hasOwnProperty('error_validation')) {
-                        $.each(response.error_validation, function (i, value) {
+                        $.each(response.error_validation, function(i, value) {
                             errorhtml += value + '<br>'
                         })
                     }
@@ -409,20 +410,20 @@ $('#submit_deportistas_file_form').click(function () {
                         icon: 'success',
                         title: 'Correcto',
                         html: response.msn,
-                        willClose: function () {
+                        willClose: function() {
                             tabla_deportistas.draw();
                             $('#carga_archivo').modal('hide');
                         }
                     })
                 }
-            }).always(function (jqXHR, textStatus) {
+            }).always(function(jqXHR, textStatus) {
                 if (textStatus != "success") {
                     swal.fire({
                         icon: 'error',
                         title: 'Ha ocurrido un error AJAX',
                         html: jqXHR.statusText,
                         timer: 5000,
-                        willClose: function () { }
+                        willClose: function() {}
                     })
                 }
             });

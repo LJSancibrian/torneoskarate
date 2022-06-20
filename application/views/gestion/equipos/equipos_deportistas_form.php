@@ -26,8 +26,8 @@
 
 		<?php if (isset($clubs)) { ?>
 			<div class="form-group">
-				<label for="club_id"><strong>Selecciona un equipo</strong></label>
-				<select class="form-control" name="club_id" id="club_id">
+				<label for="clubs_id"><strong>Selecciona un equipo</strong></label>
+				<select class="form-control" name="clubs_id" id="clubs_id">
 					<option value="">Selecciona un equipo</option>
 					<?php
 					foreach ($clubs as $key => $club) {
