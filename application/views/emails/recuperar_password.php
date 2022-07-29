@@ -106,7 +106,7 @@
                                                     <tbody>
                                                         <tr>
                                                             <td style="width:600px;">
-                                                                <img alt="" height="auto" src="https://www.karatepielagos.com/assets/img/headeremail.png" style="border:none;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="600" />
+                                                                <img alt="" height="auto" src="<?php echo base_url()?>/assets/img/headeremail.png" style="border:none;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="600" />
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -134,7 +134,7 @@
                                     <tbody>
                                         <tr>
                                             <td align="left" style="font-size:0px;padding:10px 25px;padding-top:50;padding-right:25px;padding-bottom:30px;padding-left:25px;word-break:break-word;">
-                                                <div style="font-family:open Sans Helvetica, Arial, sans-serif;font-size:35px;font-weight:bold;line-height:1;text-align:left;color:#333333;">KARATEPIELAGOS.COM</div>
+                                                <div style="font-family:open Sans Helvetica, Arial, sans-serif;font-size:35px;font-weight:bold;line-height:1;text-align:left;color:#333333;">TORNEOS.APISERVICES.ES</div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -181,7 +181,7 @@
                                         </tr>
                                         <tr>
                                             <td align="left" style="font-size:0px;padding:10px 25px;padding-top:25px;padding-right:25px;padding-bottom:25px;padding-left:25px;word-break:break-word;">
-                                                <div style="font-family:open Sans Helvetica, Arial, sans-serif;font-size:18px;line-height:1;text-align:left;color:#008081;">Un saludo,<br /><br /> karetepielagos.com</div>
+                                                <div style="font-family:open Sans Helvetica, Arial, sans-serif;font-size:18px;line-height:1;text-align:left;color:#008081;">Un saludo,<br /><br /> apiservices.es</div>
                                             </td>
                                         </tr>
                                     </tbody>

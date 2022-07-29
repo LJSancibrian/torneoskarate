@@ -5,7 +5,7 @@
 function site_title()
 {
     $ci = &get_instance();
-    echo ($ci->config->item('site_name') != '') ? $ci->config->item('site_name') : ((defined('SITE_TITLE')) ? SITE_TITLE : '');
+    return ($ci->config->item('site_title') != '') ? $ci->config->item('site_title') : '';
 }
 
 function euros($monto)

@@ -489,7 +489,11 @@ class Database extends CI_Model
         $this->db->select('user_id, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
         $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
         $this->db->where('puntoskata.user_id', $user_id);
-        $this->db->where_in('puntoskata.ronda', $ronda);
+        if(is_array($ronda)){
+            $this->db->where_in('puntoskata.ronda', $ronda);
+        }else{
+            $this->db->where('puntoskata.ronda', $ronda);
+        }
         $this->db->where('puntoskata.puntos >', 0);
         $this->db->group_by('user_id');
         return $this->db->get('puntoskata')->row();

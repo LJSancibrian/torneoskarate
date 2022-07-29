@@ -1,10 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <section class="posts section">
 	<div class="container">
-		<div class="col-md-12 text-center">
+		<?php /* <div class="col-md-12 text-center">
 			<h2>CLASIFICACIONES LIGA MUNICIPAL 2022</h2>
 			<a href="<?php echo base_url(); ?>ligamunicipal2022" class="btn btn-main">Clasificaciones generales</a>
 		</div>
+		*/ ?>
 
 		<?php if (count($proximos_torneos) > 0) { ?>
 			<h3 class="text-center mb-3">Próximos torneos</h3>

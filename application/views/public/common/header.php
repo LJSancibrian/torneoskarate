@@ -5,8 +5,8 @@
 		<nav class="navbar navbar-expand-lg navbar-light">
 			<!-- logo -->
 			<a class="navbar-brand logo" href="<?php echo base_url(); ?>">
-				<img class="logo-default" src="<?php echo base_url(); ?>assets/img/logo-ayuntamiento-pielagos-2018.png" alt="<?php echo site_title(); ?>" />
-				<img class="logo-white" src="<?php echo base_url(); ?>assets/img/logo-ayuntamiento-pielagos-2018.png" alt="<?php echo site_title(); ?>" />
+				<img class="logo-default" src="<?php echo base_url(); ?>assets/img/logo-300.png" alt="<?php echo site_title(); ?>" />
+				<img class="logo-white" src="<?php echo base_url(); ?>assets/img/logo-blanco-300.png" alt="<?php echo site_title(); ?>" />
 			</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
