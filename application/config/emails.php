@@ -4,7 +4,7 @@
 $config['protocol'] = 'mail';
 $config['smtp_host'] = '';
 $config['smtp_port'] = '';
-$config['smtp_user'] = '';
+$config['smtp_user'] = 'no-replay@karatepielagos.com';
 $config['smtp_pass'] = '';
 $config['mailtype'] = 'html';
 $config['charset_email'] = 'utf-8';

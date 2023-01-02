@@ -148,7 +148,7 @@
 					</div>
 				</li>
 
-				
+				<?php */ ?>
 
 				<li class="nav-item">
 					<a class="nav-link" data-toggle="collapse" href="#collapseArchivos">
@@ -181,7 +181,6 @@
 						</ul>
 					</div>
 				</li>
-				<?php */ ?>
 
 				<?php /*
 				<li class="nav-item">

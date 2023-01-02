@@ -1,7 +1,7 @@
 <footer class="footer">
 	<div class="container-fluid">
 		<div class="copyright ml-auto">
-		Gestión de torneos APIservices  © <?=date('Y')?> Secore.es
+			Ayuntamiento de Piélagos <?php echo date('Y'); ?>
 		</div>
 	</div>
 </footer>

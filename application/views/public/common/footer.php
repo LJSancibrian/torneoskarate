@@ -46,6 +46,6 @@
   </div>
   */ ?>
   <div class="footer-bottom">
-    <h5>Gestión de torneos APIservices  © <?=date('Y')?> Secore.es</h5>
+    <h5>Escuela de Kárate del Ayuntamiento de Piélagos</h5>
   </div>
 </footer> <!-- end footer -->

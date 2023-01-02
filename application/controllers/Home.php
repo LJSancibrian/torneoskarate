@@ -9,8 +9,9 @@ class Home extends CI_Controller
     }
     public function index()
     {
-        $data['page_header']    = 'Gestión de torneos';
-        $data['page_sub_header']    = 'Apiservices';
+        $data['page_header']    = 'Torneos de<br>Karate';
+        $data['page_header']    = 'Torneos de Karate';
+        $data['page_sub_header']    = 'Ayuntamiento de Piélagos';
         $params = [
             'tabla' => 'torneos',
             'where' => [
@@ -224,7 +225,7 @@ class Home extends CI_Controller
                     $this->session->set_flashdata('gotourl', $this->input->post('gotourl'));
                 }
                 $data['page_header']    = 'Área Privada';
-                $data['page_sub_header']    = 'Gestión de torneos';
+                $data['page_sub_header']    = 'Torneos de Karate';
                 $data['view']           = 'public/secciones/login';
                 show($data);
             }
@@ -302,7 +303,7 @@ class Home extends CI_Controller
                 $this->session->set_flashdata('gotourl', $this->input->post('gotourl'));
             }
             $data['page_header']    = 'Área privada';
-            $data['page_sub_header']    = 'Gestión de torneos';
+            $data['page_sub_header']    = 'Torneos de Karate';
             $data['view']           = 'public/secciones/recuperar_contrasena';
             show($data);
         } else {
@@ -310,7 +311,7 @@ class Home extends CI_Controller
             if (empty($identity)) {
                 $this->session->set_flashdata('error', 'El email indicado no se corresponde con ninguna cuenta de usuario.');
                 $data['page_header']    = 'Área privada';
-                $data['page_sub_header']    = 'Gestión de torneos';
+                $data['page_sub_header']    = 'Torneos de Karate';
                 $data['view']           = 'public/secciones/recuperar_contrasena';
                 show($data);
             } else {
@@ -400,7 +401,7 @@ class Home extends CI_Controller
                 $this->session->set_flashdata('error', $data['error']);
                 $data['user_id'] = $user->id;
                 $data['page_header']    = 'Área privada';
-                $data['page_sub_header']    = 'Gestión de torneos';
+                $data['page_sub_header']    = 'Torneos de Karate';
                 $data['view']           = 'public/secciones/recuperar_password_code';
                 show($data);
             } else {
@@ -484,34 +485,4 @@ class Home extends CI_Controller
             }
         }
     }
-
-    /*public function change_names()
-    {
-        $users = $this->db->get('users')->result();
-
-        foreach ($users as $key => $u) {
-           
-            if($u->genero > 0){
-                $this->db->where('genero', ($u->genero == 1) ? 'M' : 'F');
-                $this->db->order_by('rand()');
-                $this->db->limit(1);
-                $nombre = $this->db->get('nombres')->row()->nombre;
-
-                $this->db->order_by('rand()');
-                $this->db->limit(2);
-                $apellidos = $this->db->get('apellidos')->result();
-
-                $data = [
-                    'first_name' => $nombre,
-                    'last_name' => $apellidos[0]->apellido.' '.$apellidos[1]->apellido,
-                    'phone' => mt_rand(500000000, 599999999),
-                    'dni' => $this->utilidades->rand_unique('users', 'dni', 9, TRUE)
-                ];
-                $this->db->where('id', $u->id);
-                $this->db->update('users', $data);
-            }
-           
-        }
-    }*/
-    
 }

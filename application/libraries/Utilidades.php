@@ -82,30 +82,58 @@ class Utilidades
 
     public function sendmail($datos, $forzado = false)
     {
-       $this->u->load->config('emails');
+        /***************************
+        Se reibe un array con los siguientes elementos
+        (minimo):
+        'to' => email de destino
+        'subject' => asunto del envio
+        (opcional):
+        'config' => otra configuracion que no sea la de por defecto
+        'attach' => archivos adjuntos, en array
+        'bcc' => para mas de un destinatario
+        'message' => para enviar un email especiífico
+        /***************************/
+        $this->u->load->config('emails');
         if ($_SERVER['SERVER_NAME'] == 'localhost' || $this->u->config->item('smtp_user') == '') {
             return true;
         } else {
             if (isset($datos['configemail'])) {
                 $config = $datos['configemail'];
             } else {
-                $config = array(
-                    'protocol'       => $this->u->config->item('protocol'),
-                    'smtp_host'      => $this->u->config->item('smtp_host'),
-                    'smtp_port'      => $this->u->config->item('smtp_port'),
-                    'smtp_user'      => $this->u->config->item('smtp_user'),
-                    'smtp_pass'      => $this->u->config->item('smtp_pass'),
-                    'mailtype'       => $this->u->config->item('mailtype'),
-                    'charset'        => $this->u->config->item('charset_email'),
-                    'bcc_batch_mode' => $this->u->config->item('bcc_batch_mode'),
-                    'validation'     => $this->u->config->item('validation'),
-                );
+                if($this->u->config->item('protocol') != ''){
+                    $config['protocolo'] = $this->u->config->item('protocol');
+                }
+                if($this->u->config->item('smtp_host') != ''){
+                    $config['smtp_host'] = $this->u->config->item('smtp_host');
+                }
+                if($this->u->config->item('smtp_port') != ''){
+                    $config['smtp_port'] = $this->u->config->item('smtp_port');
+                }
+                if($this->u->config->item('smtp_user') != ''){
+                    $config['smtp_user'] = $this->u->config->item('smtp_user');
+                }
+                if($this->u->config->item('smtp_pass') != ''){
+                    $config['smtp_pass'] = $this->u->config->item('smtp_pass');
+                }
+                if($this->u->config->item('protocol') != ''){
+                    $config['protocolo'] = $this->u->config->item('protocol');
+                }
             }
+
+            $config['mailtype'] = $this->u->config->item('mailtype');
+            $config['charset'] = $this->u->config->item('charset_email');
+            $config['bcc_batch_mode'] = $this->u->config->item('bcc_batch_mode');
+            $config['validation'] = $this->u->config->item('validation');
 
             $this->u->load->library("email");
             $this->u->email->clear(TRUE);
             $this->u->email->initialize($config);
-            $this->u->email->from($this->u->config->item('smtp_user'), limpiar_string($this->u->config->item('site_title')));
+            if (isset($datos['from'])) {
+                $this->u->email->from($datos['from'], 'Karatepielagos.com');
+            }else{
+                $this->u->email->from($this->u->config->item('smtp_user'), 'Karatepielagos.com');
+            }
+            
             $this->u->email->to($datos['to']);
             $this->u->email->subject($datos['subject']);
             if (isset($datos['attach'])) {
@@ -117,11 +145,16 @@ class Utilidades
                 $this->u->email->to('');
                 $this->u->email->bcc($datos['bcc']);
             }
+            if (isset($datos['replay_to'])) {
+                $this->u->email->reply_to($datos['replay_to']['email'], $datos['replay_to']['name']);
+            }
+
             if (isset($datos['message'])) {
                 $message = $datos['message'];
             } else {
                 $message = $this->u->load->view('emails/plantilla_base', $datos, true);
             }
+            
 
             $this->u->email->message($message);
             if ($this->u->email->send()) {

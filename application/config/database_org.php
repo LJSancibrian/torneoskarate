@@ -72,6 +72,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 $active_group = 'default2';
 $query_builder = TRUE;
+
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
@@ -115,6 +116,7 @@ $db['default2'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
 $db['server'] = array(
 	'dsn'	=> '',
 	'hostname' => 'bbdd.karatepielagos.com',
