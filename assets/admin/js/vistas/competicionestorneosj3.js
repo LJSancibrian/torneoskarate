@@ -167,6 +167,65 @@ $(document).on('click', '[data-generar-tablero]', function() {
                 actualizar_datos_combates();
             }
 
+            if (competicion_tipo == 'liga') {
+                var html = `<h4 class="card-title d-flex justify-content-between align-items-center">Fase de grupos <span id="totalcomabtes"></span></h4>
+                <div id="fasegrupos"></div>
+                <hr>
+                <h4>Eliminatorias</h4>
+                <div id="faseeliminatorias">
+                    <div class="brackets"></div>
+                </div>
+                <button type="button" data-guardar-liguilla="${competicion_torneo_id}" class="btn btn-sm btn-default m-3">Guardar grupos</button>`;
+                $('#tablero-competicion').html(html);
+                var totalinscritos = response.inscritos.length;
+                var grupos = [];
+
+                // se genera una tabla 
+                grupos.push(1)
+               
+                $('[id^="grupokumite_"]').remove();
+                for (let index = 0; index < grupos.length; index++) {
+                    var html = `<div class="border-bottom d-flex flex-row justify-content-start my-3" id="grupokumite_${grupos[index]}" grupo="${grupos[index]}">
+                    <table class="table table-striped table-bordered text-center w-auto" id="tablakumite_${grupos[index]}">
+                    <thead>
+                        <tr>
+                            <th colspan="4" class="bg-white text-primary font-weigth-bold">GRUPO ${grupos[index]}</th>
+                        </tr>
+                    </thead>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th colspan="2" class="text-left">Deportista</th>
+                            <th class="text-left">Equipo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="no-sort"><td colspan="4"></td></tr>
+                    </tbody>
+                </table></div>`;
+                    $('#fasegrupos').append(html);
+                }
+                // recorrer las inscripciones y colocar una en cada grupo de forma
+                $.each(response.inscritos, function(i, elem) {
+                    var deportista = elem.first_name + ' ' + elem.last_name;
+                    var posicion = i + 1;
+                    var tr = `<tr data-user="${elem.user_id}" data-inscripcion_id="${elem.inscripcion_id}"><td>${posicion}</td><td colspan="2" class="text-nowrap">${deportista}</td><td>${elem.nombre}</td></tr>`;
+                    if (i < grupos.length) {
+                        var letter = grupos[i];
+                    } else {
+                        var grupo = i % grupos.length;
+                        var letter = grupos[grupo];
+                    }
+                    selectortabla = '#tablakumite_' + letter + ' tbody';
+                    $(selectortabla).append(tr);
+                })
+                tabassortable();
+                dibujar_cruces_grupos();
+                dibulareliminatorias()
+                actualizar_datos_combates();
+            }
+
+
         }
     }).always(function(jqXHR, textStatus) {
         if (textStatus != "success") {
@@ -625,6 +684,51 @@ function dibular_competicion_eliminatoria(inscripciones) {
 
 }
 
+
+function dibujarLiga(inscripciones)
+{
+    console.log(inscripciones);
+
+    let teams = [
+        'Tigers',
+        'Foofels',
+        'Drampamdom',
+        'Lakebaka'
+    ]
+      
+      const roundRobin = (teams) => {
+        let schedule = []
+        let league = teams.slice()
+        
+        if (league.length % 2) {
+          league.push('None')
+        }
+        
+        let rounds = league.length
+        
+        for (let j=0; j<(rounds-1)*2; j ++) {
+          schedule[j] = []
+          for (let i=0; i<rounds/2; i++) {
+            if (league[i] !== 'None' && league[rounds-1-i] !== 'None') {
+              if (j % 2 == 1) {
+                schedule[j].push([league[i], league[rounds-1-i]])
+              } else {
+                schedule[j].push([league[rounds-1-i], league[i]])
+              }
+            }
+          }
+          league.splice(1, 0, league.pop())
+        }
+        return schedule
+      }
+      
+      let leagueSchedule = roundRobin(teams)
+      
+      for (let p=0; p<leagueSchedule.length; p++) {
+        console.log(leagueSchedule[p])
+      }
+      
+}
 function eliminatoriasortable() {
     $('.g_round:first >.g_game').sortable({
         opacity: 0.9,

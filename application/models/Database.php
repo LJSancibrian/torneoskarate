@@ -919,15 +919,15 @@ class Database extends CI_Model
             $player->hantei = $totaluser->hantei;
         }
         usort($players, function ($a, $b) {
-            $retval = $b->ganados <=> $a->ganados;
+            $retval = $b->ganados <=> $a->ganados; // mas combates ganados
             if ($retval == 0) {
-                $retval = $b->puntos <=> $a->puntos;
+                $retval = $b->puntos <=> $a->puntos; // mas puntos a favor
                 if ($retval == 0) {
-                    $retval = $a->puntos_contra <=> $b->puntos_contra;
+                    $retval = $a->puntos_contra <=> $b->puntos_contra; // menos puntos en contra
                     if ($retval == 0) {
-                        $retval = $b->senshu <=> $a->senshu;
+                        $retval = $b->senshu <=> $a->senshu; // mas sehshu a favor
                         if ($retval == 0) {
-                            $retval = $b->hantei <=> $a->hantei;
+                            $retval = $b->hantei <=> $a->hantei; // mas hantei a favor
                         }
                     }
                 }

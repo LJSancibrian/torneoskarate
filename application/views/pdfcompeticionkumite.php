@@ -95,12 +95,12 @@
 
 <body style="word-spacing:normal;padding:50px 0px 0px 0px;">
     <footer>
-        <?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?> - página <span class="page-number"></span>
+    <?php echo $competicion->modalidad; ?> <?php echo $competicion->categoria; ?> <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?> => <?php echo $competicion->nivel; ?> - página <span class="page-number"></span>
     </footer>
     <table class="header">
         <tr>
             <td>
-            <?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?>
+            <?php echo $competicion->modalidad; ?> <?php echo $competicion->categoria; ?> <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?> => <?php echo $competicion->nivel; ?> 
             </td>
         </tr>
     </table>
@@ -114,10 +114,10 @@
                     <tr class="border">
                         <th style="padding: 2px;">#</th>
                         <th style="padding: 2px;">R</th>
-                        <th>AKA</th>
-                        <th></th>
-                        <th></th>
                         <th>AO</th>
+                        <th></th>
+                        <th></th>
+                        <th>AKA</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -127,20 +127,20 @@
                         <tr height="50px" class="border">
                             <td style="padding: 2px !important;text-align:center;" class="border"><?php echo $match->match_id; ?></td>
                             <td style="padding: 2px !important;text-align:center;"><?php echo $match->ronda; ?></td>
-                            <td style="width:200px;"><div style="height:35px;"><?php echo ucwords(str_replace('<br>', '<br> ', strtolower($match->rojo->nombre))); ?></div></td>
-                            <td></td>
-                            <td></td>
                             <td style="width:200px;"><div style="height:35px;"><?php echo ucwords(str_replace('<br>', '<br> ', strtolower($match->azul->nombre))); ?></div></td>
+                            <td></td>
+                            <td></td>
+                            <td style="width:200px;"><div style="height:35px;"><?php echo ucwords(str_replace('<br>', '<br> ', strtolower($match->rojo->nombre))); ?></div></td>
                         </tr>
                         <tr height="30px">
                             <td colspan="6"><div style="height:10px;"></div></td>
                         </tr>
                     <?php 
-                    if(!array_key_exists($match->user_rojo, $usuers)){
-                        $usuers[$match->user_rojo] = $match->rojo->nombre;
-                    }
                     if(!array_key_exists($match->user_azul, $usuers)){
                         $usuers[$match->user_azul] = $match->azul->nombre;
+                    }
+                    if(!array_key_exists($match->user_rojo, $usuers)){
+                        $usuers[$match->user_rojo] = $match->rojo->nombre;
                     }
                 
                 } ?>

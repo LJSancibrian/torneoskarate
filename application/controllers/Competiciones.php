@@ -276,6 +276,19 @@ class Competiciones extends CI_Controller
             ];
             returnAjax($response);
         }
+
+        if(input('competicion_tipo') == 'liga'){
+            // es kata. Se ordenan de forma aleatoria las inscripcionbes y se retornan los valores de ronda y jueces, por si los quiere variar
+            shuffle($inscripciones);
+            $response = [
+                'error'     => 0,
+                'tipo' => 'KUMITE',
+                'competicion_tipo' => input('competicion_tipo'),
+                'inscritos' => $inscripciones, //array_slice($inscripciones, 0, 24), //$inscripciones,
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        }
     }
 
     public function pdfdoc($competicion_torneo_id)

@@ -163,7 +163,11 @@ $(document).on('click', '#guardar-marcador', function() {
     var senshu = $('[name="senshu"]:checked').val()
     var hantei = $('[name="hantei"]:checked').val()
     var winner = 0;
-    if (puntos_rojo - puntos_azul == 0) {
+    if (puntos_rojo - puntos_azul < 0) {
+        winner = user_azul
+    }else if (puntos_rojo - puntos_azul > 0) {
+        winner = user_rojo
+    } else if (puntos_rojo - puntos_azul == 0) {
         if (senshu == 'rojo') {
             winner = user_rojo
         } else {
@@ -172,19 +176,23 @@ $(document).on('click', '#guardar-marcador', function() {
             } else {
                 if (hantei == 'azul') {
                     winner = user_azul
-                } else {
+                } else if (hantei == 'rojo'){
                     winner = user_rojo
+                } else {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'ERROR',
+                        html: 'En caso de empate, es necesario indicar un ganador. Marcar ganador por HANTEI',
+                        willClose: function() {
+                          
+                        }
+                    });
+                    return;
                 }
             }
         }
     }
-    if (puntos_rojo - puntos_azul < 0) {
-        winner = user_azul
-    }
-
-    if (puntos_rojo - puntos_azul > 0) {
-        winner = user_rojo
-    }
+    
 
     var fd = new FormData();
     fd.append("match_id", match_id);

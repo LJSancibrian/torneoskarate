@@ -35,6 +35,11 @@
                     <li class="py-1">
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" title="Generar como eliminatoria" data-generar-tablero="<?php echo $competicion->competicion_torneo_id; ?>" data-generar-tipo="eliminatoria"><i class="fas fa-random mr-2"></i> Eliminatorias directas</button> Entrentamiento directo entre deportistas continuando en la competición los ganadores.
                     </li>
+
+                    <li class="py-1">
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" title="Generar como liga todos contra todos" data-generar-tablero="<?php echo $competicion->competicion_torneo_id; ?>" data-generar-tipo="liga"><i class="fas fa-random mr-2"></i> Liga</button> Liga todos contra todos, pasando a la final el primer y segundo clasificado.
+                    </li>
+
                 </ul>
             </div>
 
