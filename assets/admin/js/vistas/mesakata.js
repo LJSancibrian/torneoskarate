@@ -260,6 +260,9 @@ function clasificacion(table_ID) {
                     <td>${row.nombre}</td>
                     <td>${row.total}</td>
                     <td>${row.media}</td>
+                    <td>${row.puntos_max}</td>
+                    <td>${row.puntos_max2}</td>
+                    <td>${row.puntos_max3}</td>
                     </tr>`;
 
                     $(bodytable).append(tr)

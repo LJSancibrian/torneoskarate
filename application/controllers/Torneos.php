@@ -339,6 +339,9 @@ class Torneos extends CI_Controller
             $data['clubs'] = $this->database->torneoClubs($torneo->torneo_id);
             $data['deportistas'] = $this->database->getDeportistas();
             //printr( $data['deportistas']);
+            $data['competicioneskata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
+           // printr($data['competicioneskata']);
+            $data['competicioneskumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
             if ($torneo->tipo != 2) {
                 $data['m_kata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
             }
@@ -1171,6 +1174,33 @@ class Torneos extends CI_Controller
             ];
             $inscripcion_final = $this->database->insert('torneos_inscripciones', $params);
         }
+    }
+
+    public function copy_inscripciones()
+    {
+        isAjax();
+        $this->form_validation->set_rules('competicion_origen', 'Competición origen', 'trim|required');
+        $this->form_validation->set_rules('competicion_destino', 'Competición destino', 'trim|required');
+        validForm();
+
+        // busca la copeticion
+        $inscripciones = $this->database->inscritosCompeticion(input('competicion_origen'));
+
+        foreach ($inscripciones as $key => $i) {
+            $params = [
+                'torneo_id' => input('torneo_id'),
+                'user_id' => $i->user_id,
+                'competicion_torneo_id' => input('competicion_destino'),
+                'estado' => 1
+            ];
+            $inscripcion_final = $this->database->insert('torneos_inscripciones', $params);
+        }
+        $response = [
+            'error'     => 0,
+            'msn' => 'Inscripciones copiadas',
+            'csrf'      => $this->security->get_csrf_hash(),
+        ];
+        returnAjax($response);
     }
 
 }

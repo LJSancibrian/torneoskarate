@@ -4,18 +4,15 @@
 			 <?php /* <img src="<?php echo base_url(); ?>assets/images/logo-obulcula.png" alt="navbar brand" class="navbar-brand img-fluid" style="filter: brightness(0) invert(1); max-height:30px;"> */ ?>
 		</a>
 		<?php if($this->user->group->id > 3){?>
-		<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon">
-						<i class="icon-menu"></i>
-					</span>
-				</button>
-				<button class="topbar-toggler more"><i class="icon-options-vertical"></i></button>
+			<button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon">
+				<i class="icon-menu"></i>
+			</span>
+		</button>
 		<div class="nav-toggle">
-		<div class="nav-toggle">
-					<button class="btn btn-toggle sidenav-overlay-toggler">
-						<i class="icon-menu"></i>
-					</button>
-				</div>
+			<button class="btn btn-toggle toggle-sidebar">
+				<i class="icon-menu"></i>
+			</button>
 		</div>
 		<?php }else{?>
 

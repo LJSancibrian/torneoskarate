@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <section class="posts section">
 	<div class="container">
-		<div class="col-md-12 text-center">
+		<div class="col-md-12 text-center d-none">
 			<h2>CLASIFICACIONES LIGA MUNICIPAL 2022</h2>
 			<a href="<?php echo base_url(); ?>ligamunicipal2022" class="btn btn-main">Clasificaciones generales</a>
 		</div>

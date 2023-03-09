@@ -278,3 +278,89 @@ $(document).on('click', '#add_inscripcion', function() {
 $(document).ready(function() {
     $(".select2").select2();
 });
+
+$(document).on('click', '#copy_inscripciones', function() {
+    swal.fire({
+        icon: 'question',
+        title: 'Confirmar acción',
+        showCancelButton: true,
+        confirmButtonText: 'Si, copiar',
+        cancelButtonText: 'Cerrar sin cambios',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var fd = new FormData();
+            fd.append("torneo_id", $('[name="torneo_id"]').val());
+            fd.append("competicion_origen", $('[name="competicion_origen"]').val());
+            fd.append("competicion_destino", $('[name="competicion_destino"]').val());
+            fd.append("csrf_token", $('[name="csrf_token"]').val());
+            $.ajax({
+                url: base_url + 'Torneos/copy_inscripciones',
+                method: "POST",
+                contentType: false,
+                processData: false,
+                data: fd
+            }).done(function(response) {
+                var response = JSON.parse(response);
+                $('[name="csrf_token"]').val(response.csrf)
+                if (response.error > 0) {
+                    var errorhtml = ''
+                    if (response.hasOwnProperty('error_validation')) {
+                        $.each(response.error_validation, function(i, value) {
+                            errorhtml += value + '<br>'
+                        })
+                    }
+                    if (response.hasOwnProperty('error_msn')) {
+                        errorhtml += response.error_msn
+                    }
+                    swal.fire({
+                        icon: 'error',
+                        title: 'ERROR',
+                        html: errorhtml,
+                        willClose: function() {
+                            if (response.hasOwnProperty('redirect')) {
+                                if (response.redirect == 'refresh') {
+                                    location.reload()
+                                } else {
+                                    window.location.href = response.redirect
+                                }
+                            }
+                        }
+                    });
+                    select.val(competicion_previa_torneo_id);
+                    return;
+                } else {
+                    swal.fire({
+                        icon: 'success',
+                        title: 'Correcto',
+                        html: response.msn,
+                        willClose: function () {
+                            if (response.hasOwnProperty('redirect')) {
+                                if (response.redirect == 'refresh') {
+                                    location.reload()
+                                } else {
+                                    window.location.href = response.redirect
+                                }
+                            }
+                            $('[name="competicion_origen"]').val('');
+                            $('[name="competicion_destino"]').val('');
+                            $('[name="competicion_origen"]').trigger('change');
+                            $('[name="competicion_destino"]').trigger('change');
+                            table_inscripciones.draw()
+                        }
+                    })
+                }
+            }).always(function(jqXHR, textStatus) {
+                if (textStatus != "success") {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Ha ocurrido un error AJAX',
+                        html: jqXHR.statusText,
+                        timer: 5000,
+                        willClose: function() {}
+                    })
+                }
+            });
+
+        }
+    });
+})

@@ -450,11 +450,12 @@ class Database extends CI_Model
             }
 
             $puntos = $this->getPuntosordenadosKata($competicion_torneo_id, $user->user_id);
-            $user->puntos_max = (isset($puntos[0])) ? $puntos[0] : 0;
-            $user->puntos_max2 = (isset($puntos[1])) ? $puntos[1] : 0;
-            $user->puntos_max3 = (isset($puntos[2])) ? $puntos[2] : 0;
+            $user->puntos_max = (isset($puntos[0])) ? $puntos[0]->puntos : 0;
+            $user->puntos_max2 = (isset($puntos[1])) ? $puntos[1]->puntos : 0;
+            $user->puntos_max3 = (isset($puntos[2])) ? $puntos[2]->puntos : 0;
+            $user->puntos_max4 = (isset($puntos[3])) ? $puntos[3]->puntos : 0;
+            
         }
-
         usort($clasificacion, function ($a, $b) {
             $totalb = (isset($b->rondas[3]->total)) ? $b->rondas[3]->total : 0;
             $totala = (isset($a->rondas[3]->total)) ? $a->rondas[3]->total : 0;
@@ -502,7 +503,7 @@ class Database extends CI_Model
     {
         $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
         $this->db->where('puntoskata.user_id', $user_id);
-        $this->db->order_by('puntos', 'ASC');
+        $this->db->order_by('puntos', 'desc');
         $todos =  $this->db->get('puntoskata')->result();
         return $todos;
     }
@@ -919,15 +920,15 @@ class Database extends CI_Model
             $player->hantei = $totaluser->hantei;
         }
         usort($players, function ($a, $b) {
-            $retval = $b->ganados <=> $a->ganados; // mas combates ganados
+            $retval = $b->ganados <=> $a->ganados;
             if ($retval == 0) {
-                $retval = $b->puntos <=> $a->puntos; // mas puntos a favor
+                $retval = $b->puntos <=> $a->puntos;
                 if ($retval == 0) {
-                    $retval = $a->puntos_contra <=> $b->puntos_contra; // menos puntos en contra
+                    $retval = $a->puntos_contra <=> $b->puntos_contra;
                     if ($retval == 0) {
-                        $retval = $b->senshu <=> $a->senshu; // mas sehshu a favor
+                        $retval = $b->senshu <=> $a->senshu;
                         if ($retval == 0) {
-                            $retval = $b->hantei <=> $a->hantei; // mas hantei a favor
+                            $retval = $b->hantei <=> $a->hantei;
                         }
                     }
                 }

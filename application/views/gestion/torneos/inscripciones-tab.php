@@ -34,6 +34,45 @@
                 </div>
             </div>
         
+            <div class="row border-bottom mb-3" id="add_inscripcion_form">
+            <div class="col-12 ">
+                <h3>Copiar inscripciones de una categoria a otra</h3>
+            </div>
+                <div class="col-12 col-md-4 mb-3">
+                    <label for="" class="col-12 mb-2">Competición de origen (copiar desde):</label>
+                    <select name="competicion_origen" id="competicion_origen" class="form-control select2">
+                        <option value="" disabled>KATA</option>
+                        <?php foreach ($competicioneskata as $key => $c) { 
+                            $nombre = $c->modalidad . ' ' .$c->categoria . ' ' . (($c->genero == 'M') ? 'Masculino' : (($c->genero == 'F') ? 'Femenino' : ' Mixto'));?>
+                            <option value="<?php echo $c->competicion_torneo_id;?>"><?php echo $nombre; ?></option>
+                        <?php } ?>
+                        <option value="" disabled>KUMITE</option>
+                        <?php foreach ($competicioneskumite as $key => $c) { 
+                            $nombre = $c->modalidad . ' ' .$c->categoria . ' ' . (($c->genero == 'M') ? 'Masculino' : (($c->genero == 'F') ? 'Femenino' : ' Mixto'));?>
+                            <option value="<?php echo $c->competicion_torneo_id;?>"><?php echo $nombre; ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 mb-3">
+                    <label for="" class="col-12 mb-2">Competición de destino (copiar hasta):</label>
+                    <select name="competicion_destino" id="competicion_destino" class="form-control select2">
+                    <option value="" disabled>KATA</option>
+                        <?php foreach ($competicioneskata as $key => $c) { 
+                            $nombre = $c->modalidad . ' ' .$c->categoria . ' ' . (($c->genero == 'M') ? 'Masculino' : (($c->genero == 'F') ? 'Femenino' : ' Mixto'));?>
+                            <option value="<?php echo $c->competicion_torneo_id;?>"><?php echo $nombre; ?></option>
+                        <?php } ?>
+                        <option value="" disabled>KUMITE</option>
+                        <?php foreach ($competicioneskumite as $key => $c) { 
+                            $nombre = $c->modalidad . ' ' .$c->categoria . ' ' . (($c->genero == 'M') ? 'Masculino' : (($c->genero == 'F') ? 'Femenino' : ' Mixto'));?>
+                            <option value="<?php echo $c->competicion_torneo_id;?>"><?php echo $nombre; ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-4 mb-3">
+                    <button class="btn btn-default" type="button" id="copy_inscripciones">Copiar inscripcionesde origen a destino</button>
+                </div>
+            </div>
        
             <div class="row border-bottom mb-3" id="filtros_inscripciones">
                 <label for="" class="col-12 mb-2">Filtrar por:</label>

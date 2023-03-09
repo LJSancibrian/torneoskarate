@@ -95,9 +95,9 @@
 
         <div class="card-header d-flex justify-content-between">
             <div class="card-title fw-mediumbold">RONDA FINAL</div>
-            <button class="btn btn-icon btn-primary btn-round btn-sm" ver-competicion="<?php echo $competicion->competicion_torneo_id; ?>" ver-ronda="3">
+            <?php /*<button class="btn btn-icon btn-primary btn-round btn-sm" ver-competicion="<?php echo $competicion->competicion_torneo_id; ?>" ver-ronda="3">
                 <i class="fas fa-desktop"></i>
-            </button>
+            </button> */ ?>
         </div>
 
         <div class="card-body p-1 bg-white" id="tablero-competicion-2">
@@ -189,6 +189,9 @@
                                         <th>Equipo</th>
                                         <th>Puntos</th>
                                         <th>Media</th>
+                                        <th>Max 1</th>
+                                        <th>Max.2</th>
+                                        <th>Max 3</th>
                                     </tr>
                                 </thead>
                                 <tbody id="clasificacion_competicion"></tbody>

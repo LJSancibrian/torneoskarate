@@ -41,8 +41,6 @@
     }
 </style>
 
-
-
 <body id="clasificaicon" onClick="toggleFullScreen()">
 
         <div id="entatami" style="display:none"></div>
