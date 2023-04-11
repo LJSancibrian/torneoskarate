@@ -32,7 +32,7 @@
                         <th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
                         <th class="bg-white text-primary" colspan="3">Ronda 1</th>
                         <th class="bg-white text-primary" colspan="3">Ronda 2</th>
-                        <?php /*<th class="bg-white text-primary" colspan="4">Ronda 3</th>*/ ?>
+                        <th class="bg-white text-primary" colspan="3">Ronda 3</th>
                         <th class="bg-white text-primary">Total</th>
                         <th class="bg-white text-primary">Media</th>
                     </tr>
@@ -53,10 +53,10 @@
                         <th>M2</th>
                         <?php /*<th>J1</th>
                         <th>J2</th>
-                        <th>J3</th>
-                        <th>J4</th>
-                        <th>J5</th>
-                        <th>M3</th> */ ?>
+                        <th>J3</th>*/ ?>
+                        <th>J1</th>
+                        <th>J2</th>
+                        <th>M3</th> 
                         <th>Total</th>
                         <th>Media</th>
                     </tr>
@@ -78,12 +78,12 @@
                             <td data-ronda="2" data-j="4"></td>
                             <td data-ronda="2" data-j="5"></td>*/ ?>
                             <td data-media="2" class="bg-success text-white">0</td>
-                            <?php /* <td data-ronda="3" data-j="1"></td>
+                            <td data-ronda="3" data-j="1"></td>
                             <td data-ronda="3" data-j="2"></td>
-                            <td data-ronda="3" data-j="3"></td>
+                            <?php /*<td data-ronda="3" data-j="3"></td>
                             <td data-ronda="3" data-j="4"></td>
-                            <td data-ronda="3" data-j="5"></td>
-                            <th data-media="3" class="bg-success text-white">0</td>*/ ?>
+                            <td data-ronda="3" data-j="5"></td>*/ ?>
+                            <th data-media="3" class="bg-success text-white">0</td>
                             <td data-total></td>
                             <td data-media-total class="bg-primary text-white">0</td>
                         </tr>

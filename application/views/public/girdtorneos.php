@@ -1,10 +1,19 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <section class="posts section">
 	<div class="container">
-		<div class="col-md-12 text-center d-none">
-			<h2>CLASIFICACIONES LIGA MUNICIPAL 2022</h2>
-			<a href="<?php echo base_url(); ?>ligamunicipal2022" class="btn btn-main">Clasificaciones generales</a>
-		</div>
+
+		<?php if(count($grupos) > 0){ ?>
+			<div class="col-md-12 text-center mb-3">
+				<?php 
+				$grupos_array = [] ;
+				foreach ($grupos as $key => $grupo) {
+					if(!in_array($grupo->grupo_id, $grupos_array)){ 
+						$grupos_array[] = $grupo->grupo_id;?>
+						<a href="<?php echo base_url(); ?>clasificaciongrupo/<?=$grupo->grupo_id?>" class="btn btn-main m-2">Clasificaciones <?=$grupo->titulogrupo?></a>
+					<?php }
+				} ?>
+			</div>
+		<?php } ?>
 
 		<?php if (count($proximos_torneos) > 0) { ?>
 			<h3 class="text-center mb-3">Próximos torneos</h3>

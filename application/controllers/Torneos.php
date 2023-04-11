@@ -163,7 +163,7 @@ class Torneos extends CI_Controller
             ]
         ];
         $torneo_archivos  = $this->database->getWhere($params);
-        
+
         $torneo->archivos = $torneo_archivos;
         $response = [
             'error'    => 0,
@@ -280,7 +280,7 @@ class Torneos extends CI_Controller
         if (!isset($torneo) || $torneo == false) {
             show_404();
         }
-       
+
         $data['torneo'] = $torneo;
         $data['view'] = ['gestion/torneos/base'];
         $data['page_header']    =   $torneo->titulo;
@@ -340,14 +340,14 @@ class Torneos extends CI_Controller
             $data['deportistas'] = $this->database->getDeportistas();
             //printr( $data['deportistas']);
             $data['competicioneskata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
-           // printr($data['competicioneskata']);
+            // printr($data['competicioneskata']);
             $data['competicioneskumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
             if ($torneo->tipo != 2) {
                 $data['m_kata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
             }
             if ($torneo->tipo != 1) {
                 $data['m_kumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
-            } 
+            }
             $data['view'] = ['gestion/torneos/base'];
             $data['css_files'] = [
                 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css'
@@ -373,7 +373,7 @@ class Torneos extends CI_Controller
 
     public function categorias($slug)
     {
-       // adminPage();
+        // adminPage();
         asistenteCoachPage();
         $data = [];
         $torneo = $this->database->buscarDato('torneos', 'slug', $slug);
@@ -435,7 +435,7 @@ class Torneos extends CI_Controller
         if ($torneo->tipo != 2) {
             $data['competicioneskata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
             foreach ($data['competicioneskata'] as $k => $competicion) {
-                $clasifica = $this->database->clasificacionFinalKata($competicion->competicion_torneo_id,[1,2,3]);
+                $clasifica = $this->database->clasificacionFinalKata($competicion->competicion_torneo_id, [1, 2, 3]);
                 $competicion->clasificacion = $clasifica;
             }
         }
@@ -471,7 +471,7 @@ class Torneos extends CI_Controller
         if ($torneo->tipo != 2) {
             $data['competicioneskata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
             foreach ($data['competicioneskata'] as $key => $competicionkata) {
-                $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionFinalKata($competicionkata->competicion_torneo_id, [1,2,3]);
+                $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionFinalKata($competicionkata->competicion_torneo_id, [1, 2, 3]);
             }
         }
         if ($torneo->tipo != 1) {
@@ -1203,4 +1203,240 @@ class Torneos extends CI_Controller
         returnAjax($response);
     }
 
+
+    public function grupos()
+    {
+
+        adminPage();
+        validUrl();
+        $data['page_header']    = 'Grupos de torneos';
+        $data['table_title'] = 'Lista de grupos de torneos';
+
+        $data['table_button']   = [
+            'name' => 'crear_grupo',
+            'content' => '<i class="fa fa-plus mr-3"></i> Nuevo grupo',
+            'extra' => [
+                'data-tooltip' => TRUE,
+                'data-editar-grupo' => 'nuevo',
+                'title' => 'Crear nuevo grupo',
+                'data-original-title' => 'Crear nuevo grupo',
+                'class' => 'btn btn-sm btn-primary ml-auto'
+            ]
+        ];
+        $params = [
+            'tabla' => 'torneos_grupos',
+            'where' => [
+                'estado' => 1,
+                'deletedAt' => '	0000-00-00 00:00:00'
+            ]
+        ];
+        $data['grupos'] = $this->database->getWhere($params);
+        $params = [
+            'tabla' => 'torneos',
+            'where' => ['deletedAt' => '	0000-00-00 00:00:00']
+        ];
+        $data['torneos'] = $this->database->getWhere($params);
+        $data['view']           = ['gestion/common/tabla_datatable', 'gestion/torneos/torneos_grupo_form_modal'];
+        $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos_grupos.js'];
+
+        show($data);
+    }
+     /***
+     * DATATABLES GET
+     */
+    // datatable torneos
+    public function getTorneosGrupos($columna = null, $valor = null)
+    {
+        logged();
+        $this->load->library('Datatable');
+        $tabla  = 'torneos_grupos';
+        $campos = [
+            $tabla . '.grupo_id',
+            $tabla . '.titulo',
+            $tabla . '.descripcion',
+            "GROUP_CONCAT(torneos.titulo SEPARATOR ', ') AS titulos_torneos",
+            $tabla.'.estado'
+        ];
+        $join     = [
+            'grupos_torneos' => 'torneos_grupos.grupo_id = grupos_torneos.grupo_id',
+            'torneos' => "grupos_torneos.torneo_id = torneos.torneo_id"
+        ];
+        $add_rule = [
+            "group_by" => "torneos_grupos.grupo_id",
+        ];
+        $where = [];
+        /*if ($this->input->get('estado') != '') {
+            $where['estado'] = $this->input->get('estado');
+        }
+        if ($this->input->get('proximos') == 1) {
+            $where['fecha >='] = date('Y-m-d');
+        }
+        if ($this->input->get('proximos') == 2) {
+            $where['fecha <'] = date('Y-m-d');
+        }*/
+        if ($columna != "" && $valor != "") {
+            $where  = [$tabla . '.' . $columna => $valor];
+            $result = json_decode($this->datatable->get_datatable($this->input->get(), $tabla, $join, $campos, $where, $add_rule));
+        } else {
+            $result = json_decode($this->datatable->get_datatable($this->input->get(), $tabla, $join, $campos, $where, $add_rule));
+        }
+        $result->query = $this->db->last_query();
+        $res = json_encode($result);
+        echo $res;
+
+    }
+    // procesamiento del formulario de nuevo usuario: crea tambien un equipo para ese usuario
+    public function nuevo_grupo_form()
+    {
+        adminPage();
+        isAjax();
+        $this->form_validation->set_rules('titulo', 'Título', 'trim|required');
+        $this->form_validation->set_rules('descripcion', 'Texto promocional', 'trim|required');
+        $this->form_validation->set_rules('torneo_id[]', 'Torneos', 'trim|required');
+        validForm();
+        $data = [
+            'titulo' => $this->input->post('titulo'),
+            'descripcion'  => $this->input->post('descripcion'),
+            'torneo_ids'        => implode('|', $this->input->post('torneo_id[]')),
+            'estado'        => ($this->input->post('estado') == 'OK') ? 1 : 0,
+        ];
+        $grupo_id = $this->database->insert('torneos_grupos', $data);
+
+        foreach ($this->input->post('torneo_id[]') as $t => $torneo_id) {
+           $data = [
+                'grupo_id' => $grupo_id,
+                'torneo_id' => $torneo_id
+           ];
+           $this->database->insert('grupos_torneos', $data);
+        }
+        if ($grupo_id) {
+            $redirect = base_url() . 'torneos/grupo/' . $grupo_id;
+            $response = [
+                'error'    => 0,
+                'msn'      => 'Nuevo grupo de torneos creado correctamente',
+                'redirect' => $redirect,
+                'csrf'     => $this->security->get_csrf_hash(),
+            ];
+            echo json_encode($response);
+            exit();
+        } else {
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'No se ha podido crear el grupo de torneos',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            echo json_encode($response);
+            exit();
+        }
+    }
+
+     // obtiene los datos del equipo
+     public function ver_grupo_fetch()
+     {
+         logged();
+         isAjax();
+         $this->form_validation->set_rules('grupo_id', 'Grupo', 'trim|required');
+         validForm();
+         $grupo_id = $this->input->post('grupo_id');
+         $grupo = $this->database->buscarDato('torneos_grupos', 'grupo_id', $grupo_id);
+ 
+         if (!$grupo) {
+             $response = [
+                 'error'     => 1,
+                 'error_msn' => 'Grupo no encontrado.',
+                 'csrf'      => $this->security->get_csrf_hash(),
+             ];
+             echo json_encode($response);
+             exit();
+         }
+         $response = [
+             'error'    => 0,
+             'data'      => ['grupo' => $grupo],
+             'csrf'     => $this->security->get_csrf_hash(),
+         ];
+         returnAjax($response);
+     }
+
+      // procesamiento del formulario de los datos del equipo
+    public function editar_grupo_form()
+    {
+        adminPage();
+        isAjax();
+        if ($this->input->post('grupo_id') == '') {
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'Identificador de grupo no válido.',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        }
+        $grupo = $this->database->buscarDato('torneos_grupos', 'grupo_id', $this->input->post('grupo_id'));
+        if (!$grupo) {
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'El grupo no existe.',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        }
+        $this->form_validation->set_rules('titulo', 'Título', 'trim|required');
+        $this->form_validation->set_rules('descripcion', 'Descripcion', 'trim|required');
+        validForm();
+        $torneo_ids_post = implode('|', $this->input->post('torneo_id[]'));
+        if ($grupo->titulo != $this->input->post('titulo')) {
+            $datos['titulo'] = $this->input->post('titulo');
+        }
+        if ($grupo->descripcion != $this->input->post('descripcion')) {
+            $datos['descripcion'] = $this->input->post('descripcion');
+        }
+        if ($grupo->torneo_ids != $torneo_ids_post) {
+            $datos['torneo_ids'] = $torneo_ids_post;
+        }
+        if ($this->input->post('estado') == 'OK') {
+            if ($grupo->estado == 0) {
+                $datos['estado'] = 1;
+            }
+        } else {
+            if ($grupo->estado == 1) {
+                $datos['estado'] = 0;
+            }
+        }
+        if (empty($datos)) {
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'Los datos indicados no cambian los datos del grupo.',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        } else {
+            $cambiar = $this->database->actualizar('torneos_grupos', $datos, 'grupo_id', $this->input->post('grupo_id'));
+            if ($cambiar != $this->input->post('grupo_id')) {
+                $response = [
+                    'error'     => 1,
+                    'error_msn' => 'Ha ocurrido un error y no se han realizado los cambios.',
+                    'csrf'      => $this->security->get_csrf_hash(),
+                ];
+                echo json_encode($response);
+                exit();
+            } else {
+                if(isset( $datos['torneo_ids']) ) {
+                    $this->db->query('DELETE FROM grupos_torneos WHERE grupo_id = '.$this->input->post('grupo_id').';');
+                    foreach ($this->input->post('torneo_id[]') as $t => $torneo_id) {
+                        $data = [
+                             'grupo_id' => $this->input->post('grupo_id'),
+                             'torneo_id' => $torneo_id
+                        ];
+                        $this->database->insert('grupos_torneos', $data);
+                     }
+                }
+                $response = [
+                    'error' => 0,
+                    'msn'   => 'Actualización de datos correcta',
+                    'csrf'  => $this->security->get_csrf_hash(),
+                ];
+                echo json_encode($response);
+                exit();
+            }
+        }
+    }
 }

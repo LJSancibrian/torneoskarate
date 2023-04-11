@@ -112,12 +112,29 @@
 					</div>
 				</li>
 				<li class="nav-item <?php echo ($this->uri->segment(1) == 'torneos') ? 'active submenu' : '';?>">
-					<a href="<?php echo base_url();?>torneos">
-							<i class="fas fa-trophy"></i>
-							<p>Torneos</p>
-						</a>
+					<a class="nav-link" data-toggle="collapse" href="#collapsetorneos" aria-expanded="<?php echo ($this->uri->segment(1) == 'torneos') ? 'true' : 'false';?>">
+						<i class="fas fa-users"></i>
+						<span>Torneos</span>
+						<span class="caret"></span>
+					</a>
+					<div class="collapse <?php echo ($this->uri->segment(1) == 'torneos') ? 'show' : '';?>" id="collapsetorneos">
+						<ul class="nav nav-collapse">
+							<li <?php echo ($this->uri->segment(1) == 'torneos' && $this->uri->segment(2) == '') ? 'class="active"' : '';?>>
+								<a href="<?php echo base_url();?>torneos">
+									<span class="sub-item">Torneos</span>
+								</a>
+							</li>
 
+							<li <?php echo ($this->uri->segment(1) == 'torneos' && $this->uri->segment(2) == 'grupos') ? 'class="active"' : '';?>>
+								<a href="<?php echo base_url();?>torneos/grupos">
+									<span class="sub-item">Grupos de torneos</span>
+								</a>
+							</li>
+						</ul>
+					</div>
 				</li>
+
+					
 				<?php /* ?>
 				<li class="nav-item <?php echo ($this->uri->segment(1) == 'Competiciones_ko') ? 'active submenu' : '';?>">
 					<a href="<?php echo base_url();?>Competiciones_ko">

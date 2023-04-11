@@ -20,7 +20,7 @@
                                     <?php foreach ($kata as $key => $competicion) {
                                         if ($competicion->estado < 3) { ?>
                                             <tr>
-                                                <td><a href="<?php echo base_url(); ?>ligamunicipal2022/<?php echo $competicion->competicion_torneo_id; ?>" class="align-items-center d-flex justify-content-between"><?php echo $competicion->categoria; ?> <?php echo $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto'); ?> <i class="tf-ion-podium" style="font-size: 1.5rem;"></i></a></td>
+                                                <td><a href="<?php echo base_url(); ?>clasificacioncompeticiongrupo/<?php echo $competicion->competicion_torneo_id; ?>" class="align-items-center d-flex justify-content-between"><?php echo $competicion->categoria; ?> <?php echo $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto'); ?> <i class="tf-ion-podium" style="font-size: 1.5rem;"></i></a></td>
                                             </tr>
                                     <?php }
                                     } ?>
@@ -46,7 +46,7 @@
                                     <?php foreach ($kumite as $key => $competicion) {
                                         if ($competicion->estado < 3) { ?>
                                             <tr>
-                                                <td><a href="<?php echo base_url(); ?>ligamunicipal2022/<?php echo $competicion->competicion_torneo_id; ?>" class="align-items-center d-flex justify-content-between"><?php echo $competicion->categoria; ?> <?php echo $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto'); ?> <i class="tf-ion-podium" style="font-size: 1.5rem;"></i></a></td>
+                                                <td><a href="<?php echo base_url(); ?>clasificacioncompeticiongrupo/<?php echo $competicion->competicion_torneo_id; ?>" class="align-items-center d-flex justify-content-between"><?php echo $competicion->categoria; ?> <?php echo $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto'); ?> <i class="tf-ion-podium" style="font-size: 1.5rem;"></i></a></td>
                                             </tr>
                                     <?php }
                                     } ?>

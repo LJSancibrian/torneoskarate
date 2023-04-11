@@ -9,9 +9,12 @@ class Home extends CI_Controller
     }
     public function index()
     {
-        $data['page_header']    = 'Torneos de<br>Karate';
         $data['page_header']    = 'Torneos de Karate';
         $data['page_sub_header']    = 'Ayuntamiento de Piélagos';
+        
+        // se buscan los grupos, ordenados por fecha torneo
+        $grupos = $this->database->getTorneosHome();
+        $data['grupos'] = $grupos;
         $params = [
             'tabla' => 'torneos',
             'where' => [
@@ -170,7 +173,7 @@ class Home extends CI_Controller
 
     public function compLM2022($competicion_torneo_id)
     {
-        validUrl();
+        //validUrl();
         $data = []; 
         $competicion = $this->database->getCompeticion($competicion_torneo_id);
         if (!isset($competicion) || $competicion == false) {
@@ -187,6 +190,36 @@ class Home extends CI_Controller
         show($data);
 
     }
+
+    public function clasificaciongrupo($grupo_id)
+    {
+       // validUrl();
+        $data = [];
+        $grupo = $this->database->buscarDato('torneos_grupos', 'grupo_id',$grupo_id);
+        $competiciones = $this->database->getCompeticionesGrupo($grupo_id);
+        $competicioneskata = [];
+        $competicioneskumite = [];
+        $sibling = [];
+        foreach ($competiciones as $key => $value) {
+            if($value->modalidad == 'kata' && !in_array($value->sibling_id, $sibling) ){
+                $competicioneskata[] = $value;
+                $sibling[] = $value->competicion_torneo_id;
+               
+            }elseif($value->modalidad == 'kumite' && !in_array($value->sibling_id, $sibling) ){
+                $competicioneskumite[] = $value;
+                $sibling[] = $value->competicion_torneo_id;
+                if($value->sibling_id > 0) {
+                    $sibling[] =$value->sibling_id ;
+                };
+            }
+        }
+        $data['page_header']    =  strtoupper($grupo->titulo).'<br>AYTO. PIÉLAGOS';
+        $data['kata'] = $competicioneskata;
+        $data['kumite'] = $competicioneskumite;
+        $data['view']           = 'public/vistalm2022';
+        show($data);
+    }
+
 
     /**************
      * 

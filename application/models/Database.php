@@ -1397,7 +1397,27 @@ class Database extends CI_Model
 
     public function getCompeticionesLM($year)
     {
-        $this->db->where_in('torneo_id', $this->config->item('lm'.$year));
+        $this->db->where_in('torneo_id', [$this->config->item('lm'.$year)]);
+        $this->db->where('estado !=', 3);
+        $this->db->where('deletedAt', '0000-00-00 00:00:00');
+        $this->db->order_by('competicion_torneo_id', 'asc');
+        return $this->db->get('torneos_competiciones')->result();
+    }
+
+    public function getCompeticionesGrupo($grupo_id)
+    {
+        // primero, los torneos
+        $this->db->where('grupo_id', $grupo_id);
+        $this->db->where('estado', 1);
+        $this->db->where('deletedAt', '0000-00-00 00:00:00');
+        $this->db->join('torneos', 'torneos.torneo_id = grupos_torneos.torneo_id');
+        $torneos = $this->db->get('grupos_torneos')->result();
+        $torneos_array = [];
+        foreach ($torneos as $key => $t) {
+            $torneos_array[] = $t->torneo_id;
+        }
+        // se buscan las competiciones de esos torneos
+        $this->db->where_in('torneo_id', $torneos_array);
         $this->db->where('estado !=', 3);
         $this->db->where('deletedAt', '0000-00-00 00:00:00');
         $this->db->order_by('competicion_torneo_id', 'asc');
@@ -1475,5 +1495,17 @@ class Database extends CI_Model
             $this->db->where('competicion_torneo_id', $competicion_torneo_id);
             $this->db->delete('matches');
         }
+    }
+
+
+    public function getTorneosHome()
+    {
+        $this->db->select('torneos.*, torneos_grupos.titulo As titulogrupo,  torneos_grupos.grupo_id');
+        $this->db->where('torneos.estado', 1);
+        $this->db->where('torneos_grupos.estado', 1);
+        $this->db->join('grupos_torneos', 'grupos_torneos.torneo_id = torneos.torneo_id', 'LEFT');
+        $this->db->join('torneos_grupos', 'torneos_grupos.grupo_id = grupos_torneos.grupo_id', 'LEFT');
+        $this->db->order_by('torneos.fecha', 'desc');
+        return $this->db->get('torneos')->result();
     }
 }

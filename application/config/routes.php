@@ -69,6 +69,8 @@ $route = [
 
     'ligamunicipal2022' => 'Home/LM2022',
     'ligamunicipal2022/(:any)' => 'Home/compLM2022/$1',
+    'clasificaciongrupo/(:any)' => 'Home/clasificaciongrupo/$1',
+    'clasificacioncompeticiongrupo/(:any)' => 'Home/compLM2022/$1',
 
     'area-privada' => 'Area_privada',
     'mi-perfil' => 'Area_privada/perfil',
