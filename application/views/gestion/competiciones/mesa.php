@@ -80,9 +80,10 @@
 
         <div class="card-header d-flex justify-content-between">
             <div class="card-title fw-mediumbold">RONDA FINAL</div>
-            <?php /*<button class="btn btn-icon btn-primary btn-round btn-sm" ver-competicion="<?php echo $competicion->competicion_torneo_id; ?>" ver-ronda="3">
+           <button class="btn btn-icon btn-primary btn-round btn-sm" ver-competicion="<?php echo $competicion->competicion_torneo_id; ?>" ver-ronda="3">
                 <i class="fas fa-desktop"></i>
-            </button> */ ?>
+            </button>
+            <button onclick="openFullscreenWindow()">Abrir ventana en pantalla secundaria</button>
         </div>
 
         <div class="card-body p-1 bg-white" id="tablero-competicion-2">

@@ -1,16 +1,27 @@
 
 
-
 function clasificacion() {
     var entatami = localStorage.getItem('enkata')
     if (entatami !== null) {
-        $('#entatami').html(entatami)
-        $('#entatami').slideDown('500')
+        var actual = $('#entatami').html()
+        if(actual != entatami){
+            $('#entatami').slideUp('500', function(){
+                $('#entatami').html(entatami)
+                $('#entatami').slideDown().addClass('tracking-in-expand')
+            })
+            
+        }
+       
     } else {
-        $('#entatami').html('')
-        $('#entatami').slideUp('500')
+        var actual = $('#entatami').html()
+        if(actual != 'Ayuntamiento de Piélagos<br>Karate Piélagos'){
+            $('#entatami').slideUp('500', function(){
+                $('#entatami').html('Ayuntamiento de Piélagos<br>Karate Piélagos')
+                $('#entatami').slideDown().addClass('tracking-in-expand')
+            })
+        }
     }
-    var competicion_torneo_id = $('[data-competicion]').attr('data-competicion');
+    /*var competicion_torneo_id = $('[data-competicion]').attr('data-competicion');
     var fd = new FormData();
     fd.append("competicion_torneo_id", competicion_torneo_id);
     fd.append("csrf_token", $('[name="csrf_token"]').val());
@@ -74,7 +85,7 @@ function clasificacion() {
                 willClose: function () { }
             })
         }
-    });
+    });*/
 }
 
 function openFullscreen() {
@@ -126,7 +137,6 @@ function toggleFullScreen() {
 }
 
 $(document).ready(function () {
-    
     clasificacion();
     setInterval(function () { clasificacion()}, 1000)
 })
