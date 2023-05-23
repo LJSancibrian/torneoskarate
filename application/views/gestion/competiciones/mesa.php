@@ -80,15 +80,12 @@
 
         <div class="card-header d-flex justify-content-between">
             <div class="card-title fw-mediumbold">RONDA FINAL</div>
-           <button class="btn btn-icon btn-primary btn-round btn-sm" ver-competicion="<?php echo $competicion->competicion_torneo_id; ?>" ver-ronda="3">
-                <i class="fas fa-desktop"></i>
-            </button>
-            <button onclick="openFullscreenWindow()">Abrir ventana en pantalla secundaria</button>
+            <button class="btn btn-primary btn-round btn-sm" onclick="openFullscreenWindow()"><i class="fas fa-desktop"></i> Abrir ventana en pantalla secundaria</button>
         </div>
 
         <div class="card-body p-1 bg-white" id="tablero-competicion-2">
-            <div class="d-flex flex-column flex-md-row">
-                <div class="mb-3 mr-md-3">
+            <div class="row">
+                <div class="col-md-4">
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered text-center" style="max-width:500px;" id="tablakatafinal" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
                             <thead>
@@ -114,9 +111,9 @@
                                     <tr data-user_id="<?php echo $value->user_id; ?>">
                                         <td class=""><?php echo $value->orden; ?></td>
                                         <td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
-                                        <td data-ronda="3" data-j="1"></td>
-                                        <td data-ronda="3" data-j="2"></td>
-                                        <td data-ronda="3" data-j="3"></td>
+                                        <td data-ronda="<?=$rondaspuntos + 1?>" data-j="1"></td>
+                                        <td data-ronda="<?=$rondaspuntos + 1?>" data-j="2"></td>
+                                        <td data-ronda="<?=$rondaspuntos + 1?>" data-j="3"></td>
                                         <td data-total></td>
                                         <td data-media-total class="bg-primary text-white">0</td>
                                     </tr>
@@ -125,7 +122,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="">
+                <div class="col-md-8">
                     <div class="table-responsive">
                         <table class="table table-striped w-100" id="clasificaionkatafinal">
                             <thead>
@@ -135,6 +132,7 @@
                                     <th>Equipo</th>
                                     <th>Puntos</th>
                                     <th>Media</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody id="clasificacion_final_competicion"></tbody>

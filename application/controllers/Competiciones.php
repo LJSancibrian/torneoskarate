@@ -76,6 +76,7 @@ class Competiciones extends CI_Controller
 
         $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
         if($competicion->tipo == 'puntos'){
+            $data['rondaspuntos'] = $this->database->getrondaskata($competicion_torneo_id);
             $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
             $data['js_files']       = [
                 assets_url() . 'admin/js/vistas/mesakata.js',
@@ -614,7 +615,10 @@ class Competiciones extends CI_Controller
         isAjax();
         $this->form_validation->set_rules('competicion_torneo_id', 'Competición', 'trim|required');
         validForm();
-        $clasificacion = $this->database->clasificacionKata(input('competicion_torneo_id'), [1, 2]);
+        $competicion_torneo_id = input('competicion_torneo_id');
+        $rondas_normal = $this->database->getrondaskata($competicion_torneo_id);
+        $rondas = range(1, $rondas_normal);
+        $clasificacion = $this->database->clasificacionKata(input('competicion_torneo_id'), $rondas);
         $response = [
             'error'     => 0,
             'clasificacion' => $clasificacion,
@@ -655,22 +659,13 @@ class Competiciones extends CI_Controller
         isAjax();
         $this->form_validation->set_rules('competicion_torneo_id', 'Competición', 'trim|required');
         validForm();
-        $clasificacion = $this->database->clasificacionFinalKata(input('competicion_torneo_id'), [1, 2, 3]);
-        $clasificacionfinal = [];
-        foreach ($clasificacion as $key => $value) {
-            if ($value->rondas[3] != null) {
-                $clasificacionfinal[] = [
-                    'first_name' => $value->first_name,
-                    'last_name' => $value->last_name,
-                    'nombre' => $value->nombre,
-                    'total' => $value->rondas[3]->total,
-                    'media' => $value->rondas[3]->media
-                ];
-            }
-        }
+
+       
+
+        $clasificacion = $this->database->clasificacionFinalKata(input('competicion_torneo_id'));
         $response = [
             'error'     => 0,
-            'clasificacion' => $clasificacionfinal,
+            'clasificacion' => $clasificacion,
             'csrf'      => $this->security->get_csrf_hash(),
         ];
         returnAjax($response);

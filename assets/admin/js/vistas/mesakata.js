@@ -363,7 +363,18 @@ function clasificacion(table_ID) {
                     <td>${row.puntos_max3}</td>
                     </tr>`;
 
-                    $(bodytable).append(tr)
+                    var tr2 = `<tr clasificado_user="${row.user_id}" clasificado_inscripcion="${row.inscripcion_id}">
+                    <td>${i + 1}</td>
+                    <td class="columnfixed">${row.first_name} ${row.last_name}</td>
+                    <td>${row.nombre}</td>
+                    <td>${row.total}</td>
+                    <td>${row.media}</td>
+                    </tr>`;
+
+                    var trrow = (table_ID == 'tablakata') ? tr : tr2;
+
+
+                    $(bodytable).append(trrow)
                 })
                 setTimeout(function () {
                     $(bodytable).slideDown();

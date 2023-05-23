@@ -352,6 +352,12 @@ class Database extends CI_Model
         return ['ordenados' => $orden, 'noordenados' => $noorden];
     }
 
+    public function getrondaskata($competicion_torneo_id){
+        $q = "SELECT count(puntos_id) AS valoraciones FROM puntoskata WHERE competicion_torneo_id = ".$competicion_torneo_id." AND juez = 1 AND puntos > 0 GROUP BY user_id ORDER bY SUM(puntos) ASC LIMIT 1,1;";
+        $rondaspuntos = $this->db->query($q)->row()->valoraciones;
+       return $rondaspuntos;
+    }
+
     public function actualizarPuntosKata($competicion_torneo_id, $user_id, $ronda, $juez, $puntos)
     {
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
@@ -405,12 +411,27 @@ class Database extends CI_Model
             $this->db->where('user_id', $user->user_id);
             $inscripcion = $this->db->get('torneos_inscripciones')->row();
             $user->inscripcion_id = $inscripcion->inscripcion_id;
+
+            $puntos = $this->getPuntosordenadosKata($competicion_torneo_id, $user->user_id);
+            $user->puntos_max = (isset($puntos[0])) ? $puntos[0]->puntos : 0;
+            $user->puntos_max2 = (isset($puntos[1])) ? $puntos[1]->puntos : 0;
+            $user->puntos_max3 = (isset($puntos[2])) ? $puntos[2]->puntos : 0;
+            $user->puntos_max4 = (isset($puntos[3])) ? $puntos[3]->puntos : 0;
         }
+
+       
         return $clasificacion;
     }
 
-    public function clasificacionFinalKata($competicion_torneo_id, $rondas)
+    public function clasificacionFinalKata($competicion_torneo_id)
     {
+        $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
+        $ronda_final = $valoracion_normal + 1;
+        $primerosclasificados = $this->clasificacionKata($competicion_torneo_id, [$ronda_final]);
+        
+        /*
+        printr( $primerosclasificados);
+        
         $this->db->select('user_id, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
         $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
         $this->db->group_by('user_id');
@@ -483,6 +504,9 @@ class Database extends CI_Model
         });
 
         return $clasificacion;
+        */
+
+        return $primerosclasificados;
     }
 
     public function getPuntosRondaKata($competicion_torneo_id, $ronda, $user_id)
@@ -509,15 +533,18 @@ class Database extends CI_Model
     }
     public function actualizarFinalistasKata($competicion_torneo_id, $users_id)
     {
-        $this->db->where('competicion_torneo_id', $competicion_torneo_id);
-        $this->db->where('ronda', 3);
-        $this->db->delete('puntoskata');
+        $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
+        $ronda_final = $valoracion_normal + 1;
 
+        $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+        $this->db->where('ronda', $ronda_final);
+        $this->db->delete('puntoskata');
+        
         foreach ($users_id as $key => $user_id) {
             $data = [
                 'competicion_torneo_id' => $competicion_torneo_id,
                 'user_id' => $user_id,
-                'ronda' => 3,
+                'ronda' => $ronda_final,
                 'juez' => 0,
                 'puntos' => 0
             ];
@@ -528,12 +555,15 @@ class Database extends CI_Model
 
     public function finalKata($competicion_torneo_id)
     {
+        $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
+        $ronda_final = $valoracion_normal + 1;
+
         $this->db->select('first_name, last_name, usercode, c.nombre, i.user_id, i.inscripcion_id, i.grupo, i.orden, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
         $this->db->join('users', 'users.id = puntoskata.user_id');
         $this->db->join('clubs c', 'c.club_id = users.club_id');
         $this->db->join('torneos_inscripciones i', 'i.user_id = users.id');
         $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
-        $this->db->where('puntoskata.ronda', 3);
+        $this->db->where('puntoskata.ronda', $ronda_final);
         $this->db->group_by('puntoskata.user_id');
         $this->db->order_by('total', 'DESC');
         $this->db->order_by('media', 'DESC');

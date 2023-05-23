@@ -118,6 +118,7 @@ class Home extends CI_Controller
         }
 
         if ($competicion->tipo == 'puntos') {
+            $data['rondaspuntos'] = $this->database->getrondaskata($competicion_torneo_id);
             $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
             $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
             $data['view'] = 'public/vistacompeticionkata';

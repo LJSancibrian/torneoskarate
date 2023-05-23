@@ -37,9 +37,9 @@
                             <tr>
                                 <th class="bg-white text-primary"></th>
                                 <th class="bg-white text-primary"> <button class="btn btn-info btn-block" data-clasificacion="<?php echo $competicion->competicion_torneo_id; ?>">Ver la clasificación</button></th>
-                                <th class="bg-white text-primary" colspan="3">Ronda 1</th>
-                                <th class="bg-white text-primary" colspan="3">Ronda 2</th>
-                                <?php /*<th class="bg-white text-primary" colspan="6">Ronda 3</th>*/ ?>
+                                <?php for ($i=1; $i <= $rondaspuntos; $i++) { 
+                                    echo '<th class="bg-white text-primary" colspan="3">Ronda'.$i.'</th>';
+                                }?>
                                 <th class="bg-white text-primary">Total</th>
                                 <th class="bg-white text-primary">Media</th>
                             </tr>
@@ -47,64 +47,15 @@
                             <tr>
                                 <th class="">#</th>
                                 <th class="text-left columnfixed">Deportista</th>
-                                <th>P1</th>
-                                <th>P2</th>
-                                <?php /*<th>P3</th>
-                                <th>P4</th>
-                                <th>P5</th> */ ?>
-                                <th>T1</th>
-                                <th>P1</th>
-                                <th>P2</th>
-                                <?php /*<th>P3</th>
-                                <th>P4</th>
-                                <th>P5</th> */ ?>
-                                <th>T2</th>
-                                <?php /*<th>P1</th>
-                                <th>P2</th>
-                                <th>P3</th>
-                                <?php /*<th>P4</th>
-                                <th>P5</th> 
-                                <th>M3</th>*/ ?>
+                                <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+                                    <th>P1</th>
+                                    <th>P2</th>
+                                    <th>T1</th>
+                                <?php } ?>
                                 <th>Total</th>
                                 <th>Media</th>
                             </tr>
                         </thead>
-                        <?php /* <tfoot>
-                            <tr>
-                                <th class="">#</th>
-                                <th class="text-left columnfixed">Deportista</th>
-                                <th>P1</th>
-                                <th>P2</th>
-                                <th>P3</th>
-                                <th>P4</th>
-                                <th>P5</th>
-                                <th>M1</th>
-                                <th>P1</th>
-                                <th>P2</th>
-                                <th>P3</th>
-                                <th>P4</th>
-                                <th>P5</th> 
-                                <th>M2</th>
-                                <th>P1</th>
-                                <th>P2</th>
-                                <th>P3</th>
-                                <th>P4</th>
-                                <th>P5</th>
-                                <th>M3</th>
-                                <th>Total</th>
-                                <th>Media</th>
-                            </tr>
-                            <tr>
-                                <th class="bg-white text-primary"></th>
-                                <th class="bg-white text-primary"> <button class="btn btn-info btn-block" data-clasificacion="<?php echo $competicion->competicion_torneo_id; ?>">Ver la clasificación</button></th>
-                                <th class="bg-white text-primary" colspan="4">Ronda 1</th>
-                                <th class="bg-white text-primary" colspan="4">Ronda 2</th>
-                                <th class="bg-white text-primary" colspan="6">Ronda 3</th> 
-                                <th class="bg-white text-primary">Total</th>
-                                <th class="bg-white text-primary">Media</th>
-                            </tr>
-                        </tfoot>
-                        */ ?>
                         <tbody>
                             <?php foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
                                 <tr data-user_id="<?php echo $value->user_id; ?>">
@@ -112,24 +63,11 @@
                                     <td class="text-left text-nowrap">
                                         <?php echo $value->first_name; ?> <?php echo $value->last_name; ?>
                                     </td>
-                                    <td data-ronda="1" data-j="1"></td>
-                                    <td data-ronda="1" data-j="2"></td>
-                                    <?php /*<td data-ronda="1" data-j="3"></td>
-                                    <td data-ronda="1" data-j="4"></td>
-                                    <td data-ronda="1" data-j="5"></td>*/ ?>
-                                    <td data-media="1" class="bg-success text-white">0</td>
-                                    <td data-ronda="2" data-j="1"></td>
-                                    <td data-ronda="2" data-j="2"></td>
-                                    <?php /*<td data-ronda="2" data-j="3"></td>
-                                    <td data-ronda="1" data-j="4"></td>
-                                    <td data-ronda="1" data-j="5"></td>*/ ?>
-                                    <td data-media="2" class="bg-success text-white">0</td>
-                                    <?php /*<td data-ronda="3" data-j="1"></td>
-                                    <td data-ronda="3" data-j="2"></td>
-                                    <td data-ronda="3" data-j="3"></td>
-                                    <td data-ronda="3" data-j="4"></td>
-                                    <td data-ronda="3" data-j="5"></td>
-                                    <th data-media="3" class="bg-success text-white">0</td> */ ?>
+                                    <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+                                        <td data-ronda="<?=$i?>" data-j="1"></td>
+                                        <td data-ronda="<?=$i?>" data-j="2"></td>
+                                        <td data-media="<?=$i?>" class="bg-success text-white">0</td>
+                                    <?php } ?>
                                     <td data-total></td>
                                     <td data-media-total class="bg-primary text-white">0</td>
                                 </tr>
