@@ -570,6 +570,208 @@ class Database extends CI_Model
         return $this->db->get('puntoskata')->result();
     }
 
+    /**
+     * 
+     */
+    public function actualizarPuntosRey($competicion_torneo_id, $user_id, $field, $valor)
+    {
+        $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+        $this->db->where('user_id', $user_id);
+        $puntuacion = $this->db->get('puntosrey')->row();
+        if (!isset($puntuacion)) {
+            $data = [
+                'competicion_torneo_id' => $competicion_torneo_id,
+                'user_id' => $user_id,
+                $field => $valor,
+            ];
+            $this->db->insert('puntosrey', $data);
+            $puntos_id = $this->db->insert_id();
+        } else {
+            $data = [
+                $field => $valor,
+            ];
+            $this->db->where('puntos_id', $puntuacion->puntos_id);
+            $this->db->update('puntosrey', $data);
+            $puntos_id =  $puntuacion->puntos_id;
+        }
+        $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+        $this->db->where('puntos_id', $puntos_id);
+        $puntuacion = $this->db->get('puntosrey')->row();
+        $puntos_victoria = 100 * $puntuacion->victorias;
+        $puntos_empates = 50 * $puntuacion->empates;
+        $puntos_derrota = 0 * $puntuacion->derrotas;
+        $puntos_total = $puntos_victoria + $puntos_empates + $puntos_derrota + $puntuacion->puntos_favor;
+        $total_combates = $puntuacion->victorias + $puntuacion->empates + $puntuacion->derrotas;
+        $data = [
+            'puntos_total' => $puntos_total,
+            'total_combates' => $total_combates,
+        ];
+        $this->db->where('puntos_id', $puntos_id);
+        $this->db->update('puntosrey', $data);
+        return $puntos_id;
+
+    }
+
+    public function clasificacionGrupoRey($competicion_torneo_id, $grupo)
+    {
+        $this->db->select('puntosrey.*, users.first_name, users.last_name, clubs.nombre');
+        $this->db->select('COALESCE(puntosrey.puntos_total, 0) as puntos_total', false);
+        $this->db->select('COALESCE(puntosrey.total_combates, 0) as total_combates', false);
+        $this->db->select('COALESCE(puntosrey.victorias, 0) as victorias', false);
+        $this->db->select('COALESCE(puntosrey.empates, 0) as empates', false);
+        $this->db->select('COALESCE(puntosrey.derrotas, 0) as derrotas', false);
+        $this->db->select('COALESCE(puntosrey.puntos_favor, 0) as puntos_favor', false);
+
+        $this->db->where('torneos_inscripciones.competicion_torneo_id', $competicion_torneo_id);
+        $this->db->where('torneos_inscripciones.grupo', $grupo);
+
+        $this->db->order_by('puntosrey.puntos_total', 'DESC');
+        $this->db->order_by('puntosrey.total_combates', 'ASC');
+        $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
+        $this->db->join('clubs', 'clubs.club_id = users.club_id');
+        $this->db->join('puntosrey', 'torneos_inscripciones.user_id = puntosrey.user_id', 'left');
+        $clasificacion = $this->db->get('torneos_inscripciones')->result();       
+        return $clasificacion;
+    }
+
+    public function clasificacionFinalRey($competicion_torneo_id)
+    {
+        $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
+        $ronda_final = $valoracion_normal + 1;
+        $primerosclasificados = $this->clasificacionKata($competicion_torneo_id, [$ronda_final]);
+        
+        /*
+        printr( $primerosclasificados);
+        
+        $this->db->select('user_id, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
+        $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
+        $this->db->group_by('user_id');
+        //$this->db->order_by('media', 'DESC');
+        $clasificacion = $this->db->get('puntoskata')->result();
+
+        foreach ($clasificacion as $key => $user) {
+            // usuario y club
+            $this->db->join('clubs c', 'c.club_id = users.club_id');
+            $this->db->where('users.id', $user->user_id);
+            $userd = $this->db->get('users')->row();
+            $user->first_name = $userd->first_name;
+            $user->last_name = $userd->last_name;
+            $user->nombre = $userd->nombre;
+            $user->first_name = $userd->first_name;
+            // inscripcion
+            $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+            $this->db->where('user_id', $user->user_id);
+            $inscripcion = $this->db->get('torneos_inscripciones')->row();
+            $user->inscripcion_id = $inscripcion->inscripcion_id;
+            // rondas
+            $user->total = 0;
+            $user->media = 0;
+            $user->valoraciones = 0;
+            $user->rondas = [];
+            foreach ($rondas as $key => $ronda) {
+                $user->rondas[$ronda] = $this->getPuntosRondaKata($competicion_torneo_id, $ronda, $user->user_id);
+            }
+            foreach ($user->rondas as $key => $rondauser) {
+                if (isset($rondauser)) {
+                    $user->total = $user->total + $rondauser->total;
+                    $user->valoraciones += $rondauser->valoraciones;
+                }
+            }
+            if ($user->valoraciones > 0) {
+                $user->media = round($user->total / $user->valoraciones, 2);
+            }
+
+            $puntos = $this->getPuntosordenadosKata($competicion_torneo_id, $user->user_id);
+            $user->puntos_max = (isset($puntos[0])) ? $puntos[0]->puntos : 0;
+            $user->puntos_max2 = (isset($puntos[1])) ? $puntos[1]->puntos : 0;
+            $user->puntos_max3 = (isset($puntos[2])) ? $puntos[2]->puntos : 0;
+            $user->puntos_max4 = (isset($puntos[3])) ? $puntos[3]->puntos : 0;
+            
+        }
+        usort($clasificacion, function ($a, $b) {
+            $totalb = (isset($b->rondas[3]->total)) ? $b->rondas[3]->total : 0;
+            $totala = (isset($a->rondas[3]->total)) ? $a->rondas[3]->total : 0;
+            $retval =  $totalb <=> $totala;
+            if ($retval == 0) {
+                $retval = $b->total <=> $a->total;
+                if ($retval == 0) {
+                    $retval = $b->media <=> $a->media;
+                    if ($retval == 0) {
+                        $retval = $b->puntos_max <=> $a->puntos_max;
+                        if ($retval == 0) {
+                            $retval = $b->puntos_max2 <=> $a->puntos_max2;
+                            if ($retval == 0) {
+                                $retval = $b->puntos_max3 <=> $a->puntos_max3;
+                                if ($retval == 0) {
+                                    $retval = $b->puntos_max4 <=> $a->puntos_max4;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $retval;
+        });
+
+        return $clasificacion;
+        */
+
+        return $primerosclasificados;
+    }
+
+    
+    public function getPuntosordenadosRey($competicion_torneo_id, $user_id)
+    {
+        $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
+        $this->db->where('puntoskata.user_id', $user_id);
+        $this->db->order_by('puntos', 'desc');
+        $todos =  $this->db->get('puntosrey')->result();
+        return $todos;
+    }
+    public function actualizarFinalistasRey($competicion_torneo_id, $users_id)
+    {
+        $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
+        $ronda_final = $valoracion_normal + 1;
+
+        $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+        $this->db->where('ronda', $ronda_final);
+        $this->db->delete('puntosrey');
+        
+        foreach ($users_id as $key => $user_id) {
+            $data = [
+                'competicion_torneo_id' => $competicion_torneo_id,
+                'user_id' => $user_id,
+                'ronda' => $ronda_final,
+                'juez' => 0,
+                'puntos' => 0
+            ];
+            $this->db->insert('puntosrey', $data);
+        }
+        return TRUE;
+    }
+
+    public function finalRey($competicion_torneo_id)
+    {
+        $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
+        $ronda_final = $valoracion_normal + 1;
+
+        $this->db->select('first_name, last_name, usercode, c.nombre, i.user_id, i.inscripcion_id, i.grupo, i.orden, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
+        $this->db->join('users', 'users.id = puntoskata.user_id');
+        $this->db->join('clubs c', 'c.club_id = users.club_id');
+        $this->db->join('torneos_inscripciones i', 'i.user_id = users.id');
+        $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
+        $this->db->where('puntoskata.ronda', $ronda_final);
+        $this->db->group_by('puntoskata.user_id');
+        $this->db->order_by('total', 'DESC');
+        $this->db->order_by('media', 'DESC');
+        return $this->db->get('puntoskata')->result();
+    }
+
+    /**
+     * 
+     */
+
     public function getMatches($competicion_torneo_id)
     {
         $this->no_deleted();

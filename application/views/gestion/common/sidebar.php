@@ -121,15 +121,22 @@
 						<ul class="nav nav-collapse">
 							<li <?php echo ($this->uri->segment(1) == 'torneos' && $this->uri->segment(2) == '') ? 'class="active"' : '';?>>
 								<a href="<?php echo base_url();?>torneos">
-									<span class="sub-item">Torneos</span>
+									<span class="sub-item">Próximos torneos</span>
 								</a>
 							</li>
 
-							<li <?php echo ($this->uri->segment(1) == 'torneos' && $this->uri->segment(2) == 'grupos') ? 'class="active"' : '';?>>
-								<a href="<?php echo base_url();?>torneos/grupos">
-									<span class="sub-item">Grupos de torneos</span>
+							<li <?php echo ($this->uri->segment(1) == 'torneos' && $this->uri->segment(2) == 'pasados') ? 'class="active"' : '';?>>
+								<a href="<?php echo base_url();?>torneos/pasados">
+									<span class="sub-item">Torneos pasados</span>
 								</a>
 							</li>
+							<?php if ($this->user->group->id < 4) { ?>
+								<li <?php echo ($this->uri->segment(1) == 'torneos' && $this->uri->segment(2) == 'grupos') ? 'class="active"' : '';?>>
+									<a href="<?php echo base_url();?>torneos/grupos">
+										<span class="sub-item">Grupos de torneos</span>
+									</a>
+								</li>
+							<?php } ?>
 						</ul>
 					</div>
 				</li>

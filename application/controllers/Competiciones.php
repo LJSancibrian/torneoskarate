@@ -27,21 +27,12 @@ class Competiciones extends CI_Controller
             $data['torneo'] = $torneo;
         }
         $inscripciones = $this->database->inscritosCompeticion($competicion_torneo_id);
-        // valorar si es kata o kumite
-        /*
-        if ($competicion->modalidad == 'KATA' || $competicion->modalidad == 'kata') {
-            $data['view'] = ['gestion/competiciones/tablerokata'];
-        } else {
-            $data['view'] = ['gestion/competiciones/tablerokumite'];
-        }
-        */
         $data['view'] = ['gestion/competiciones/tablerogeneral'];
         $data['deportistas'] = $this->database->getDeportistas();
         $data['competicion'] = $competicion;
         $data['inscripciones'] = $inscripciones;
         $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
         $data['page_header']    =   (isset($torneo)) ? $torneo->titulo . ': Competición' : $competicion->categoria . ' ' . $competicion->modalidad;
-       // printr($data['matches']);
         $data['css_files']       = [
             'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
             assets_url() . 'plugins/jquery.gracket/style.css',
@@ -72,10 +63,11 @@ class Competiciones extends CI_Controller
         }
         $data['torneo'] = $torneo;
         $data['competicion'] = $competicion;
-        $data['view'] = ['gestion/competiciones/mesa'];
+        //$data['view'] = ['gestion/competiciones/mesa'];
 
         $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
         if($competicion->tipo == 'puntos'){
+            $data['view'] = ['gestion/competiciones/mesakata'];
             $data['rondaspuntos'] = $this->database->getrondaskata($competicion_torneo_id);
             $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
             $data['js_files']       = [
@@ -83,6 +75,7 @@ class Competiciones extends CI_Controller
             ];
         }
         if($competicion->tipo == 'liguilla'){
+            $data['view'] = ['gestion/competiciones/mesaliguilla'];
             $data['tipo'] = $tipo;
             $matches = $this->database->getMatchesTree($competicion_torneo_id);
             $eliminatorias = $this->database->getEliminatoriasTree($competicion_torneo_id);
@@ -95,7 +88,9 @@ class Competiciones extends CI_Controller
                 assets_url() . 'admin/js/vistas/mesacompeticionkumite.js',
             ];
         }
+
         if($competicion->tipo == 'eliminatoria'){
+            $data['view'] = ['gestion/competiciones/mesaeliminatoria'];
             $matches = $this->database->getMatchesTree($competicion_torneo_id);
             $eliminatorias = $this->database->getEliminatoriasTree($competicion_torneo_id);
             $data['matches'] = $matches;
@@ -107,6 +102,30 @@ class Competiciones extends CI_Controller
                 assets_url() . 'admin/js/vistas/mesacompeticionkumite.js',
             ];
         }
+
+        //CREATE TABLE `playoff`.`puntosrey` (`puntos_id` INT(11) NOT NULL , `competicion_torneo_id` INT(11) NOT NULL , `user_id` INT(11) NOT NULL , `victorias` INT(3) NOT NULL , `empates` INT(3) NOT NULL , `derrotas` INT(3) NOT NULL , `puntos_favor` INT(5) NOT NULL , `total_combates` INT(3) NOT NULL , `puntos_total` INT(5) NOT NULL , `penalizaciones` INT(3) NOT NULL ) ENGINE = InnoDB;
+
+        if($competicion->tipo == 'rey'){
+            $grupos = [];
+            foreach ($data['ordenparticipacion']['ordenados'] as $key => $part) {
+                $grupos[$part->grupo][] = $part;
+            }
+            $data['grupos'] = $grupos;
+            
+            $data['view'] = ['gestion/competiciones/mesarey'];
+            $data['tipo'] = $tipo;
+            $matches = $this->database->getMatchesTree($competicion_torneo_id);
+            $eliminatorias = $this->database->getEliminatoriasTree($competicion_torneo_id);
+            $data['matches'] = $matches;
+            $data['eliminatorias'] = $eliminatorias;
+            $data['js_files']       = [
+                assets_url() . 'plugins/moment.min.js',
+                assets_url() . 'plugins/ezcountimer/ez.countimer.js',
+                assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
+                assets_url() . 'admin/js/vistas/mesacompeticionrey.js',
+            ];
+        }
+
         //printr($eliminatorias);
         $data['page_header']    =   $torneo->titulo . ': ' . $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
         show($data);
@@ -231,7 +250,7 @@ class Competiciones extends CI_Controller
         // valorar si es kata o kumite
         if(input('competicion_tipo') == 'puntos'){
             if ($competicion->modalidad == 'KATA' || $competicion->modalidad == 'kata') {
-                // es kata. Se ordenan de forma aleatoria las inscripcionbes y se retornan los valores de ronda y jueces, por si los quiere variar
+                // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
                 shuffle($inscripciones);
                 $response = [
                     'error'     => 0,
@@ -253,7 +272,7 @@ class Competiciones extends CI_Controller
         
 
         if(input('competicion_tipo') == 'liguilla'){
-            // es kata. Se ordenan de forma aleatoria las inscripcionbes y se retornan los valores de ronda y jueces, por si los quiere variar
+            // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
             shuffle($inscripciones);
             $response = [
                 'error'     => 0,
@@ -266,7 +285,7 @@ class Competiciones extends CI_Controller
         }
 
         if(input('competicion_tipo') == 'eliminatoria'){
-            // es kata. Se ordenan de forma aleatoria las inscripcionbes y se retornan los valores de ronda y jueces, por si los quiere variar
+            // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
             shuffle($inscripciones);
             $response = [
                 'error'     => 0,
@@ -279,7 +298,7 @@ class Competiciones extends CI_Controller
         }
 
         if(input('competicion_tipo') == 'liga'){
-            // es kata. Se ordenan de forma aleatoria las inscripcionbes y se retornan los valores de ronda y jueces, por si los quiere variar
+            // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
             shuffle($inscripciones);
             $response = [
                 'error'     => 0,
@@ -289,6 +308,29 @@ class Competiciones extends CI_Controller
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
+        }
+
+        if(input('competicion_tipo') == 'rey'){
+            if(input('competicion_grupos') != '' && input('competicion_grupos') > 0){
+                shuffle($inscripciones);
+                $response = [
+                    'error'     => 0,
+                    'tipo' => 'KUMITE',
+                    'competicion_tipo' => input('competicion_tipo'),
+                    'competicion_grupos' => input('competicion_grupos'),
+                    'inscritos' => $inscripciones,
+                    'csrf'      => $this->security->get_csrf_hash(),
+                ];
+                returnAjax($response);
+
+            }else{
+                $response = [
+                    'error'     => 1,
+                    'error_msn' => 'El número mínimo de grupos es 1',
+                    'csrf'      => $this->security->get_csrf_hash(),
+                ];
+                returnAjax($response);
+            }
         }
     }
 
@@ -549,6 +591,7 @@ class Competiciones extends CI_Controller
             'updatedAt' => date('Y-m-d H:i:s'),
             'tipo' => input('tipo')
         ];
+        // printr($params);
         $this->database->actualizar('torneos_competiciones', $params, 'competicion_torneo_id', input('competicion_torneo_id'));
         $response = [
             'error'     => 0,
@@ -679,6 +722,81 @@ class Competiciones extends CI_Controller
             assets_url() . 'admin/js/vistas/verrondakata.js',
         ];
         show($data);
+    }
+
+    // competicion REY
+    public function guardar_puntos_rey()
+    {
+        isAjax();
+        asistentePage();
+        $this->form_validation->set_rules('competicion_torneo_id', 'Competición', 'trim|required');
+        $this->form_validation->set_rules('user_id', 'Deportista', 'trim|required');
+        $this->form_validation->set_rules('valor', 'Valor', 'trim|required');
+        $this->form_validation->set_rules('field', 'Campo', 'trim|required');
+        validForm();
+        $this->utilidades->competicionEditable(input('competicion_torneo_id'));
+
+        $guardado = $this->database->actualizarPuntosRey(input('competicion_torneo_id'), input('user_id'), input('field'), input('valor'));
+        if (is_numeric($guardado)) {
+            $response = [
+                'error'     => 0,
+                'msn' => 'Guardado',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        } else {
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'Competcición no encontrada',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        }
+    }
+    // competicion puntos
+    public function obtener_puntos_rey_competicion()
+    {
+        isAjax();
+        $this->form_validation->set_rules('competicion_torneo_id', 'Competición', 'trim|required');
+        validForm();
+        $params = [
+            'tabla' => 'puntosrey',
+            'where' => [
+                'competicion_torneo_id' => input('competicion_torneo_id')
+            ]
+        ];
+        $deportistas = $this->database->getWhere($params);
+        $response = [
+            'error'     => 0,
+            'deportistas' => $deportistas,
+            'csrf'      => $this->security->get_csrf_hash(),
+        ];
+        returnAjax($response);
+    }
+
+    public function clasificacionGrupoRey()
+    {
+        isAjax();
+        $this->form_validation->set_rules('competicion_torneo_id', 'Competicion ID', 'trim');
+        $this->form_validation->set_rules('grupo', 'Grupo', 'trim');
+        validForm();
+        $competicion = $this->database->getCompeticion(input('competicion_torneo_id'));
+        if (!isset($competicion) || $competicion == FALSE) {
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'Competcición no encontrada',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        }
+        $players = $this->database->clasificacionGrupoRey(input('competicion_torneo_id'), input('grupo'));
+        //printr($players);
+        $response = [
+            'error' => 0,
+            'users' => $players,
+            'csrf'  => $this->security->get_csrf_hash(),
+        ];
+        returnAjax($response);
     }
     
     // matches
@@ -1251,7 +1369,7 @@ class Competiciones extends CI_Controller
         $inscripciones = $this->database->inscritosCompeticion(input('competicion_torneo_id'));
         // valorar si es kata o kumite
         if ($competicion->modalidad == 'KATA' || $competicion->modalidad == 'kata') {
-            // es kata. Se ordenan de forma aleatoria las inscripcionbes y se retornan los valores de ronda y jueces, por si los quiere variar
+            // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
             shuffle($inscripciones);
             $response = [
                 'error'     => 0,
@@ -1263,7 +1381,7 @@ class Competiciones extends CI_Controller
         }
 
         if ($competicion->modalidad == 'KUMITE' || $competicion->modalidad == 'kumite') {
-            // es kata. Se ordenan de forma aleatoria las inscripcionbes y se retornan los valores de ronda y jueces, por si los quiere variar
+            // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
             shuffle($inscripciones);
             $response = [
                 'error'     => 0,

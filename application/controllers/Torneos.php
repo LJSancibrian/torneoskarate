@@ -20,7 +20,7 @@ class Torneos extends CI_Controller
         asistentePage();
         validUrl();
         $data['page_header']    = 'Torneos';
-        $data['table_title'] = 'Lista de torneos registrados en la plataforma';
+        $data['table_title'] = 'Próximos torneos registrados en la plataforma';
         if ($this->user->group->id < 4) {
             $data['table_button']   = [
                 'name' => 'crear_torneo',
@@ -34,10 +34,26 @@ class Torneos extends CI_Controller
                 ]
             ];
             $data['view']           = ['gestion/common/tabla_datatable', 'gestion/torneos/torneos_form_modal'];
-            $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos.js'];
+            $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos_p.js'];
         } else {
             $data['view']           = ['gestion/common/tabla_datatable'];
-            $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos_aux.js'];
+            $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos_p_aux.js'];
+        }
+        show($data);
+    }
+
+    public function pasados()
+    {
+        asistentePage();
+        validUrl();
+        $data['page_header']    = 'Torneos';
+        $data['table_title'] = 'Torneos finalizados';
+        if ($this->user->group->id < 4) {
+            $data['view']           = ['gestion/common/tabla_datatable', 'gestion/torneos/torneos_form_modal'];
+            $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos_pa.js'];
+        } else {
+            $data['view']           = ['gestion/common/tabla_datatable'];
+            $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos_pa_aux.js'];
         }
         show($data);
     }
@@ -338,9 +354,7 @@ class Torneos extends CI_Controller
             $data['tabactive'] = 'inscripciones-tab';
             $data['clubs'] = $this->database->torneoClubs($torneo->torneo_id);
             $data['deportistas'] = $this->database->getDeportistas();
-            //printr( $data['deportistas']);
             $data['competicioneskata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
-            // printr($data['competicioneskata']);
             $data['competicioneskumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
             if ($torneo->tipo != 2) {
                 $data['m_kata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');

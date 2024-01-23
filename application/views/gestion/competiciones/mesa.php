@@ -411,6 +411,150 @@
         <?php $this->load->view('gestion/competiciones/marcadorauxiliar'); ?>
     <?php } ?>
 
+    <?php if ($competicion->tipo == 'rey') { ?>
+
+        <div class="card-body" id="tablero-competicion">
+
+            <?php /*<ul class="nav nav-pills nav-secondary nav-pills-no-bd mb-3" role="tablist">
+                <li class="nav-item submenu">
+                    <a class="nav-link <?php echo ($tipo == 'grupos') ? 'active show' : ''; ?>" href="<?php echo base_url(); ?>Competiciones/mesa/<?php echo $competicion->competicion_torneo_id; ?>/grupos">Fase de grupos</a>
+                </li>
+                <li class="nav-item submenu">
+                    <a class="nav-link <?php echo ($tipo == 'eliminatorias') ? 'active show' : ''; ?>" href="<?php echo base_url(); ?>Competiciones/mesa/<?php echo $competicion->competicion_torneo_id; ?>/eliminatorias" role="tab">Eliminatorias</a>
+                </li>
+            </ul> */ ?>
+            <div id="content_print">
+                <?php $g = 0;
+                foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
+                    <?php if ($value->grupo > $g) { 
+                        $g = $value->grupo;
+                        if ($key > 0) {
+                            echo '</tbody></table></div></div>
+                            <div class="col-md-4">';
+                            $this->load->view('gestion/competiciones/marcadorauxiliarrey');
+                            echo '</div></div>';
+                        }?>  
+
+                        <div class="row">
+                            <div class="col-md-8">  
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered text-center" id="tablarey<?=$value->grupo?>" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-white text-primary" colspan="7">Grupo <?=$value->grupo?></th>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-white text-primary">#</th>
+                                        <th class="bg-white text-primary text-left columnfixed">Deportista</th>
+                                        <th class="bg-white text-primary">V</th>
+                                        <th class="bg-white text-primary">E</th>
+                                        <th class="bg-white text-primary">D</th>
+                                        <th class="bg-white text-primary">Pt.F</th>
+                                        <th class="bg-white text-primary">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    <?php } ?>
+                            <tr data-user_id="<?php echo $value->user_id; ?>">
+                                <td class=""><?php echo $value->orden; ?></td>
+                                <td class="text-left text-nowrap columnfixed">
+                                    <button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button>
+                                </td>
+                                <td data-editable></td>
+                                <td data-editable></td>
+                                <td data-editable></td>
+                                <td data-editable></td>
+                                <td></td>
+                            </tr>
+                        
+                    <?php if (count($ordenparticipacion['ordenados']) == $key + 1) {
+                        echo '</tbody></table></div></div>
+                        <div class="col-md-4">';
+                        $this->load->view('gestion/competiciones/marcadorauxiliarrey');
+                        echo '</div></div>';
+                    }?>
+                <?php } ?>
+
+                
+                    <div id="faseeliminatoria" competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
+                        <div class="brackets"></div>
+                        <div class="row text-center flex-nowrap" style=" overflow-x: auto;white-space: nowrap">
+                            <?php foreach ($eliminatorias as $key => $eliminatoria) {
+                                if ($key  == count($eliminatorias)) {
+                                    $ronda = 'FINAL';
+                                } elseif ($key  == count($eliminatorias) - 1) {
+                                    $ronda = 'SEMI - FINAL';
+                                } else {
+                                    $ronda = 'Ronda ' . $key;
+                                } ?>
+                                <div class="col-md-4 col-lg-3 round">
+                                    <h4 class="bg-primary text-white p-2 mb-3"><?php echo $ronda; ?></h4>
+                                    <div>
+                                        <?php foreach ($eliminatoria as $match) { ?>
+                                            <ul class="list-group p-0 match btn btn-link" data-match_id="<?php echo $match->match_id; ?>" <?php if ($match->user_rojo == 0 || $match->user_azul == 0) {
+                                                                                                                                                echo 'style="pointer-events: none"';
+                                                                                                                                            } ?>>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: red;" data-user="<?php echo $match->user_rojo; ?>">
+                                                    <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo (isset($match->rojo)) ? $match->rojo->nombre : ''; ?></span>
+                                                    <span class="bg-white <?php echo ($match->hantei == 'rojo') ? 'hantei' : ''; ?> <?php echo ($match->senshu == 'rojo') ? 'senshu' : ''; ?>" style="width:25px;"><?php echo (isset($match->rojo)) ? $match->puntos_rojo : 0; ?></span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: blue;" data-user="<?php echo $match->user_azul; ?>">
+                                                    <span class="text-white text-truncate text-left"><?php echo (isset($match->azul)) ? $match->azul->nombre : ''; ?></span>
+                                                    <span class="bg-white <?php echo ($match->hantei == 'azul') ? 'hantei' : ''; ?> <?php echo ($match->senshu == 'azul') ? 'senshu' : ''; ?>" style="width:25px;"><?php echo (isset($match->azul)) ? $match->puntos_azul : 0; ?></span>
+                                                </li>
+                                            </ul>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                            <?php } ?>
+                        </div>
+
+                    </div>
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="card-title fw-mediumbold w-100"><a data-finalizar-competicion href="<?php echo base_url(); ?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
+                    </div>
+                
+
+                
+
+                <div class="modal fade" id="clasificaciongrupo" tabindex="-1" role="dialog" aria-labelledby="clasificaciongrupoLabel">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Clasificación Grupo <span id="clasificacionGrupoModal"></span></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered text-center w-auto" id="clasificacionModalTable">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th class="text-left">Deportista</th>
+                                                <th class="text-left">Equipo</th>
+                                                <th class="text-left">Victorias</th>
+                                                <th class="text-left">Puntos favor</th>
+                                                <th class="text-left">Puntos contra</th>
+                                                <th class="text-left">Senshu</th>
+                                                <th class="text-left">Hantei</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody data-competicion_torneo_id="" data-grupo="">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <?php } ?>
+
 </div>
 
 <?php echo form_open();
