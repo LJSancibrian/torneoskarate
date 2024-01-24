@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+    <title><?php echo strtoupper($competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel); ?> - <?php echo strtoupper(($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto')); ?>
+    </title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+        html {
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            margin-top: 1cm;
+        }
+
+        p {
+            font-size: 14px;
+        }
+
+        p>small {
+            font-size: 12px;
+        }
+
+        .header {
+            position: fixed;
+            width: 100%;
+            top: -0px;
+            left: 0px;
+            right: 0px;
+            /*height: 50px;*/
+            text-align: center;
+            font-size: 22px;
+            text-transform: uppercase;
+            font-weight: 900;
+            border: 1px solid #008081;
+            color: #008081;
+            vertical-align: middle;
+        }
+
+        footer {
+            position: fixed;
+            bottom: -50px;
+            left: 0px;
+            right: 0px;
+            height: 30px;
+            text-align: center;
+            font-size: 12px;
+            text-transform: capitalize;
+        }
+
+        .bg-secondary {
+            background-color: #008081;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 2px;
+            border: 0px solid #cccccc;
+        }
+
+        .table thead th {
+            border-bottom-width: 2px;
+            font-weight: 600;
+            border-color: #008081;
+            background-color: #008081;
+            color: #ffffff;
+        }
+
+        .table tr.border td,
+        .table tr.border th {
+            font-size: 16px;
+            border-color: #008081 !important;
+            border: 1px solid #008081;
+            padding: 5px;
+            vertical-align: middle;
+        }
+
+        .border-y {
+            border-top: 1px solid #008081;
+            border-bottom: 1px solid #008081;
+        }
+
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: Arial, Helvetica, sans-serif;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            padding-top: 5px;
+        }
+
+        .page-number:before {
+            content: counter(page);
+        }
+
+        .page_break {
+            page-break-after: always;
+        }
+
+        .page_break:last-child {
+            page-break-after: avoid;
+        }
+    </style>
+</head>
+
+<body style="word-spacing:normal;padding:0px 0px 0px 0px;">
+    <footer>
+        <?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?> - página <span class="page-number"></span>
+    </footer>
+    <table class="header">
+        <tr>
+            <td style="font-family: Arial, Helvetica, sans-serif;">
+                <?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?>
+            </td>
+        </tr>
+    </table>
+
+    <?php foreach ($grupos as $key => $grupo) { ?>
+        <div class="page_break" style="border: 1px solid #008081; padding-left:10px; padding-bottom:10px; padding-right: 10px;">
+            <h2>Grupo <?= $key ?></h2>
+            <table class="table" id="tablakata">
+                <thead>
+                    <tr class="border">
+                        <th>Deportista</th>
+                        <th>Penal.</th>
+                        <th>V</th>
+                        <th>E</th>
+                        <th>D</th>
+                        <th>Pt.F</th>
+                        <th>Com.</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($grupo as $k => $value) { ?>
+                        <tr class="border">
+                            <td><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    <?php } ?>
+
+
+    <div class="page_break" style="border: 1px solid #008081; padding-left:10px; padding-right: 10px;">
+        <h2>Eliminatorias</h2>
+        <?php  
+        function clasificado($string, $eliminatorias){
+            $primer = $string[0];
+            switch ( $primer) {
+                case 'g':
+                    $grupo = explode('|',substr($string, 1))[0];
+                    echo  '<span style="font-size: 12px; color: #CCCCCC;">'.'Ganador Grupo '.$grupo.'</span>';
+                    break;
+                
+                case 'm':
+                    $posicion = explode('|',substr($string, 1))[0];
+                    $explode = explode('|', $string);
+                    $puesto = end($explode);
+                    echo  '<span style="font-size: 12px; color: #CCCCCC;">'.$puesto.'º mejor '.$posicion.'º clasificado</span>';
+                    break;
+                case 'r':
+                    $last = substr($string, -1, 1);
+                    $puesto = ($last == '-') ? 'Perdedor' : 'Ganador';
+                    $explode = explode('|', $string);
+                    $ronda = str_replace('r', '', $explode[0]);
+                    $nmatch  =  ($last == '-') ? str_replace($last, '', end($explode)) : end($explode);
+                    $combate = $eliminatorias[$ronda][$nmatch - 1];
+                    echo  '<span style="font-size: 12px; color: #CCCCCC;">'.$puesto.' '.$combate->match_id.'</span>';
+                  
+                default:
+                    
+                    break;
+            }
+        }
+        foreach ($eliminatorias as $key => $eliminatoria) {
+            if ($key  == count($eliminatorias)) {
+                $ronda = 'FINAL y 3er y 4º PUESTO';
+            } elseif ($key  == count($eliminatorias) - 1) {
+                $ronda = 'SEMI - FINAL';
+            } else {
+                $ronda = 'Ronda ' . $key;
+            } ?>
+
+            <h4 class="border-y" style="padding-left: 10px;"><?php echo $ronda; ?></h4>
+            <table class="table" id="tablakata">
+                <thead>
+                    <tr class="border">
+                        <th style="padding: 2px;">#</th>
+                        <th>AKA</th>
+                        <th></th>
+                        <th></th>
+                        <th>AO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    foreach ($eliminatoria as $value) {?>
+                         <tr class="border">
+                            <td style="padding: 2px !important;text-align:center;"><?php echo $value->match_id; ?></td>
+                            <td style="width:200px;"><div style="height:35px;"><?php echo clasificado($value->parent_rojo, $eliminatorias); ?></div></td>
+                            <td></td>
+                            <td></td>
+                            <td style="width:200px;"><div style="height:35px;"><?php echo clasificado($value->parent_azul, $eliminatorias); ?></div></td>
+                        </tr>
+                        <tr height="50px">
+                            <td colspan="5"><div style="height:10px;"></div></td>
+                        </tr>
+
+                    <?php } ?>
+                </tbody>
+            </table>
+        <?php } ?>
+    </div>
+</body>
+
+</html>

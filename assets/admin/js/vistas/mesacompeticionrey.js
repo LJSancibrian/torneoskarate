@@ -21,7 +21,6 @@ $(document).on('focus', '[data-editable]', function () {
 });
 
 $(document).on('focusout', '[data-editable]', function () {
-    
     if ($(this).text() == '') {
         return;
     }
@@ -142,6 +141,11 @@ function cargar_puntos(){
                 tr.find('[data-field="total_combates"]').html(deportista.total_combates)
                 tr.find('[data-field="puntos_total"]').html(deportista.puntos_total)
             })
+
+			$.each($('tbody[data-competicion_torneo_id][data-grupo]'), function(g, grupo){
+				console.log(g)
+				updateClasificacionGrupo(competicion_torneo_id, g + 1 )
+			})
         }
     }).always(function (jqXHR, textStatus) {
         if (textStatus != "success") {
@@ -156,16 +160,254 @@ function cargar_puntos(){
     });
 }
 
+function updateClasificacionGrupo(competicion_torneo_id, grupo) {
+    var fd = new FormData();
+    fd.append("competicion_torneo_id", competicion_torneo_id);
+    fd.append("grupo", grupo);
+    fd.append("csrf_token", $('[name="csrf_token"]').val());
+    $.ajax({
+        url: base_url + 'Competiciones/clasificacionGrupoRey',
+        method: "POST",
+        contentType: false,
+        processData: false,
+        data: fd
+    }).done(function(response) {
+        var response = JSON.parse(response);
+        $('[name="csrf_token"]').val(response.csrf)
+        if (response.error > 0) {
+            var errorhtml = ''
+            if (response.hasOwnProperty('error_validation')) {
+                $.each(response.error_validation, function(i, value) {
+                    errorhtml += value + '<br>'
+                })
+            }
+            if (response.hasOwnProperty('error_msn')) {
+                errorhtml += response.error_msn
+            }
+            swal.fire({
+                icon: 'error',
+                title: 'ERROR',
+                html: errorhtml,
+                willClose: function() {
+                    if (response.hasOwnProperty('redirect')) {
+                        if (response.redirect == 'refresh') {
+                            location.reload()
+                        } else {
+                            window.location.href = response.redirect
+                        }
+                    }
+                }
+            });
+            return;
+        } else {
+            var tbody = $('tbody[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
+            tbody.slideUp();
+            tbody.html('');
+            $.each(response.users, function(i, user) {
+                var posicion = i + 1;
+                var deportista = user.first_name + ' ' + user.last_name;
+                var club = user.nombre;
+
+                var tr = '<tr>';
+                tr += '<td>' + posicion + '</td>';
+                tr += '<td>' + deportista + '</td>';
+                tr += '<td>' + club + '</td>';
+				tr += '<td>' + user.puntos_total + '</td>';
+                tr += '<td>' + user.victorias + '</td>';
+                tr += '<td>' + user.empates + '</td>';
+                tr += '<td>' + user.derrotas + '</td>';
+                tr += '<td>' + user.puntos_favor + '</td>';
+				tr += '<td>' + user.total_combates + '</td>';  
+                tr += '</th>';
+                tbody.append(tr);
+            })
+            tbody.slideDown();
+
+            var tbodyg = $('#tablakumite_' + grupo + ' tbody[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
+            tbodyg.slideUp();
+            tbodyg.html('');
+            $.each(response.users, function(i, user) {
+                var posicion = i + 1;
+                var deportista = user.first_name + ' ' + user.last_name;
+                var club = user.nombre;
+
+                var tr = '<tr>';
+                tr += '<td>' + posicion + '</td>';
+                tr += '<td colspan="2">' + deportista + '</td>';
+                tr += '<td>' + club + '</td>';
+                tr += '</th>';
+
+                tbodyg.append(tr);
+            })
+            tbodyg.slideDown();
+        }
+    }).always(function(jqXHR, textStatus) {
+        if (textStatus != "success") {
+            swal.fire({
+                icon: 'error',
+                title: 'Ha ocurrido un error AJAX',
+                html: jqXHR.statusText,
+                timer: 5000,
+                willClose: function() {}
+            })
+        }
+    });
+
+}
+
+
+function dibujar_cruces_grupos() {
+    var competicion_torneo_id = $('#faseeliminatorias').attr('competicion_torneo_id');
+    var fd = new FormData();
+    fd.append("competicion_torneo_id", competicion_torneo_id);
+    fd.append("csrf_token", $('[name="csrf_token"]').val());
+    $.ajax({
+        url: base_url + 'Competiciones/eliminatoriasCompeticion',
+        method: "POST",
+        contentType: false,
+        processData: false,
+        data: fd
+    }).done(function(response) {
+        var response = JSON.parse(response);
+        $('[name="csrf_token"]').val(response.csrf)
+        if (response.data.length > 0) {
+            $(".brackets").html('')
+            $(".brackets").slideDown(300)
+            $(".brackets").gracket({ src: response.data });
+
+        } else {
+            $(".brackets").slideDown(300)
+        }
+
+    }).always(function(jqXHR, textStatus) {
+        if (textStatus != "success") {
+            swal.fire({
+                icon: 'error',
+                title: 'Ha ocurrido un error AJAX',
+                html: jqXHR.statusText,
+                timer: 5000,
+                willClose: function() {}
+            })
+        }
+    });
+    TestData = [
+        /* [
+             [
+                 { "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1, "displaySeed": "D1", "score": 47 }, 
+                 { "name": "Andrew Miller", "id": "andrew-miller", "seed": 2 }
+             ],
+             [{ "name": "James Coutry", "id": "james-coutry", "seed": 3 }, { "name": "Sam Merrill", "id": "sam-merrill", "seed": 4 }],
+             [{ "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }, { "name": "Everett Zettersten", "id": "everett-zettersten", "seed": 6 }],
+             [{ "name": "John Scott", "id": "john-scott", "seed": 7 }, { "name": "Teddy Koufus", "id": "teddy-koufus", "seed": 8 }],
+             [{ "name": "Arnold Palmer", "id": "arnold-palmer", "seed": 9 }, { "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }],
+             [{ "name": "Jesse James", "id": "jesse-james", "seed": 1 }, { "name": "Scott Anderson", "id": "scott-anderson", "seed": 12 }],
+             [{ "name": "Josh Groben", "id": "josh-groben", "seed": 13 }, { "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }],
+             [{ "name": "Jake Coutry", "id": "jake-coutry", "seed": 15 }, { "name": "Spencer Zettersten", "id": "spencer-zettersten", "seed": 16 }]
+         ],
+         [
+             [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }, { "name": "James Coutry", "id": "james-coutry", "seed": 3 }],
+             [{ "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }, { "name": "Teddy Koufus", "id": "teddy-koufus", "seed": 8 }],
+             [{ "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }, { "name": "Scott Anderson", "id": "scott-anderson", "seed": 12 }],
+             [{ "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }, { "name": "Jake Coutry", "id": "jake-coutry", "seed": 15 }]
+         ],*/
+        [
+            [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }, { "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }],
+            [{ "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }, { "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }]
+        ],
+        [
+            [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }, { "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }]
+        ],
+        [
+            [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }]
+        ]
+    ];
+
+    // initializer
+
+
+}
+
+$(document).on('click', '[data-guardar-clasificaicon]', function() {
+    var competicion_torneo_id = $(this).attr('data-guardar-clasificaicon');
+    var grupo = $(this).attr('data-grupo');
+    var fd = new FormData();
+    fd.append("competicion_torneo_id", competicion_torneo_id);
+    fd.append("grupo", grupo);
+    fd.append("csrf_token", $('[name="csrf_token"]').val());
+    $.ajax({
+        url: base_url + 'Competiciones/guardarClasificacionGrupo',
+        method: "POST",
+        contentType: false,
+        processData: false,
+        data: fd
+    }).done(function(response) {
+        var response = JSON.parse(response);
+        $('[name="csrf_token"]').val(response.csrf)
+        if (response.error > 0) {
+            var errorhtml = ''
+            if (response.hasOwnProperty('error_validation')) {
+                $.each(response.error_validation, function(i, value) {
+                    errorhtml += value + '<br>'
+                })
+            }
+            if (response.hasOwnProperty('error_msn')) {
+                errorhtml += response.error_msn
+            }
+            swal.fire({
+                icon: 'error',
+                title: 'ERROR',
+                html: errorhtml,
+                willClose: function() {
+                    if (response.hasOwnProperty('redirect')) {
+                        if (response.redirect == 'refresh') {
+                            location.reload()
+                        } else {
+                            window.location.href = response.redirect
+                        }
+                    }
+                }
+            });
+            return;
+        } else {
+            swal.fire({
+                icon: 'success',
+                title: 'OK',
+                html: response.msn,
+                willClose: function() {
+                    if (response.hasOwnProperty('redirect')) {
+                        if (response.redirect == 'refresh') {
+                            location.reload()
+                        } else {
+                            window.location.href = response.redirect
+                        }
+                    }
+                }
+            });
+            return;
+        }
+
+    }).always(function(jqXHR, textStatus) {
+        if (textStatus != "success") {
+            swal.fire({
+                icon: 'error',
+                title: 'Ha ocurrido un error AJAX',
+                html: jqXHR.statusText,
+                timer: 5000,
+                willClose: function() {}
+            })
+        }
+    });
+});
 
 
 
 
 
 
+// ELIMINATORIAS
 $(document).on('click', '[data-match_id]', function() {
     var match = $(this)
     var match_id = match.attr('data-match_id');
-
     var fd = new FormData();
     fd.append("match_id", match_id);
     fd.append("csrf_token", $('[name="csrf_token"]').val());
@@ -311,10 +553,6 @@ $(document).on('click', '[name="hantei"]', function() {
     $(this).prop('checked', estado);
 });
 
-$(".check-female").click(function() {
-    $("#female").prop("checked", true);
-});
-
 $(document).on('click', '#guardar-marcador', function() {
     var match_id = $('#marcadorauxiliar').find('[data-match-id]').attr('data-match-id');
     var ul = $('[data-match_id="' + match_id + '"]');
@@ -357,7 +595,6 @@ $(document).on('click', '#guardar-marcador', function() {
         }
     }
     
-
     var fd = new FormData();
     fd.append("match_id", match_id);
     fd.append("puntos_rojo", puntos_rojo);
@@ -367,7 +604,6 @@ $(document).on('click', '#guardar-marcador', function() {
     fd.append("winner", winner);
     fd.append("estado", 'completado');
     fd.append("csrf_token", $('[name="csrf_token"]').val());
-
     $.ajax({
         url: base_url + 'Competiciones/updateMatch',
         method: "POST",
@@ -405,10 +641,6 @@ $(document).on('click', '#guardar-marcador', function() {
         } else {
             // actualizar el combate
             var match = response.match
-                /*var ul = $('[data-match_id="' + match.match_id + '"]');
-                ul.find('[data-user="' + match.user_rojo + '"]').children(":last").html(match.puntos_rojo).removeClass('bg-white').addClass('text-white')
-                ul.find('[data-user="' + match.user_azul + '"]').children(":last").html(match.puntos_azul).removeClass('bg-white').addClass('text-white')
-                //ul.attr('style', 'pointer-events: none')*/
             swal.fire({
                 icon: 'success',
                 title: 'OK',
@@ -441,341 +673,11 @@ $(document).on('click', '#guardar-marcador', function() {
 
 })
 
-$(document).on('click', '[data-ver-clasificacion]', function() {
-	var competicion_torneo_id = $('#competicion_torneo_id').val();
-    var grupo = $(this).attr('data-grupo');
-    $('#clasificacionModalTable tbody').attr('data-competicion_torneo_id', competicion_torneo_id);
-    $('#clasificacionModalTable tbody').attr('data-grupo', grupo);
-    updateClasificacionGrupo(competicion_torneo_id, grupo)
-    $('#clasificaciongrupo').modal('show')
-})
 
-function updateClasificacionGrupo(competicion_torneo_id, grupo) {
-    var fd = new FormData();
-    fd.append("competicion_torneo_id", competicion_torneo_id);
-    fd.append("grupo", grupo);
-    fd.append("csrf_token", $('[name="csrf_token"]').val());
-    $.ajax({
-        url: base_url + 'Competiciones/clasificacionGrupoRey',
-        method: "POST",
-        contentType: false,
-        processData: false,
-        data: fd
-    }).done(function(response) {
-        var response = JSON.parse(response);
-        $('[name="csrf_token"]').val(response.csrf)
-        if (response.error > 0) {
-            var errorhtml = ''
-            if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
-                    errorhtml += value + '<br>'
-                })
-            }
-            if (response.hasOwnProperty('error_msn')) {
-                errorhtml += response.error_msn
-            }
-            swal.fire({
-                icon: 'error',
-                title: 'ERROR',
-                html: errorhtml,
-                willClose: function() {
-                    if (response.hasOwnProperty('redirect')) {
-                        if (response.redirect == 'refresh') {
-                            location.reload()
-                        } else {
-                            window.location.href = response.redirect
-                        }
-                    }
-                }
-            });
-            return;
-        } else {
-            var tbody = $('#clasificacionModalTable tbody[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
-            tbody.slideUp();
-            tbody.html('');
-            $.each(response.users, function(i, user) {
-                var posicion = i + 1;
-                var deportista = user.first_name + ' ' + user.last_name;
-                var club = user.nombre;
-
-                var tr = '<tr>';
-                tr += '<td>' + posicion + '</td>';
-                tr += '<td>' + deportista + '</td>';
-                tr += '<td>' + club + '</td>';
-				tr += '<td>' + user.puntos_total + '</td>';
-                tr += '<td>' + user.victorias + '</td>';
-                tr += '<td>' + user.empates + '</td>';
-                tr += '<td>' + user.derrotas + '</td>';
-                tr += '<td>' + user.puntos_favor + '</td>';
-				tr += '<td>' + user.total_combates + '</td>';  
-                tr += '</th>';
-                tbody.append(tr);
-            })
-            tbody.slideDown();
-
-            var tbodyg = $('#tablakumite_' + grupo + ' tbody[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
-            tbodyg.slideUp();
-            tbodyg.html('');
-            $.each(response.users, function(i, user) {
-                var posicion = i + 1;
-                var deportista = user.first_name + ' ' + user.last_name;
-                var club = user.nombre;
-
-                var tr = '<tr>';
-                tr += '<td>' + posicion + '</td>';
-                tr += '<td colspan="2">' + deportista + '</td>';
-                tr += '<td>' + club + '</td>';
-                tr += '</th>';
-
-                tbodyg.append(tr);
-            })
-            tbodyg.slideDown();
-        }
-    }).always(function(jqXHR, textStatus) {
-        if (textStatus != "success") {
-            swal.fire({
-                icon: 'error',
-                title: 'Ha ocurrido un error AJAX',
-                html: jqXHR.statusText,
-                timer: 5000,
-                willClose: function() {}
-            })
-        }
-    });
-
-}
-
-function updateClasificacionGrupoUsers(competicion_torneo_id, grupo) {
-    var fd = new FormData();
-    fd.append("competicion_torneo_id", competicion_torneo_id);
-    fd.append("grupo", grupo);
-    fd.append("csrf_token", $('[name="csrf_token"]').val());
-    $.ajax({
-        url: base_url + 'Competiciones/clasificacionGrupo',
-        method: "POST",
-        contentType: false,
-        processData: false,
-        data: fd
-    }).done(function(response) {
-        var response = JSON.parse(response);
-        $('[name="csrf_token"]').val(response.csrf)
-        if (response.error > 0) {
-            var errorhtml = ''
-            if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
-                    errorhtml += value + '<br>'
-                })
-            }
-            if (response.hasOwnProperty('error_msn')) {
-                errorhtml += response.error_msn
-            }
-            swal.fire({
-                icon: 'error',
-                title: 'ERROR',
-                html: errorhtml,
-                willClose: function() {
-                    if (response.hasOwnProperty('redirect')) {
-                        if (response.redirect == 'refresh') {
-                            location.reload()
-                        } else {
-                            window.location.href = response.redirect
-                        }
-                    }
-                }
-            });
-            return;
-        } else {
-            var tbody = $('tbody.user[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
-            tbody.slideUp();
-            tbody.html('');
-            $.each(response.users, function(i, user) {
-                var posicion = i + 1;
-                var deportista = user.first_name + ' ' + user.last_name;
-                var tr = '<tr data-user_ud="' + user.user_id + '">';
-                tr += '<td>' + posicion + '</td>';
-                tr += '<td>' + deportista + '</td>';
-                tr += '</th>';
-                tbody.append(tr);
-            })
-            tbody.slideDown();
-        }
-    }).always(function(jqXHR, textStatus) {
-        if (textStatus != "success") {
-            swal.fire({
-                icon: 'error',
-                title: 'Ha ocurrido un error AJAX',
-                html: jqXHR.statusText,
-                timer: 5000,
-                willClose: function() {}
-            })
-        }
-    });
-
-}
-
-
-function dibujar_cruces_grupos() {
-    var competicion_torneo_id = $('#faseeliminatorias').attr('competicion_torneo_id');
-    var fd = new FormData();
-    fd.append("competicion_torneo_id", competicion_torneo_id);
-    fd.append("csrf_token", $('[name="csrf_token"]').val());
-    $.ajax({
-        url: base_url + 'Competiciones/eliminatoriasCompeticion',
-        method: "POST",
-        contentType: false,
-        processData: false,
-        data: fd
-    }).done(function(response) {
-        var response = JSON.parse(response);
-        $('[name="csrf_token"]').val(response.csrf)
-        if (response.data.length > 0) {
-            $(".brackets").html('')
-            $(".brackets").slideDown(300)
-            $(".brackets").gracket({ src: response.data });
-
-        } else {
-            $(".brackets").slideDown(300)
-        }
-
-    }).always(function(jqXHR, textStatus) {
-        if (textStatus != "success") {
-            swal.fire({
-                icon: 'error',
-                title: 'Ha ocurrido un error AJAX',
-                html: jqXHR.statusText,
-                timer: 5000,
-                willClose: function() {}
-            })
-        }
-    });
-    TestData = [
-        /* [
-             [
-                 { "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1, "displaySeed": "D1", "score": 47 }, 
-                 { "name": "Andrew Miller", "id": "andrew-miller", "seed": 2 }
-             ],
-             [{ "name": "James Coutry", "id": "james-coutry", "seed": 3 }, { "name": "Sam Merrill", "id": "sam-merrill", "seed": 4 }],
-             [{ "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }, { "name": "Everett Zettersten", "id": "everett-zettersten", "seed": 6 }],
-             [{ "name": "John Scott", "id": "john-scott", "seed": 7 }, { "name": "Teddy Koufus", "id": "teddy-koufus", "seed": 8 }],
-             [{ "name": "Arnold Palmer", "id": "arnold-palmer", "seed": 9 }, { "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }],
-             [{ "name": "Jesse James", "id": "jesse-james", "seed": 1 }, { "name": "Scott Anderson", "id": "scott-anderson", "seed": 12 }],
-             [{ "name": "Josh Groben", "id": "josh-groben", "seed": 13 }, { "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }],
-             [{ "name": "Jake Coutry", "id": "jake-coutry", "seed": 15 }, { "name": "Spencer Zettersten", "id": "spencer-zettersten", "seed": 16 }]
-         ],
-         [
-             [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }, { "name": "James Coutry", "id": "james-coutry", "seed": 3 }],
-             [{ "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }, { "name": "Teddy Koufus", "id": "teddy-koufus", "seed": 8 }],
-             [{ "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }, { "name": "Scott Anderson", "id": "scott-anderson", "seed": 12 }],
-             [{ "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }, { "name": "Jake Coutry", "id": "jake-coutry", "seed": 15 }]
-         ],*/
-        [
-            [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }, { "name": "Anothy Hopkins", "id": "anthony-hopkins", "seed": 5 }],
-            [{ "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }, { "name": "Sammy Zettersten", "id": "sammy-zettersten", "seed": 14 }]
-        ],
-        [
-            [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }, { "name": "Ryan Anderson", "id": "ryan-anderson", "seed": 10 }]
-        ],
-        [
-            [{ "name": "Erik Zettersten", "id": "erik-zettersten", "seed": 1 }]
-        ]
-    ];
-
-    // initializer
-
-
-}
-
-function guardarClasificaciones() {
-
-}
-$(document).on('click', '[data-guardar-clasificaicon]', function() {
-    var competicion_torneo_id = $(this).attr('data-guardar-clasificaicon');
-    var grupo = $(this).attr('data-grupo');
-    var fd = new FormData();
-    fd.append("competicion_torneo_id", competicion_torneo_id);
-    fd.append("grupo", grupo);
-    fd.append("csrf_token", $('[name="csrf_token"]').val());
-    $.ajax({
-        url: base_url + 'Competiciones/guardarClasificacionGrupo',
-        method: "POST",
-        contentType: false,
-        processData: false,
-        data: fd
-    }).done(function(response) {
-        var response = JSON.parse(response);
-        $('[name="csrf_token"]').val(response.csrf)
-        if (response.error > 0) {
-            var errorhtml = ''
-            if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
-                    errorhtml += value + '<br>'
-                })
-            }
-            if (response.hasOwnProperty('error_msn')) {
-                errorhtml += response.error_msn
-            }
-            swal.fire({
-                icon: 'error',
-                title: 'ERROR',
-                html: errorhtml,
-                willClose: function() {
-                    if (response.hasOwnProperty('redirect')) {
-                        if (response.redirect == 'refresh') {
-                            location.reload()
-                        } else {
-                            window.location.href = response.redirect
-                        }
-                    }
-                }
-            });
-            return;
-        } else {
-            swal.fire({
-                icon: 'success',
-                title: 'OK',
-                html: response.msn,
-                willClose: function() {
-                    if (response.hasOwnProperty('redirect')) {
-                        if (response.redirect == 'refresh') {
-                            location.reload()
-                        } else {
-                            window.location.href = response.redirect
-                        }
-                    }
-                }
-            });
-            return;
-        }
-
-    }).always(function(jqXHR, textStatus) {
-        if (textStatus != "success") {
-            swal.fire({
-                icon: 'error',
-                title: 'Ha ocurrido un error AJAX',
-                html: jqXHR.statusText,
-                timer: 5000,
-                willClose: function() {}
-            })
-        }
-    });
-})
 
 $(document).ready(function() {
-    /*$('tbody.user[data-competicion_torneo_id]').each(function(index, elem) {
-        var competicion_torneo_id = $(elem).attr('data-competicion_torneo_id');
-        var grupo = $(elem).attr('data-grupo');
-        updateClasificacionGrupoUsers(competicion_torneo_id, grupo)
-    })
-    if ($('#faseeliminatorias').length) {
-        dibujar_cruces_grupos()
-    }*/
 	cargar_puntos();
 })
-
-
-
-
-
 
 $(document).on('click', '#exportar_grupos', function() {
     var competicion_torneo_id = $(this).attr('data-competicion_torneo_id');

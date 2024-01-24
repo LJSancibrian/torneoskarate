@@ -159,6 +159,11 @@ class Competiciones extends CI_Controller
             $data['view'] = ['gestion/competiciones/clasificacionkumite'];
         }
 
+        if($competicion->tipo == 'rey'){
+            $data['clasificacion'] = $this->database->clasificacionGlobalRey($competicion_torneo_id);
+            $data['view'] = ['gestion/competiciones/clasificacionrey'];
+        }
+
         $data['page_header']    =   $torneo->titulo . ': ' . 'Clasificación' . $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
         $data['js_files']       = [
             assets_url() . 'admin/js/vistas/clasificacioncompeticion.js',
@@ -230,7 +235,7 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -350,7 +355,23 @@ class Competiciones extends CI_Controller
             $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
             $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
             $plantilla = 'pdfcompeticionkata';
-        } else {
+        } elseif ($competicion->tipo == 'rey') {
+            $plantilla = 'pdfcompeticionrey';
+            $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
+            $grupos = [];
+            foreach ($data['ordenparticipacion']['ordenados'] as $key => $part) {
+                $grupos[$part->grupo][] = $part;
+            }
+            $data['grupos'] = $grupos;
+            $matches = $this->database->getMatchesTree($competicion_torneo_id);
+            $eliminatorias = $this->database->getEliminatoriasTree($competicion_torneo_id);
+            $data['matches'] = $matches;
+            $data['eliminatorias'] = $eliminatorias;
+            $data['torneo'] = $torneo;
+            $data['competicion'] = $competicion;
+            $data['page_header']    =   $torneo->titulo . ': ' . $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
+        }else{
+     
             $plantilla = 'pdfcompeticionkumite';
             $matches = $this->database->getMatchesTreePdf($competicion_torneo_id);
             $grupos = [];
@@ -373,17 +394,33 @@ class Competiciones extends CI_Controller
         $this->pdf->generate($html, $filename, true, 0);
     }
 
+    public function pdfdoccombates()
+    {
+       
+            $plantilla = 'pdfcompeticionreycombates';
+            $data['page_header']    =   'Registro de combates';
+        
+
+        $this->load->library('pdf');
+        $html     = $this->load->view($plantilla, $data, true);
+        $filename = 'hoja_combates_rey_de_la_pista';
+        $this->pdf->generate($html, $filename, true, 0);
+    }
+
     public function FinalizarCompeticion($competicion_torneo_id)
     {
         asistentePage();
         $competicion = $this->database->getCompeticion($competicion_torneo_id);
+        
         if (!isset($competicion) || $competicion == false) {
             show_404();
         }
         $torneo = $this->database->buscarDato('torneos', 'torneo_id', $competicion->torneo_id);
+        
         if (!isset($torneo) || $torneo == false || $torneo->deletedAt != '0000-00-00 00:00:00') {
             show_404();
         }
+       
         if($competicion_torneo_id == 128){
             // copiar en competiciones 121 y 119
             // buscar las inscripciones y las copia
@@ -423,13 +460,14 @@ class Competiciones extends CI_Controller
             $this->guardarClasificacionLM(121);
             $this->guardarClasificacionLM(119);
         }
-
+        
         $this->guardarClasificacionLM($competicion_torneo_id);
         $params = [
             'estado' => 2,
             'updatedAt' => date('Y-m-d H:i:s')
         ];
         $this->database->actualizar('torneos_competiciones', $params, 'competicion_torneo_id', $competicion_torneo_id);
+        
         redirect('torneos/competiciones/' . $torneo->slug, 'refresh');
     }
 
@@ -443,7 +481,7 @@ class Competiciones extends CI_Controller
         }
         if ($competicion->tipo == 'puntos') {
             $orden = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3]);
-        } elseif ($competicion->tipo == 'liguilla' || $competicion->tipo == 'eliminatoria') {
+        } elseif ($competicion->tipo == 'liguilla' || $competicion->tipo == 'eliminatoria'|| $competicion->tipo == 'rey') {
             $orden = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
         } else {
             show_404();
@@ -502,7 +540,7 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -557,7 +595,7 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -626,7 +664,7 @@ class Competiciones extends CI_Controller
         } else {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -690,7 +728,7 @@ class Competiciones extends CI_Controller
         } else {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -747,7 +785,7 @@ class Competiciones extends CI_Controller
         } else {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -784,7 +822,7 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -961,7 +999,7 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -987,13 +1025,20 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
         }
-        $players = $this->database->clasificacionGrupoKumite(input('competicion_torneo_id'), input('grupo'));
-        //printr($players);
+        $players = [];
+        if($competicion->tipo == 'liguilla'){
+            $players = $this->database->clasificacionGrupoKumite(input('competicion_torneo_id'), input('grupo'));
+        }
+
+        if($competicion->tipo == 'rey'){
+            $players = $this->database->clasificacionGrupoRey(input('competicion_torneo_id'), input('grupo'));
+        }
+        
         $matches = $this->database->getEliminatoriasGrupo(input('competicion_torneo_id'), input('grupo'));
         //printr($this->db->last_query());
         $cambios = 0;
@@ -1172,7 +1217,7 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -1195,7 +1240,7 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);
@@ -1351,7 +1396,7 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == FALSE) {
             $response = [
                 'error'     => 1,
-                'error_msn' => 'Competcición no encontrada',
+                'error_msn' => 'Competición no encontrada',
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
             returnAjax($response);

@@ -636,88 +636,7 @@ class Database extends CI_Model
 
     public function clasificacionFinalRey($competicion_torneo_id)
     {
-        $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
-        $ronda_final = $valoracion_normal + 1;
-        $primerosclasificados = $this->clasificacionKata($competicion_torneo_id, [$ronda_final]);
         
-        /*
-        printr( $primerosclasificados);
-        
-        $this->db->select('user_id, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
-        $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
-        $this->db->group_by('user_id');
-        //$this->db->order_by('media', 'DESC');
-        $clasificacion = $this->db->get('puntoskata')->result();
-
-        foreach ($clasificacion as $key => $user) {
-            // usuario y club
-            $this->db->join('clubs c', 'c.club_id = users.club_id');
-            $this->db->where('users.id', $user->user_id);
-            $userd = $this->db->get('users')->row();
-            $user->first_name = $userd->first_name;
-            $user->last_name = $userd->last_name;
-            $user->nombre = $userd->nombre;
-            $user->first_name = $userd->first_name;
-            // inscripcion
-            $this->db->where('competicion_torneo_id', $competicion_torneo_id);
-            $this->db->where('user_id', $user->user_id);
-            $inscripcion = $this->db->get('torneos_inscripciones')->row();
-            $user->inscripcion_id = $inscripcion->inscripcion_id;
-            // rondas
-            $user->total = 0;
-            $user->media = 0;
-            $user->valoraciones = 0;
-            $user->rondas = [];
-            foreach ($rondas as $key => $ronda) {
-                $user->rondas[$ronda] = $this->getPuntosRondaKata($competicion_torneo_id, $ronda, $user->user_id);
-            }
-            foreach ($user->rondas as $key => $rondauser) {
-                if (isset($rondauser)) {
-                    $user->total = $user->total + $rondauser->total;
-                    $user->valoraciones += $rondauser->valoraciones;
-                }
-            }
-            if ($user->valoraciones > 0) {
-                $user->media = round($user->total / $user->valoraciones, 2);
-            }
-
-            $puntos = $this->getPuntosordenadosKata($competicion_torneo_id, $user->user_id);
-            $user->puntos_max = (isset($puntos[0])) ? $puntos[0]->puntos : 0;
-            $user->puntos_max2 = (isset($puntos[1])) ? $puntos[1]->puntos : 0;
-            $user->puntos_max3 = (isset($puntos[2])) ? $puntos[2]->puntos : 0;
-            $user->puntos_max4 = (isset($puntos[3])) ? $puntos[3]->puntos : 0;
-            
-        }
-        usort($clasificacion, function ($a, $b) {
-            $totalb = (isset($b->rondas[3]->total)) ? $b->rondas[3]->total : 0;
-            $totala = (isset($a->rondas[3]->total)) ? $a->rondas[3]->total : 0;
-            $retval =  $totalb <=> $totala;
-            if ($retval == 0) {
-                $retval = $b->total <=> $a->total;
-                if ($retval == 0) {
-                    $retval = $b->media <=> $a->media;
-                    if ($retval == 0) {
-                        $retval = $b->puntos_max <=> $a->puntos_max;
-                        if ($retval == 0) {
-                            $retval = $b->puntos_max2 <=> $a->puntos_max2;
-                            if ($retval == 0) {
-                                $retval = $b->puntos_max3 <=> $a->puntos_max3;
-                                if ($retval == 0) {
-                                    $retval = $b->puntos_max4 <=> $a->puntos_max4;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return $retval;
-        });
-
-        return $clasificacion;
-        */
-
-        return $primerosclasificados;
     }
 
     
@@ -1625,6 +1544,74 @@ class Database extends CI_Model
 
         $return = array_merge($finalistas, $players);
         return $return;
+    }
+
+    public function clasificacionGlobalRey($competicion_torneo_id)
+    {
+        $this->db->select('puntosrey.*, users.id AS  user_id, users.first_name, users.last_name, clubs.nombre');
+        $this->db->select('COALESCE(puntosrey.puntos_total, 0) as puntos_total', false);
+        $this->db->select('COALESCE(puntosrey.total_combates, 0) as total_combates', false);
+        $this->db->select('COALESCE(puntosrey.victorias, 0) as victorias', false);
+        $this->db->select('COALESCE(puntosrey.empates, 0) as empates', false);
+        $this->db->select('COALESCE(puntosrey.derrotas, 0) as derrotas', false);
+        $this->db->select('COALESCE(puntosrey.puntos_favor, 0) as puntos_favor', false);
+        $this->db->select('(1 -1) as finalista', false);
+        $this->db->where('torneos_inscripciones.competicion_torneo_id', $competicion_torneo_id);
+        $this->db->where('torneos_inscripciones.estado', 1);
+        $this->db->order_by('puntosrey.puntos_total', 'DESC');
+        $this->db->order_by('puntosrey.total_combates', 'ASC');
+        $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
+        $this->db->join('clubs', 'clubs.club_id = users.club_id');
+        $this->db->join('puntosrey', 'torneos_inscripciones.user_id = puntosrey.user_id', 'left');
+        $deportistas = $this->db->get('torneos_inscripciones')->result();
+        $deportistas_array = [];       
+        foreach ($deportistas as $key => $value) {
+            $deportistas_array[$value->user_id] = $value;
+        }
+        
+        //se buscan los combates de las eleimnatorias
+        $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+        $this->db->order_by('ncombate', 'DESC');
+        $matches = $this->db->get('matches')->result();   
+        foreach ($matches as $key => $value) {
+            $deportistas_array[$value->user_rojo]->finalista ++;
+            $deportistas_array[$value->user_azul]->finalista ++;
+            $deportistas_array[$value->user_rojo]->puntos_favor += $value->puntos_rojo;
+            $deportistas_array[$value->user_azul]->puntos_favor += $value->puntos_azul;
+            $deportistas_array[$value->user_rojo]->total_combates ++;
+            $deportistas_array[$value->user_azul]->total_combates ++;
+            $loser = ($value->winner == $value->user_rojo) ? $value->user_azul : $value->user_rojo;
+            $deportistas_array[$loser]->derrotas ++;
+            $deportistas_array[$value->winner]->victorias ++;
+            $deportistas_array[$value->winner]->puntos_total += 300;
+            $deportistas_array[$loser]->puntos_total += 100;
+        }
+
+        usort($deportistas_array, function ($a, $b) {
+            $retval = $b->finalista <=> $a->finalista;
+            if ($retval == 0) {
+                $retval = $b->puntos_total <=> $a->puntos_total;
+                if ($retval == 0) {
+                    $retval = $b->victorias <=> $a->victorias;
+                    if ($retval == 0) {
+                        $retval = $b->empates <=> $a->empates;
+                        if ($retval == 0) {
+                            $retval = $a->derrotas <=> $b->derrotas;
+                            if ($retval == 0) {
+                                $retval = $b->puntos_favor <=> $a->puntos_favor;
+                                if ($retval == 0) {
+                                    $retval = $a->total_combates <=> $b->total_combates;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return $retval;
+        });
+
+        return $deportistas_array;
+        
     }
 
     public function getCompeticionesLM($year)
