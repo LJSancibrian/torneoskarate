@@ -11,7 +11,7 @@ class Home extends CI_Controller
     {
         $data['page_header']    = 'Torneos de Karate';
         $data['page_sub_header']    = 'Ayuntamiento de Piélagos';
-        
+
         // se buscan los grupos, ordenados por fecha torneo
         $grupos = $this->database->getTorneosHome();
         $data['grupos'] = $grupos;
@@ -65,14 +65,14 @@ class Home extends CI_Controller
         if ($torneo->tipo != 2) {
             $data['competicioneskata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
             foreach ($data['competicioneskata'] as $key => $competicionkata) {
-                if($competicionkata->tipo == 'puntos'){
-                    $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionFinalKata($competicionkata->competicion_torneo_id, [1,2,3]);
-                }else{
-                    $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionGlobalKumite($competicionkata->competicion_torneo_id, [1,2,3]);
-                } 
+                if ($competicionkata->tipo == 'puntos') {
+                    $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionFinalKata($competicionkata->competicion_torneo_id, [1, 2, 3]);
+                } else {
+                    $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionGlobalKumite($competicionkata->competicion_torneo_id, [1, 2, 3]);
+                }
             }
         }
-       
+
         if ($torneo->tipo != 1) {
             $data['competicioneskumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
             foreach ($data['competicioneskumite'] as $key => $competicionkumite) {
@@ -97,9 +97,8 @@ class Home extends CI_Controller
 
     public function clasificacion_kata($competicion_torneo_id)
     {
-        $finalkata = $this->database->clasificacionFinalKata($competicion_torneo_id, [1,2,3]);
-        $kata = $this->database->clasificacionKata($competicion_torneo_id, [1,2]);
-
+        $finalkata = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3]);
+        $kata = $this->database->clasificacionKata($competicion_torneo_id, [1, 2]);
     }
 
     public function vercompeticion($slug, $competicion_torneo_id)
@@ -116,28 +115,56 @@ class Home extends CI_Controller
         if ($competicion->torneo_id != $torneo->torneo_id) {
             show_error('La competición no existe en el torneo.');
         }
+        if ($competicion->estado < 1) {
+            $data['view'] = 'public/vistacompeticionnosorteo';
+        }
+        if ($competicion->estado > 0) {
+            if ($competicion->tipo == 'puntos') {
+                $data['rondaspuntos'] = $this->database->getrondaskata($competicion_torneo_id);
+                $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
+                $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
+                $data['view'] = 'public/vistacompeticionkata';
+                $data['js_files'] = [
+                    base_url() . 'assets/public/js/vistacompeticionkata.js',
+                ];
+            }
+            if ($competicion->tipo == 'liguilla' || $competicion->tipo == 'eliminatoria') {
+                $data['view'] = 'public/vistacompeticionkumite';
+                $data['matches'] = $this->database->getMatchesTree($competicion_torneo_id);
+                $data['eliminatorias'] = $this->database->getEliminatoriasTree($competicion_torneo_id);
+                $data['css_files']       = [
+                    assets_url() . 'plugins/jquery.gracket/style.css',
+                ];
+                $data['js_files'] = [
+                    assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
+                    base_url() . 'assets/public/js/vistacompeticionkumite.js',
+                ];
+            }
 
-        if ($competicion->tipo == 'puntos') {
-            $data['rondaspuntos'] = $this->database->getrondaskata($competicion_torneo_id);
-            $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
-            $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
-            $data['view'] = 'public/vistacompeticionkata';
-            $data['js_files'] = [
-                base_url() . 'assets/public/js/vistacompeticionkata.js',
-            ];
+            if ($competicion->tipo == 'rey') {
+                $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
+                $grupos = [];
+                foreach ($data['ordenparticipacion']['ordenados'] as $key => $part) {
+                    $grupos[$part->grupo][] = $part;
+                }
+                $data['grupos'] = $grupos;
+                $data['view'] = 'public/vistacompeticionrey';
+                $eliminatorias = $this->database->getEliminatoriasTree($competicion_torneo_id);
+                for ($i = 1; $i <= count($grupos); $i++) {
+                    $data['players'][$i] = $this->database->clasificacionGrupoRey($competicion_torneo_id, $i);
+                }
+
+                $data['eliminatorias'] = $eliminatorias;
+                $data['css_files']       = [
+                    assets_url() . 'plugins/jquery.gracket/style.css',
+                ];
+                $data['js_files'] = [
+                    assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
+                    base_url() . 'assets/public/js/vistacompeticionrey.js',
+                ];
+            }
         }
-        if ($competicion->tipo == 'liguilla' || $competicion->tipo == 'eliminatoria') {
-            $data['view'] = 'public/vistacompeticionkumite';
-            $data['matches'] = $this->database->getMatchesTree($competicion_torneo_id);
-            $data['eliminatorias'] = $this->database->getEliminatoriasTree($competicion_torneo_id);
-            $data['css_files']       = [
-                assets_url() . 'plugins/jquery.gracket/style.css',
-            ];
-            $data['js_files'] = [
-                assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
-                base_url() . 'assets/public/js/vistacompeticionkumite.js',
-            ];
-        }
+
         $data['page_header']    =  $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel;
         $data['torneo'] = $torneo;
         $data['competicion'] = $competicion;
@@ -153,15 +180,14 @@ class Home extends CI_Controller
         $competicioneskumite = [];
         $sibling = [];
         foreach ($competiciones as $key => $value) {
-            if($value->modalidad == 'kata' && !in_array($value->sibling_id, $sibling) ){
+            if ($value->modalidad == 'kata' && !in_array($value->sibling_id, $sibling)) {
                 $competicioneskata[] = $value;
                 $sibling[] = $value->competicion_torneo_id;
-               
-            }elseif($value->modalidad == 'kumite' && !in_array($value->sibling_id, $sibling) ){
+            } elseif ($value->modalidad == 'kumite' && !in_array($value->sibling_id, $sibling)) {
                 $competicioneskumite[] = $value;
                 $sibling[] = $value->competicion_torneo_id;
-                if($value->sibling_id > 0) {
-                    $sibling[] =$value->sibling_id ;
+                if ($value->sibling_id > 0) {
+                    $sibling[] = $value->sibling_id;
                 };
             }
         }
@@ -175,7 +201,7 @@ class Home extends CI_Controller
     public function compLM2022($competicion_torneo_id)
     {
         //validUrl();
-        $data = []; 
+        $data = [];
         $competicion = $this->database->getCompeticion($competicion_torneo_id);
         if (!isset($competicion) || $competicion == false) {
             show_error('La competicion no existe');
@@ -189,32 +215,30 @@ class Home extends CI_Controller
         $data['clasificacion'] = $clasificacion;
         $data['view']          = 'public/vistacompeticionlm2022';
         show($data);
-
     }
 
     public function clasificaciongrupo($grupo_id)
     {
-       // validUrl();
+        // validUrl();
         $data = [];
-        $grupo = $this->database->buscarDato('torneos_grupos', 'grupo_id',$grupo_id);
+        $grupo = $this->database->buscarDato('torneos_grupos', 'grupo_id', $grupo_id);
         $competiciones = $this->database->getCompeticionesGrupo($grupo_id);
         $competicioneskata = [];
         $competicioneskumite = [];
         $sibling = [];
         foreach ($competiciones as $key => $value) {
-            if($value->modalidad == 'kata' && !in_array($value->sibling_id, $sibling) ){
+            if ($value->modalidad == 'kata' && !in_array($value->sibling_id, $sibling)) {
                 $competicioneskata[] = $value;
                 $sibling[] = $value->competicion_torneo_id;
-               
-            }elseif($value->modalidad == 'kumite' && !in_array($value->sibling_id, $sibling) ){
+            } elseif ($value->modalidad == 'kumite' && !in_array($value->sibling_id, $sibling)) {
                 $competicioneskumite[] = $value;
                 $sibling[] = $value->competicion_torneo_id;
-                if($value->sibling_id > 0) {
-                    $sibling[] =$value->sibling_id ;
+                if ($value->sibling_id > 0) {
+                    $sibling[] = $value->sibling_id;
                 };
             }
         }
-        $data['page_header']    =  strtoupper($grupo->titulo).'<br>AYTO. PIÉLAGOS';
+        $data['page_header']    =  strtoupper($grupo->titulo) . '<br>AYTO. PIÉLAGOS';
         $data['kata'] = $competicioneskata;
         $data['kumite'] = $competicioneskumite;
         $data['view']           = 'public/vistalm2022';
@@ -473,44 +497,44 @@ class Home extends CI_Controller
         phpinfo();
     }
 
-    
+
     public function create_finalesLM()
     {
         //adminPage();
         $competiciones = $this->database->getCompeticionesLM(2022);
-       // printr($competiciones);
+        // printr($competiciones);
         $competicioneskata = [];
         $competicioneskumite = [];
         $sibling = [];
         foreach ($competiciones as $key => $value) {
-            if($value->modalidad == 'kata' && !in_array($value->sibling_id, $sibling) ){
+            if ($value->modalidad == 'kata' && !in_array($value->sibling_id, $sibling)) {
                 $competicioneskata[] = $value;
                 $sibling[] = $value->competicion_torneo_id;
-                if($value->nivel == 'C' || $value->nivel == 'D'){ //open mixto d
+                if ($value->nivel == 'C' || $value->nivel == 'D') { //open mixto d
                     $data = [
                         'sibling_id' => ($value->sibling_id == 0) ? $value->competicion_torneo_id : $value->sibling_id,
                         'tipo' => 'eliminatoria',
                         'torneo_id' => 4,
                         'modalidad' =>  $value->modalidad,
-                        'categoria' =>  'GRAN FINAL '.$value->categoria,
+                        'categoria' =>  'GRAN FINAL ' . $value->categoria,
                         'genero' =>  $value->genero,
                         'nivel' =>  $value->nivel,
                     ];
                     $competicion_torneo_id = $this->database->insert('torneos_competiciones', $data);
                 }
-            }elseif($value->modalidad == 'kumite' && !in_array($value->sibling_id, $sibling) ){
+            } elseif ($value->modalidad == 'kumite' && !in_array($value->sibling_id, $sibling)) {
                 $competicioneskumite[] = $value;
                 $sibling[] = $value->competicion_torneo_id;
-                if($value->sibling_id > 0) {
-                    $sibling[] =$value->sibling_id ;
+                if ($value->sibling_id > 0) {
+                    $sibling[] = $value->sibling_id;
                 };
-                if($value->nivel != 'A' && $value->nivel != 'TEAM' && $value->nivel != '-'){
+                if ($value->nivel != 'A' && $value->nivel != 'TEAM' && $value->nivel != '-') {
                     $data = [
                         'sibling_id' => ($value->sibling_id == 0) ? $value->competicion_torneo_id : $value->sibling_id,
                         'tipo' => 'eliminatoria',
                         'torneo_id' => 4,
                         'modalidad' =>  $value->modalidad,
-                        'categoria' =>  'GRAN FINAL '.$value->categoria,
+                        'categoria' =>  'GRAN FINAL ' . $value->categoria,
                         'genero' =>  $value->genero,
                         'nivel' =>  $value->nivel,
                     ];
