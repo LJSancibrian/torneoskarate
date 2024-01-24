@@ -152,7 +152,7 @@ abstract class CI_Session_driver implements SessionHandlerInterface {
 		*/
 		return setcookie(
 			$this->_config['cookie_name'],
-			NULL,
+			'',
 			[
 				'expires' => 1,
 				'path' => $this->_config['cookie_path'],
