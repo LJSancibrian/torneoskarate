@@ -652,7 +652,7 @@ class Torneos extends CI_Controller
 
         if ($competicion_torneo_id != FALSE) {
             // formar el tr
-            $mod = strtolower($data['modalidad']);
+            $mod = strtolower(input('modalidad'));
             $tr = '<tr data-competicion_torneo_id="' . $competicion_torneo_id . '" data-modalidad="' . $data['modalidad'] . '">
             <td><input type="text" name="categoria_' . $mod . '" class="form-control" placeholder="Texto. Ej: Alevín" value="' . $data['categoria'] . '" disabled></td>
             <td>

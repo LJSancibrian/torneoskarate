@@ -5,7 +5,7 @@
 function site_title()
 {
     $ci = &get_instance();
-    echo ($ci->config->item('site_name') != '') ? $ci->config->item('site_name') : ((defined('SITE_TITLE')) ? SITE_TITLE : '');
+    echo ($ci->config->item('site_name') != '') ? $ci->config->item('site_name') : '';
 }
 
 function euros($monto)
@@ -175,7 +175,9 @@ return $texto;
 function limpiar_string($string)
 {
     $string = trim($string);
-    $string = utf8_encode($string);
+    if (!mb_detect_encoding($string, 'UTF-8', true)) {
+        $string = mb_convert_encoding($string, 'UTF-8', 'ISO-8859-1');
+    }
     $string = str_replace(
         array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
         array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
