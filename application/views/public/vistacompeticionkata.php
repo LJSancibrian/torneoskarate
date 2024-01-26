@@ -77,6 +77,7 @@
                 </div>
 
                 <div class="row">
+                    <?php if(count($finalistas) > 0) { ?>
                     <div class="col-lg-6">
                         <h4 class="mt-5">RONDA FINAL</h4>
                         <div class="table-responsive">
@@ -115,6 +116,7 @@
                             </table>
                         </div>
                     </div>
+                    <?php } ?>
                     <div class="col-lg-6">
                         <h4 class="mt-5">CLASIFICACIÓN FINAL</h4>
                         <div class="table-responsive">

@@ -109,9 +109,9 @@
         <table style="width: 100%;">
 			<thead>
 				<tr>
-					<th style="text-align:left; font-size:14px;">AKA</th>
+					<th style="text-align:left; font-size:14px;">AO</th>
 					<th colspan="2"></th>
-					<th style="text-align:right; font-size:14px;">AO</th>
+					<th style="text-align:right; font-size:14px;">AKA</th>
 				</tr>
 			</thead>
 			<tbody>

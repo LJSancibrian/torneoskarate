@@ -46,27 +46,16 @@
                             <th>#</th>
                             <th class="columnfixed">Deportista</th>
                             <th>Equipo</th>
-                            <th>Ronda 1</th>
-                            <th>Ronda 2</th>
-                            <th>R Final</th>
                             <th>Total</th>
                             <th>Val</th>
                             <th>Media</th>
+                            <th>Ronda 1</th>
+                            <th>Ronda 2</th>
+                            <th>R Final</th>
+                            
                         </tr>
                     </thead>
                 <tbody>
-                    <?php /*
-                    $pos = 0;
-                    foreach ($final as $key => $finalista) { ?>
-                        <tr>
-                            <td><?php echo $pos + 1;?></td>
-                            <td class="columnfixed"><?php echo $finalista->first_name.' '. $finalista->last_name;?></td>
-                            <td><?php echo $finalista->nombre;?></td>
-                            <td><?php echo $finalista->total;?></td>
-                            <td><?php echo $finalista->media;?></td>
-                        </tr>
-                    <?php  $pos++; } */?>
-
                     <?php 
                     $class = 0;
                     $pos = 0;
@@ -83,20 +72,20 @@
                             $pos = $class + 1;                     
                         }else{
                             $lasttotal = $competidor->total;
-                            $lastmedia = $competidor->media;
-                            $pos = $pos;            
+                            $lastmedia = $competidor->media;           
                         }
                         ?>
                             <tr>
                                 <td><?php echo $pos;?></td>
                                 <td class="columnfixed"><?php echo $competidor->first_name.' '. $competidor->last_name;?></td>
                                 <td><?php echo $competidor->nombre;?></td>
-                                <td><?php echo (isset($competidor->rondas[1]))?$competidor->rondas[1]->total.' / '.$competidor->rondas[1]->media:'';?></td>
-                                <td><?php echo (isset($competidor->rondas[2]))?$competidor->rondas[2]->total.' / '.$competidor->rondas[2]->media:'';?></td>
-                                <td class="bg-primary text-white"><?php echo (isset($competidor->rondas[3]))?$competidor->rondas[3]->total.' / '.$competidor->rondas[1]->media:'';?></td>
                                 <td><?php echo $competidor->total;?></td>
                                 <td><?php echo $competidor->valoraciones;?></td>
                                 <td><?php echo $competidor->media;?></td>
+                                <td><?php echo (isset($competidor->rondas[1]))?$competidor->rondas[1]->total.' / '.$competidor->rondas[1]->media:'';?></td>
+                                <td><?php echo (isset($competidor->rondas[2]))?$competidor->rondas[2]->total.' / '.$competidor->rondas[2]->media:'';?></td>
+                                <td class="bg-primary text-white"><?php echo (isset($competidor->rondas[3]))?$competidor->rondas[3]->total.' / '.$competidor->rondas[3]->media:'';?></td>
+                                
                             </tr>
                     <?php  $class++; } ?>
                 </tbody>

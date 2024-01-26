@@ -29,24 +29,19 @@
 					<tr>
 						<th class="bg-white text-primary">#</th>
 						<th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
-						<th class="bg-white text-primary" colspan="3">Ronda 1</th>
-						<th class="bg-white text-primary" colspan="3">Ronda 2</th>
-						<th class="bg-white text-primary" colspan="3">Ronda 3</th>
+						<?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+							<th class="bg-white text-primary" colspan="2">Ronda <?=$i?></th>
+						<?php } ?>
 						<th class="bg-white text-primary">Total</th>
 						<th class="bg-white text-primary">Media</th>
 					</tr>
 					<tr>
 						<th class="">#</th>
 						<th colspan="2" class="text-left columnfixed">Deportista</th>
-						<th>J1</th>
-						<th>J2</th>
-						<th>M1</th>
-						<th>J1</th>
-						<th>J2</th>
-						<th>M2</th>
-						<th>J1</th>
-						<th>J2</th>
-						<th>M3</th>
+						<?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+							<th>J1</th>
+							<th>J2</th>
+						<?php } ?>
 						<th>Total</th>
 						<th>Media</th>
 					</tr>
@@ -56,17 +51,13 @@
 						<tr data-user_id="<?php echo $value->user_id; ?>">
 							<td class=""><?php echo $value->orden; ?></td>
 							<td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
-							<td data-ronda="1" data-j="1"></td>
-							<td data-ronda="1" data-j="2"></td>
-							<td data-media="1" class="bg-success text-white">0</td>
 
-							<td data-ronda="2" data-j="1"></td>
-							<td data-ronda="2" data-j="2"></td>
-							<td data-media="2" class="bg-success text-white">0</td>
-
-							<td data-ronda="3" data-j="1"></td>
-							<td data-ronda="3" data-j="2"></td>
-							<td data-media="3" class="bg-success text-white">0</td>
+							<?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+								
+								<td data-ronda="<?=$i?>" data-j="1"></td>
+								<td data-ronda="<?=$i?>" data-j="2"></td>
+								<td data-media="<?=$i?>" class="bg-success text-white d-none">0</td>
+							<?php } ?>
 
 							<td data-total></td>
 							<td data-media-total class="bg-primary text-white">0</td>
@@ -131,7 +122,6 @@
 								<th>Equipo</th>
 								<th>Puntos</th>
 								<th>Media</th>
-
 							</tr>
 						</thead>
 						<tbody id="clasificacion_final_competicion"></tbody>

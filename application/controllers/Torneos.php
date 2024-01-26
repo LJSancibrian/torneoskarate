@@ -989,6 +989,17 @@ class Torneos extends CI_Controller
         $this->form_validation->set_rules('torneo_id', 'Torneo', 'trim|required');
         $this->form_validation->set_rules('user_id', 'Deportista', 'trim|required');
         validForm();
+        $torneo = $this->database->buscarDato('torneos', 'torneo_id',  input('torneo_id'));
+
+        if($torneo->limite < date('Y-m-d') && !$this->ion_auth->in_group([1, 2, 3])){
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'La inscripción está cerrada',
+                'redirect' => 'refresh',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        }
 
         // es nueva inscripcion, se crea un nuevo registro con la actual
         if (input('competicion_previa_torneo_id') == 0) {

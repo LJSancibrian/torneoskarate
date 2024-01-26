@@ -353,9 +353,22 @@ class Database extends CI_Model
     }
 
     public function getrondaskata($competicion_torneo_id){
-        $q = "SELECT count(puntos_id) AS valoraciones FROM puntoskata WHERE competicion_torneo_id = ".$competicion_torneo_id." AND juez = 1 AND puntos > 0 GROUP BY user_id ORDER bY SUM(puntos) ASC LIMIT 1,1;";
-        $rondaspuntos = $this->db->query($q)->row()->valoraciones;
-       return $rondaspuntos;
+        $competicion = $this->database->getCompeticion($competicion_torneo_id);
+        switch ($competicion->torneo_id) {
+            case 2:
+            case 3:
+            case 6:
+                $valoraciones = 2;
+                break;
+            case 8:
+                $valoraciones = 3;
+                break;
+            default:
+                $valoraciones = 4;
+                break;
+        }
+        
+       return $valoraciones;
     }
 
     public function actualizarPuntosKata($competicion_torneo_id, $user_id, $ronda, $juez, $puntos)
@@ -398,6 +411,7 @@ class Database extends CI_Model
         $this->db->order_by('total', 'DESC');
         $this->db->order_by('media', 'DESC');
         $clasificacion = $this->db->get('puntoskata')->result();
+   
         foreach ($clasificacion as $key => $user) {
             $this->db->join('clubs c', 'c.club_id = users.club_id');
             $this->db->where('users.id', $user->user_id);
@@ -423,89 +437,15 @@ class Database extends CI_Model
         return $clasificacion;
     }
 
-    public function clasificacionFinalKata($competicion_torneo_id)
+    public function clasificacionFinalKata($competicion_torneo_id,  $rondas = [])
     {
-        $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
-        $ronda_final = $valoracion_normal + 1;
-        $primerosclasificados = $this->clasificacionKata($competicion_torneo_id, [$ronda_final]);
-        
-        /*
-        printr( $primerosclasificados);
-        
-        $this->db->select('user_id, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
-        $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
-        $this->db->group_by('user_id');
-        //$this->db->order_by('media', 'DESC');
-        $clasificacion = $this->db->get('puntoskata')->result();
-
-        foreach ($clasificacion as $key => $user) {
-            // usuario y club
-            $this->db->join('clubs c', 'c.club_id = users.club_id');
-            $this->db->where('users.id', $user->user_id);
-            $userd = $this->db->get('users')->row();
-            $user->first_name = $userd->first_name;
-            $user->last_name = $userd->last_name;
-            $user->nombre = $userd->nombre;
-            $user->first_name = $userd->first_name;
-            // inscripcion
-            $this->db->where('competicion_torneo_id', $competicion_torneo_id);
-            $this->db->where('user_id', $user->user_id);
-            $inscripcion = $this->db->get('torneos_inscripciones')->row();
-            $user->inscripcion_id = $inscripcion->inscripcion_id;
-            // rondas
-            $user->total = 0;
-            $user->media = 0;
-            $user->valoraciones = 0;
-            $user->rondas = [];
-            foreach ($rondas as $key => $ronda) {
-                $user->rondas[$ronda] = $this->getPuntosRondaKata($competicion_torneo_id, $ronda, $user->user_id);
-            }
-            foreach ($user->rondas as $key => $rondauser) {
-                if (isset($rondauser)) {
-                    $user->total = $user->total + $rondauser->total;
-                    $user->valoraciones += $rondauser->valoraciones;
-                }
-            }
-            if ($user->valoraciones > 0) {
-                $user->media = round($user->total / $user->valoraciones, 2);
-            }
-
-            $puntos = $this->getPuntosordenadosKata($competicion_torneo_id, $user->user_id);
-            $user->puntos_max = (isset($puntos[0])) ? $puntos[0]->puntos : 0;
-            $user->puntos_max2 = (isset($puntos[1])) ? $puntos[1]->puntos : 0;
-            $user->puntos_max3 = (isset($puntos[2])) ? $puntos[2]->puntos : 0;
-            $user->puntos_max4 = (isset($puntos[3])) ? $puntos[3]->puntos : 0;
-            
+        if(empty($rondas)){
+            $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
+            $ronda_final = $valoracion_normal + 1;
+            $primerosclasificados = $this->clasificacionKata($competicion_torneo_id, [$ronda_final]);
+        }else{
+            $primerosclasificados = $this->clasificacionKata($competicion_torneo_id, $rondas);
         }
-        usort($clasificacion, function ($a, $b) {
-            $totalb = (isset($b->rondas[3]->total)) ? $b->rondas[3]->total : 0;
-            $totala = (isset($a->rondas[3]->total)) ? $a->rondas[3]->total : 0;
-            $retval =  $totalb <=> $totala;
-            if ($retval == 0) {
-                $retval = $b->total <=> $a->total;
-                if ($retval == 0) {
-                    $retval = $b->media <=> $a->media;
-                    if ($retval == 0) {
-                        $retval = $b->puntos_max <=> $a->puntos_max;
-                        if ($retval == 0) {
-                            $retval = $b->puntos_max2 <=> $a->puntos_max2;
-                            if ($retval == 0) {
-                                $retval = $b->puntos_max3 <=> $a->puntos_max3;
-                                if ($retval == 0) {
-                                    $retval = $b->puntos_max4 <=> $a->puntos_max4;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return $retval;
-        });
-
-        return $clasificacion;
-        */
-
         return $primerosclasificados;
     }
 
@@ -556,6 +496,7 @@ class Database extends CI_Model
     public function finalKata($competicion_torneo_id)
     {
         $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
+        if($valoracion_normal > 0) {
         $ronda_final = $valoracion_normal + 1;
 
         $this->db->select('first_name, last_name, usercode, c.nombre, i.user_id, i.inscripcion_id, i.grupo, i.orden, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
@@ -568,6 +509,9 @@ class Database extends CI_Model
         $this->db->order_by('total', 'DESC');
         $this->db->order_by('media', 'DESC');
         return $this->db->get('puntoskata')->result();
+        }else{
+            return [];
+        }
     }
 
     /**

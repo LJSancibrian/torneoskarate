@@ -63,8 +63,6 @@ class Competiciones extends CI_Controller
         }
         $data['torneo'] = $torneo;
         $data['competicion'] = $competicion;
-        //$data['view'] = ['gestion/competiciones/mesa'];
-
         $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
         if($competicion->tipo == 'puntos'){
             $data['view'] = ['gestion/competiciones/mesakata'];
@@ -102,8 +100,6 @@ class Competiciones extends CI_Controller
                 assets_url() . 'admin/js/vistas/mesacompeticionkumite.js',
             ];
         }
-
-        //CREATE TABLE `playoff`.`puntosrey` (`puntos_id` INT(11) NOT NULL , `competicion_torneo_id` INT(11) NOT NULL , `user_id` INT(11) NOT NULL , `victorias` INT(3) NOT NULL , `empates` INT(3) NOT NULL , `derrotas` INT(3) NOT NULL , `puntos_favor` INT(5) NOT NULL , `total_combates` INT(3) NOT NULL , `puntos_total` INT(5) NOT NULL , `penalizaciones` INT(3) NOT NULL ) ENGINE = InnoDB;
 
         if($competicion->tipo == 'rey'){
             $grupos = [];
@@ -147,7 +143,7 @@ class Competiciones extends CI_Controller
         $data['competicion'] = $competicion;
         $data['tabactive'] = 'competiciones-tab';
         if($competicion->tipo == 'puntos'){
-            $data['general'] = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3]);
+            $data['general'] = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3, 4]);
             $data['view'] = ['gestion/competiciones/clasificacionkata'];
         }
         if($competicion->tipo == 'liguilla'){
@@ -352,6 +348,7 @@ class Competiciones extends CI_Controller
         if ($competicion->tipo == 'puntos') {
             $data['torneo'] = $torneo;
             $data['competicion'] = $competicion;
+            $data['rondaspuntos'] = $this->database->getrondaskata($competicion_torneo_id);
             $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
             $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
             $plantilla = 'pdfcompeticionkata';

@@ -1,3 +1,21 @@
+function dividirArray(array, max) {
+    const grupos = [];
+    const numElementos = array.length;
+    const numGrupos = Math.ceil(numElementos / max);
+    let indiceGrupo = 0;
+
+    for (let i = 0; i < numElementos; i++) {
+        if (!grupos[indiceGrupo]) {
+            grupos[indiceGrupo] = { elementos: [] };
+        }
+        const elemento = array[i];
+        grupos[indiceGrupo].elementos.push(elemento);
+        indiceGrupo = (indiceGrupo + 1) % numGrupos;
+    }
+    return grupos;
+}
+
+
 $(document).on('click', '[data-generar-tablero]', function() {
     var competicion_torneo_id = $(this).attr('data-generar-tablero');
     var competicion_tipo = $(this).attr('data-generar-tipo');
@@ -91,38 +109,18 @@ $(document).on('click', '[data-generar-tablero]', function() {
                 $('#tablero-competicion').html(html);
                 var totalinscritos = response.inscritos.length;
                 var grupos = [];
-                if (totalinscritos < 5) {
-                    // se genera una tabla y se añaden a ella
-                    grupos.push(1)
-                } else if (totalinscritos == 12) {
-                    var ngrupos = totalinscritos / 3;
-                    ngrupos = Math.ceil(ngrupos)
-                        // letra del grupo = (index + 9).toString(36).toUpperCase()
-                    for (let index = 0; index < ngrupos; index++) {
-                        //var letter = (index + 10).toString(36).toUpperCase()
-                        var letter = index + 1
-                        grupos.push(letter)
-                    }
-                } else {
-                    // son 9 o mas 10,
-                    // calculo para tablas es el numero de inscritos dividido entre 4 (participantes en cada grupo) y redondeado a mayores 
-                    var ngrupos = totalinscritos / 4;
-                    ngrupos = Math.ceil(ngrupos)
-                        // letra del grupo = (index + 9).toString(36).toUpperCase()
-                    for (let index = 0; index < ngrupos; index++) {
-                        //var letter = (index + 10).toString(36).toUpperCase()
-                        var letter = index + 1
-                        grupos.push(letter)
-                    }
-                }
-
+                var grupos = dividirArray(response.inscritos, 6);
                 $('[id^="grupokumite_"]').remove();
-                for (let index = 0; index < grupos.length; index++) {
-                    var html = `<div class="border-bottom d-flex flex-row justify-content-start my-3" id="grupokumite_${grupos[index]}" grupo="${grupos[index]}">
-                    <table class="table table-striped table-bordered text-center w-auto" id="tablakumite_${grupos[index]}" data-rondas="si">
+
+                //for (let index = 0; index < grupos.length; index++) {
+                $.each(grupos, function (indice, grupo) {
+                    var n_grupo = indice + 1;
+                    console.log(grupo)
+                    var html = `<div class="border-bottom d-flex flex-row justify-content-start my-3" id="grupokumite_${n_grupo}" grupo="${n_grupo}">
+                    <table class="table table-striped table-bordered text-center w-auto" id="tablakumite_${n_grupo}" data-rondas="si">
                     <thead>
                         <tr>
-                            <th colspan="4" class="bg-white text-primary font-weigth-bold">GRUPO ${grupos[index]}</th>
+                            <th colspan="4" class="bg-white text-primary font-weigth-bold">GRUPO ${n_grupo}</th>
                         </tr>
                     </thead>
                     <thead>
@@ -133,25 +131,16 @@ $(document).on('click', '[data-generar-tablero]', function() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="no-sort"><td colspan="4"></td></tr>
-                    </tbody>
-                </table></div>`;
+                        <tr class="no-sort"><td colspan="4"></td></tr>`;
+                        $.each(grupo.elementos, function(i, elem) {
+                            var deportista = elem.first_name + ' ' + elem.last_name;
+                            var posicion = i + 1;
+                            html += `<tr data-user="${elem.user_id}" data-inscripcion_id="${elem.inscripcion_id}"><td>${posicion}</td><td colspan="2" class="text-nowrap">${deportista}</td><td>${elem.nombre}</td></tr>`;
+                        })
+
+                    html += `</tbody></table></div>`;
                     $('#fasegrupos').append(html);
-                }
-                // recorrer las inscripciones y colocar una en cada grupo de forma
-                $.each(response.inscritos, function(i, elem) {
-                    var deportista = elem.first_name + ' ' + elem.last_name;
-                    var posicion = i + 1;
-                    var tr = `<tr data-user="${elem.user_id}" data-inscripcion_id="${elem.inscripcion_id}"><td>${posicion}</td><td colspan="2" class="text-nowrap">${deportista}</td><td>${elem.nombre}</td></tr>`;
-                    if (i < grupos.length) {
-                        var letter = grupos[i];
-                    } else {
-                        var grupo = i % grupos.length;
-                        var letter = grupos[grupo];
-                    }
-                    selectortabla = '#tablakumite_' + letter + ' tbody';
-                    $(selectortabla).append(tr);
-                })
+                });
                 tabassortable();
                 dibujar_cruces_grupos();
                 dibulareliminatorias()
@@ -476,6 +465,17 @@ function dibulareliminatorias() {
             [
                 { name: "Segundo", id: "g1|2" },
                 { name: "Tercero", id: "g1|3" }
+            ]
+        ];
+        rounds.push(ronda);
+        var ronda = [
+            [
+                { name: "Ganador 1", id: "r1|1" },
+                { name: "Ganador 2", id: "r1|2" }
+            ],
+            [
+                { name: "Perdedor 1", id: "r1|1-" },
+                { name: "Perdedor 2", id: "r1|2-" }
             ]
         ];
         rounds.push(ronda);
