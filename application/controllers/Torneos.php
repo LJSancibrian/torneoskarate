@@ -372,6 +372,16 @@ class Torneos extends CI_Controller
             if ($torneo->tipo != 1) {
                 $data['m_kumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
             }
+
+            $params = [
+                'tabla' => 'torneos',
+                'where' => [
+                    'deletedAt' => '0000-00-00 00:00:00'
+                ],
+                'order_by' => ['fecha' => 'DESC']
+            ];
+            $data['torneos']  = $this->database->getWhere($params);
+            $data['clubs'] = $this->database->getClubs();
             $data['view'] = ['gestion/torneos/base'];
             $data['css_files'] = [
                 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css'
@@ -414,6 +424,14 @@ class Torneos extends CI_Controller
             $data['competicioneskumite'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KUMITE');
         }
         $data['tabactive'] = 'categorias-tab';
+        $params = [
+            'tabla' => 'torneos',
+            'where' => [
+                'deletedAt' => '0000-00-00 00:00:00'
+            ],
+            'order_by' => ['fecha' => 'DESC']
+        ];
+        $data['torneos']  = $this->database->getWhere($params);
         $data['js_files'][] = assets_url() . 'admin/js/vistas/torneo_categorias.js';
         show($data);
     }
@@ -567,6 +585,23 @@ class Torneos extends CI_Controller
         $modalidad = $this->input->post('modalidad');
         $genero = ($this->input->post('genero') == 'M') ? 1 : 2;
         $competiciones = $this->database->getCompeticionesTorneo($torneo_id, $modalidad, $genero);
+        $response = [
+            'error'     => 0,
+            'competiciones' => $competiciones,
+            'csrf'      => $this->security->get_csrf_hash(),
+        ];
+        echo json_encode($response);
+        exit();
+    }
+
+    public function get_competiciones_torneo()
+    {
+        logged();
+        isAjax();
+        $this->form_validation->set_rules('torneo_id', 'Torneo', 'trim|required');
+        validForm();
+        $torneo_id = $this->input->post('torneo_id');
+        $competiciones = $this->database->getCompeticionesTorneo($torneo_id);
         $response = [
             'error'     => 0,
             'competiciones' => $competiciones,
@@ -803,6 +838,63 @@ class Torneos extends CI_Controller
             ];
             returnAjax($response);
         }
+    }
+
+    public function addCategoriasTorneo()
+    {
+        adminPage();
+        isAjax();
+        $this->form_validation->set_rules('torneo_id', 'Torneo', 'trim|required');
+        $this->form_validation->set_rules('origen_torneo_id', 'Torneo origen', 'trim|required');
+        $this->form_validation->set_rules('tipo', 'Tipo', 'trim|required');
+        validForm();
+        $tipo = $this->input->post('tipo');
+        $torneo_id = $this->input->post('torneo_id');
+        $origen_torneo_id = $this->input->post('origen_torneo_id');
+        $categorias = $this->database->getCompeticionesTorneo($origen_torneo_id, $tipo);
+        $tr = '';
+        $creadas = 0;
+        $existentes = count($categorias);
+        foreach ($categorias as $key => $value) {
+            $data = [
+                'torneo_id' => input('torneo_id'),
+                'modalidad' => $value->modalidad,
+                'categoria' => $value->categoria,
+                'genero' => $value->genero,
+                'nivel' => $value->nivel,
+            ];
+            $competicion_torneo_id = $this->database->insert('torneos_competiciones', $data);
+            if ($competicion_torneo_id != FALSE) {
+                $creadas++;
+                $mod = $data['modalidad'];
+                $tr .= '<tr data-competicion_torneo_id="' . $competicion_torneo_id . '" data-modalidad="' . $data['modalidad'] . '">
+                <td><input type="text" name="categoria_' . $mod . '" class="form-control" placeholder="Texto. Ej: Alevín" value="' . $data['categoria'] . '" disabled></td>
+                <td>
+                    <select name="genero_' . $mod . '" class="form-control" disabled>';
+                $selected = ($data['genero'] == 'M') ? "selected" : "";
+                $tr .= '<option value="M" ' . $selected . '>Masculino</option>';
+                $selected = ($data['genero'] == 'F') ? "selected" : "";
+                $tr .= '<option value="F" ' . $selected . '>Femenino</option>';
+                $selected = ($data['genero'] == 'X') ? "selected" : "";
+                $tr .= '<option value="X" ' . $selected . '>Mixto</option>';
+                $tr .= '</td>
+                <td><input type="text" name="nivel_' . $mod . '" class="form-control" placeholder="Texto. Ej: < 40 Kg, ej: inicial" value="' . $data['nivel'] . '" disabled></td>
+                <td class="text-truncate">
+                <button type="button" class="btn btn-sm btn-icon btn-round btn-warning" data-edit="row' . $mod . '" data-accion="editar"><i class="fas fa-edit"></i>
+                <button type="button" class="btn btn-sm btn-icon btn-round btn-danger" data-del="row' . $mod . '"><i class="fas fa-trash"></i>
+                </td>
+                </tr>';
+            }
+        }
+        $response = [
+            'error'     => 0,
+            'html' => $tr,
+            'csrf'      => $this->security->get_csrf_hash(),
+        ];
+        if($existentes != $creadas){
+            $response['msn'] = 'No se han creado todas las categorias del torneo indicado. Revisar y añadir a mano las que faltan'; 
+        }
+        returnAjax($response);
     }
 
 
@@ -1184,10 +1276,14 @@ class Torneos extends CI_Controller
         }
     }
 
-    public function copiar_inscripciones($torneo_origen, $torneo_destino)
+    public function copiar_inscripciones($torneo_origen, $torneo_destino, $club_id = '')
     {
         adminPage();
         $this->db->where('torneo_id', $torneo_origen);
+        if($club_id != ''){
+            $this->db->where('club_id', $club_id);
+            $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
+        }
         $this->db->where('deletedAt', '0000-00-00 00:00:00');
         $inscripciones = $this->db->get('torneos_inscripciones')->result();
 
@@ -1217,10 +1313,11 @@ class Torneos extends CI_Controller
         $this->form_validation->set_rules('competicion_origen', 'Competición origen', 'trim|required');
         $this->form_validation->set_rules('competicion_destino', 'Competición destino', 'trim|required');
         validForm();
-
+        $club_id = input('club_origen');
         // busca la copeticion
-        $inscripciones = $this->database->inscritosCompeticion(input('competicion_origen'));
-
+        $inscripciones = $this->database->inscritosCompeticion(input('competicion_origen'), $club_id);
+        
+        
         foreach ($inscripciones as $key => $i) {
             $params = [
                 'torneo_id' => input('torneo_id'),

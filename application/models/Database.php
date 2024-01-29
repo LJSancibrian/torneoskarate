@@ -303,13 +303,16 @@ class Database extends CI_Model
         return $competicion;
     }
 
-    public function inscritosCompeticion($competicion_torneo_id)
+    public function inscritosCompeticion($competicion_torneo_id, $club_id = '')
     {
         $this->db->select('u.first_name, u.last_name, u.usercode, c.nombre, i.user_id, i.inscripcion_id');
         $this->db->where('i.competicion_torneo_id', $competicion_torneo_id);
         $this->db->where('i.deletedAt', '0000-00-00 00:00:00');
         $this->db->where('i.estado', 1);
         $this->db->where('u.active', 1);
+        if($club_id != ''){
+            $this->db->where('u.club_id', $club_id);
+        }
         $this->db->join('users u', 'u.id = i.user_id');
         $this->db->join('clubs c', 'c.club_id = u.club_id');
         return $this->db->get('torneos_inscripciones i')->result();

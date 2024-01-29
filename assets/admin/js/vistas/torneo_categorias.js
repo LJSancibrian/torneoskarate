@@ -251,10 +251,10 @@ $(document).on('click', '[data-add-row]', function () {
     var tr = boton.closest('tr');
     var modalidad = boton.attr('data-add-row');
     var mod = modalidad.toLowerCase();
-    var categoria = $('[name="categoria_'+mod+'"]').val();
-    var genero = $('[name="genero_'+mod+'"]').val();
-    var nivel = $('[name="nivel_'+mod+'"]').val();
-    
+    var categoria = $('[name="categoria_' + mod + '"]').val();
+    var genero = $('[name="genero_' + mod + '"]').val();
+    var nivel = $('[name="nivel_' + mod + '"]').val();
+
     var fd = new FormData();
     var torneoID = $('[name="torneo_id"]').val();
     fd.append("torneo_id", torneoID);
@@ -291,9 +291,9 @@ $(document).on('click', '[data-add-row]', function () {
         } else {
             var newtr = response.html
             tr.before(newtr)
-            $('[name="categoria_'+mod+'"]').val('');
-            $('[name="genero_'+mod+'"] option').removeAttr('selected');
-            $('[name="nivel_'+mod+'"]').val('');
+            $('[name="categoria_' + mod + '"]').val('');
+            $('[name="genero_' + mod + '"] option').removeAttr('selected');
+            $('[name="nivel_' + mod + '"]').val('');
         }
     }).always(function (jqXHR, textStatus) {
         if (textStatus != "success") {
@@ -323,9 +323,9 @@ $(document).on('click', '[data-edit]', function () {
     } else {
         // enviar el form
         var competicion_torneo_id = tr.attr('data-competicion_torneo_id')
-        var categoria = tr.find('[name="categoria_'+mod+'"]').val();
-        var genero = tr.find('[name="genero_'+mod+'"]').val();
-        var nivel = tr.find('[name="nivel_'+mod+'"]').val();
+        var categoria = tr.find('[name="categoria_' + mod + '"]').val();
+        var genero = tr.find('[name="genero_' + mod + '"]').val();
+        var nivel = tr.find('[name="nivel_' + mod + '"]').val();
         var modalidad = tr.attr('data-modalidad');
         var fd = new FormData();
         var torneoID = $('[name="torneo_id"]').val();
@@ -392,7 +392,7 @@ $(document).on('click', '[data-del]', function () {
     swal.fire({
         icon: 'question',
         title: 'Confirmar acción',
-        html: 'Elimiar las competición ' + categoria + ' ' + genero + ' ' + nivel + ' de ' + modalidad +'?',
+        html: 'Elimiar las competición ' + categoria + ' ' + genero + ' ' + nivel + ' de ' + modalidad + '?',
         showCancelButton: true,
         confirmButtonText: 'Si, eliminar',
         cancelButtonText: 'Cerrar sin cambios',
@@ -430,6 +430,68 @@ $(document).on('click', '[data-del]', function () {
                     return;
                 } else {
                     tr.remove();
+                }
+            }).always(function (jqXHR, textStatus) {
+                if (textStatus != "success") {
+                    swal.fire({
+                        icon: 'error',
+                        title: 'Ha ocurrido un error AJAX',
+                        html: jqXHR.statusText,
+                        timer: 5000,
+                        willClose: function () { }
+                    })
+                }
+            });
+        }
+    })
+})
+
+$(document).on('change', '[data-copiar-categorias]', function () {
+    var tipo = $(this).attr('data-copiar-categorias');
+    var torneo_id = $('[name="torneo_id"]').val();
+    var origen_torneo_id = $(this).val();
+    swal.fire({
+        icon: 'question',
+        title: 'Confirmar acción',
+        html: '¿Copiar las competiciones del torneo indicado?',
+        showCancelButton: true,
+        confirmButtonText: 'Si, copiar',
+        cancelButtonText: 'Cerrar sin cambios',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var fd = new FormData();
+            fd.append("tipo", tipo);
+            fd.append("torneo_id", torneo_id);
+            fd.append("origen_torneo_id", origen_torneo_id);
+            fd.append("csrf_token", $('[name="csrf_token"]').val());
+            $.ajax({
+                url: base_url + 'Torneos/addCategoriasTorneo',
+                method: "POST",
+                contentType: false,
+                processData: false,
+                data: fd
+            }).done(function (response) {
+                var response = JSON.parse(response);
+                $('[name="csrf_token"]').val(response.csrf)
+                if (response.error > 0) {
+                    var errorhtml = ''
+                    if (response.hasOwnProperty('error_validation')) {
+                        $.each(response.error_validation, function (i, value) {
+                            errorhtml += value + '<br>'
+                        })
+                    }
+                    if (response.hasOwnProperty('error_msn')) {
+                        errorhtml += response.error_msn
+                    }
+                    swal.fire({
+                        icon: 'error',
+                        title: 'ERROR',
+                        html: errorhtml,
+                    });
+                    return;
+                } else {
+                    var trs = response.html
+                    $('tbody[data-tipo="'+tipo+'"]').append(trs)
                 }
             }).always(function (jqXHR, textStatus) {
                 if (textStatus != "success") {
