@@ -18,6 +18,7 @@ class Area_privada extends CI_Controller
     {
         validUrl();
         logged();
+        redirect('torneos');
         $data = [];
         $data['page_header']    = 'Area privada';
         show($data);

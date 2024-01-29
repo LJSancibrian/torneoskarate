@@ -234,7 +234,8 @@ $(document).on('click', '[data-gestionar]', function() {
     }).then((result) => {
         if (result.isConfirmed) {
             var competicion_torneo_id = $(this).attr('data-gestionar');
-            window.location.href = base_url + 'Competiciones/gestion/' + competicion_torneo_id;
+            window.open(base_url + 'Competiciones/gestion/' + competicion_torneo_id, '_blank');
+            //window.location.href = base_url + 'Competiciones/gestion/' + competicion_torneo_id;
             /*
             window.open(
                 base_url + 'Competiciones/gestion/' + competicion_torneo_id,
@@ -256,7 +257,11 @@ $(document).on('click', '[data-mesa]', function() {
     }).then((result) => {
         if (result.isConfirmed) {
             var competicion_torneo_id = $(this).attr('data-mesa');
-            window.location.href = base_url + 'Competiciones/mesa/' + competicion_torneo_id;
+            window.open(
+                base_url + 'Competiciones/mesa/' + competicion_torneo_id,
+                '_blank'
+            )
+            //window.location.href = base_url + 'Competiciones/mesa/' + competicion_torneo_id;
             /*
             window.open(
                 base_url + 'Competiciones/mesa/' + competicion_torneo_id,

@@ -287,12 +287,12 @@ class Database extends CI_Model
     public function torneoArchivos($torneo_id)
     {
 
-       $this->db->where('item_id', $torneo_id);
-       $this->db->where('item_rel', 'torneo');
-       $this->db->where('estado', 'disponible');
-       $this->db->where('deletedAt', '0000-00-00 00:00:00');
-       $archivos = $this->db->get('documentos')->result();
-       return $archivos;
+        $this->db->where('item_id', $torneo_id);
+        $this->db->where('item_rel', 'torneo');
+        $this->db->where('estado', 'disponible');
+        $this->db->where('deletedAt', '0000-00-00 00:00:00');
+        $archivos = $this->db->get('documentos')->result();
+        return $archivos;
     }
 
     public function getCompeticion($competicion_torneo_id)
@@ -352,7 +352,8 @@ class Database extends CI_Model
         return ['ordenados' => $orden, 'noordenados' => $noorden];
     }
 
-    public function getrondaskata($competicion_torneo_id){
+    public function getrondaskata($competicion_torneo_id)
+    {
         $competicion = $this->database->getCompeticion($competicion_torneo_id);
         switch ($competicion->torneo_id) {
             case 2:
@@ -367,8 +368,8 @@ class Database extends CI_Model
                 $valoraciones = 4;
                 break;
         }
-        
-       return $valoraciones;
+
+        return $valoraciones;
     }
 
     public function actualizarPuntosKata($competicion_torneo_id, $user_id, $ronda, $juez, $puntos)
@@ -411,7 +412,7 @@ class Database extends CI_Model
         $this->db->order_by('total', 'DESC');
         $this->db->order_by('media', 'DESC');
         $clasificacion = $this->db->get('puntoskata')->result();
-   
+
         foreach ($clasificacion as $key => $user) {
             $this->db->join('clubs c', 'c.club_id = users.club_id');
             $this->db->where('users.id', $user->user_id);
@@ -433,17 +434,17 @@ class Database extends CI_Model
             $user->puntos_max4 = (isset($puntos[3])) ? $puntos[3]->puntos : 0;
         }
 
-       
+
         return $clasificacion;
     }
 
     public function clasificacionFinalKata($competicion_torneo_id,  $rondas = [])
     {
-        if(empty($rondas)){
+        if (empty($rondas)) {
             $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
             $ronda_final = $valoracion_normal + 1;
             $primerosclasificados = $this->clasificacionKata($competicion_torneo_id, [$ronda_final]);
-        }else{
+        } else {
             $primerosclasificados = $this->clasificacionKata($competicion_torneo_id, $rondas);
         }
         return $primerosclasificados;
@@ -454,9 +455,9 @@ class Database extends CI_Model
         $this->db->select('user_id, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
         $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
         $this->db->where('puntoskata.user_id', $user_id);
-        if(is_array($ronda)){
+        if (is_array($ronda)) {
             $this->db->where_in('puntoskata.ronda', $ronda);
-        }else{
+        } else {
             $this->db->where('puntoskata.ronda', $ronda);
         }
         $this->db->where('puntoskata.puntos >', 0);
@@ -479,7 +480,7 @@ class Database extends CI_Model
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
         $this->db->where('ronda', $ronda_final);
         $this->db->delete('puntoskata');
-        
+
         foreach ($users_id as $key => $user_id) {
             $data = [
                 'competicion_torneo_id' => $competicion_torneo_id,
@@ -496,20 +497,20 @@ class Database extends CI_Model
     public function finalKata($competicion_torneo_id)
     {
         $valoracion_normal = $this->getrondaskata($competicion_torneo_id);
-        if($valoracion_normal > 0) {
-        $ronda_final = $valoracion_normal + 1;
+        if ($valoracion_normal > 0) {
+            $ronda_final = $valoracion_normal + 1;
 
-        $this->db->select('first_name, last_name, usercode, c.nombre, i.user_id, i.inscripcion_id, i.grupo, i.orden, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
-        $this->db->join('users', 'users.id = puntoskata.user_id');
-        $this->db->join('clubs c', 'c.club_id = users.club_id');
-        $this->db->join('torneos_inscripciones i', 'i.user_id = users.id');
-        $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
-        $this->db->where('puntoskata.ronda', $ronda_final);
-        $this->db->group_by('puntoskata.user_id');
-        $this->db->order_by('total', 'DESC');
-        $this->db->order_by('media', 'DESC');
-        return $this->db->get('puntoskata')->result();
-        }else{
+            $this->db->select('first_name, last_name, usercode, c.nombre, i.user_id, i.inscripcion_id, i.grupo, i.orden, SUM(puntos) AS total, count(puntos_id) AS valoraciones, ROUND(AVG(puntos),2) AS media');
+            $this->db->join('users', 'users.id = puntoskata.user_id');
+            $this->db->join('clubs c', 'c.club_id = users.club_id');
+            $this->db->join('torneos_inscripciones i', 'i.user_id = users.id');
+            $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
+            $this->db->where('puntoskata.ronda', $ronda_final);
+            $this->db->group_by('puntoskata.user_id');
+            $this->db->order_by('total', 'DESC');
+            $this->db->order_by('media', 'DESC');
+            return $this->db->get('puntoskata')->result();
+        } else {
             return [];
         }
     }
@@ -553,7 +554,6 @@ class Database extends CI_Model
         $this->db->where('puntos_id', $puntos_id);
         $this->db->update('puntosrey', $data);
         return $puntos_id;
-
     }
 
     public function clasificacionGrupoRey($competicion_torneo_id, $grupo)
@@ -568,22 +568,23 @@ class Database extends CI_Model
 
         $this->db->where('torneos_inscripciones.competicion_torneo_id', $competicion_torneo_id);
         $this->db->where('torneos_inscripciones.grupo', $grupo);
+        $this->db->where('puntosrey.competicion_torneo_id', $competicion_torneo_id);
 
         $this->db->order_by('puntosrey.puntos_total', 'DESC');
         $this->db->order_by('puntosrey.total_combates', 'ASC');
         $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
         $this->db->join('clubs', 'clubs.club_id = users.club_id');
         $this->db->join('puntosrey', 'torneos_inscripciones.user_id = puntosrey.user_id', 'left');
-        $clasificacion = $this->db->get('torneos_inscripciones')->result();       
+        $this->db->group_by('puntosrey.user_id');
+        $clasificacion = $this->db->get('torneos_inscripciones')->result();
         return $clasificacion;
     }
 
     public function clasificacionFinalRey($competicion_torneo_id)
     {
-        
     }
 
-    
+
     public function getPuntosordenadosRey($competicion_torneo_id, $user_id)
     {
         $this->db->where('puntoskata.competicion_torneo_id', $competicion_torneo_id);
@@ -600,7 +601,7 @@ class Database extends CI_Model
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
         $this->db->where('ronda', $ronda_final);
         $this->db->delete('puntosrey');
-        
+
         foreach ($users_id as $key => $user_id) {
             $data = [
                 'competicion_torneo_id' => $competicion_torneo_id,
@@ -981,15 +982,19 @@ class Database extends CI_Model
     }
     */
 
-    public function clasificacionGrupoKumite($competicion_torneo_id, $grupo)
+    public function clasificacionGrupoKumite($competicion_torneo_id, $grupo, $iniciacion)
     {
+
         $this->no_deleted(['torneos_inscripciones']);
         $this->db->select('torneos_inscripciones.inscripcion_id, torneos_inscripciones.user_id, users.first_name, users.last_name, clubs.nombre');
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
-        $this->db->where('grupo', $grupo);
+        if ($iniciacion == 0) {
+            $this->db->where('grupo', $grupo);
+        }
         $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
         $this->db->join('clubs', 'users.club_id = clubs.club_id');
         $players = $this->db->get('torneos_inscripciones')->result();
+
 
         foreach ($players as $key => $player) {
             // lo primero, buscar los combates de ese usuario en ese grupo de esa competicion
@@ -1002,7 +1007,9 @@ class Database extends CI_Model
                 '
             );
             $this->db->where('competicion_torneo_id', $competicion_torneo_id);
-            $this->db->where('grupo', $grupo);
+            if ($iniciacion == 0) {
+                $this->db->where('grupo', $grupo);
+            }
             $this->db->group_start();
             $this->db->where('user_rojo', $player->user_id);
             $this->db->or_where('user_azul', $player->user_id);
@@ -1033,6 +1040,63 @@ class Database extends CI_Model
 
         return $players;
     }
+
+    public function clasificacionGrupoKumiteIniciacion($competicion_torneo_id, $grupo, $iniciacion)
+    {
+
+        $this->no_deleted(['torneos_inscripciones']);
+        $this->db->select('torneos_inscripciones.inscripcion_id, torneos_inscripciones.user_id, users.first_name, users.last_name, clubs.nombre');
+        $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+        $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
+        $this->db->join('clubs', 'users.club_id = clubs.club_id');
+        $players = $this->db->get('torneos_inscripciones')->result();
+
+
+        foreach ($players as $key => $player) {
+            $this->db->select(
+                'SUM(CASE WHEN user_rojo=' . $player->user_id . ' THEN puntos_rojo ELSE puntos_azul END) AS puntos_favor,
+                SUM(CASE WHEN winner = ' . $player->user_id . ' AND senshu != hantei THEN 1 ELSE 0 END) AS ganados,
+                SUM(CASE WHEN senshu = hantei THEN 1 ELSE 0 END) AS empatados,
+                SUM(CASE WHEN winner != ' . $player->user_id . ' AND senshu != hantei THEN 1 ELSE 0 END) AS perdidos     
+                '
+            );
+            $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+            $this->db->group_start();
+            $this->db->where('user_rojo', $player->user_id);
+            $this->db->or_where('user_azul', $player->user_id);
+            $this->db->group_end();
+            $totaluser = $this->db->get('matches')->row();
+
+            $player->puntos_favor = $totaluser->puntos_favor;
+            $player->ganados = $totaluser->ganados;
+            $player->empatados = $totaluser->empatados;
+            $player->perdidos = $totaluser->perdidos;
+            $puntosganados = $totaluser->ganados * 100;
+            $puntosempates = $totaluser->empatados * 50;
+            $puntosperdido = ($puntosganados + $puntosempates) == 0 ? 10 : 0;
+            $puntosfavor = $totaluser->puntos_favor;
+            $player->puntos_total = $puntosganados + $puntosempates + $puntosperdido + $puntosfavor;
+        }
+        usort($players, function ($a, $b) {
+            $retval = $b->puntos_total <=> $a->puntos_total;
+            if ($retval == 0) {
+                $retval = $b->ganados <=> $a->ganados;
+                if ($retval == 0) {
+                    $retval = $b->empatados <=> $a->empatados;
+                    if ($retval == 0) {
+                        $retval = $b->puntos_favor <=> $a->puntos_favor;
+                        if ($retval == 0) {
+                            $retval = $a->perdidos <=> $b->perdidos;
+                        }
+                    }
+                }
+            }
+            return $retval;
+        });
+
+        return $players;
+    }
+
 
     public function eliminatoriasCompeticionKumite($competicion_torneo_id)
     {
@@ -1141,6 +1205,7 @@ class Database extends CI_Model
     public function getParentDataMatch($match_id, $color)
     {
         $match  = $this->getMatch($match_id);
+        $competicion = $this->database->getCompeticion($match->competicion_torneo_id);
         $parent = ($color == 'rojo') ? $match->parent_rojo : $match->parent_azul;
         if ($parent != '') {
             $parenttipo = $parent[0];
@@ -1150,7 +1215,7 @@ class Database extends CI_Model
                 $grupo = $dat[0];
                 $posicion = $dat[1] - 1;
                 // calcular la clasificacion del grupo
-                $clasificacion = $this->clasificacionGrupoKumite($match->competicion_torneo_id,  $grupo);
+                $clasificacion = $this->clasificacionGrupoKumite($match->competicion_torneo_id,  $grupo, $competicion->iniciacion);
                 $parentData = $clasificacion[$posicion];
                 //return $parentData;
                 return (object)[
@@ -1198,7 +1263,7 @@ class Database extends CI_Model
         $this->db->where('grupo', 0);
         $this->db->group_start();
         $this->db->like('parent_rojo', 'g' . $grupo . '|');
-        $this->db->or_like('parent_rojo', 'g|' . $grupo );
+        $this->db->or_like('parent_rojo', 'g|' . $grupo);
         $this->db->or_like('parent_azul', 'g' . $grupo . '|');
         $this->db->or_like('parent_azul', 'g|' . $grupo);
         $this->db->group_end();
@@ -1262,6 +1327,7 @@ class Database extends CI_Model
 
     public function getSegundosClasificados($competicion_torneo_id)
     {
+        $competicion = $this->database->getCompeticion($competicion_torneo_id);
         $this->no_deleted();
         $this->db->select('grupo');
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
@@ -1270,7 +1336,7 @@ class Database extends CI_Model
         $grupos = $this->db->get('matches')->result();
         $segundos = [];
         foreach ($grupos as $key => $grupo) {
-            $segundos[] = $this->clasificacionGrupoKumite($competicion_torneo_id, $grupo->grupo)[1];
+            $segundos[] = $this->clasificacionGrupoKumite($competicion_torneo_id, $grupo->grupo, $competicion->iniciacion)[1];
         }
         return $segundos;
     }
@@ -1394,17 +1460,16 @@ class Database extends CI_Model
                     $eliminatorias_players[] = $player;
                 }
             }
-            
         }
         $finalistas = [];
         foreach ($eliminatorias_players as $key => $value) {
-           if($key < 4){
+            if ($key < 4) {
                 $finalistas[] =  $value;
-               unset($eliminatorias_players[$key]);
-           }
+                unset($eliminatorias_players[$key]);
+            }
         }
-        
-        if(count($eliminatorias_players) > 0){
+
+        if (count($eliminatorias_players) > 0) {
             usort($eliminatorias_players, function ($a, $b) {
                 $retval = $b->ronda <=> $a->ronda;
                 if ($retval == 0) {
@@ -1423,14 +1488,14 @@ class Database extends CI_Model
                     }
                 }
                 return $retval;
-            }); 
+            });
             $finalistas = array_merge($finalistas, $eliminatorias_players);
         }
 
         $this->no_deleted(['torneos_inscripciones']);
         $this->db->select('torneos_inscripciones.inscripcion_id, torneos_inscripciones.user_id, users.first_name, users.last_name, clubs.nombre');
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
-        if(count($anadidos) > 0){
+        if (count($anadidos) > 0) {
             $this->db->where_not_in('users.id', $anadidos);
         }
         $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
@@ -1460,9 +1525,9 @@ class Database extends CI_Model
             $player->ganados = $totaluser->ganados;
             $player->senshu = $totaluser->senshu;
             $player->hantei = $totaluser->hantei;
-            if(in_array($player->user_id, $anadidos)){
+            if (in_array($player->user_id, $anadidos)) {
                 $player->finalista = array_search($player->user_id, $anadidos);
-            }else{
+            } else {
                 $player->finalista = 100;
             }
         }
@@ -1508,25 +1573,25 @@ class Database extends CI_Model
         $this->db->join('clubs', 'clubs.club_id = users.club_id');
         $this->db->join('puntosrey', 'torneos_inscripciones.user_id = puntosrey.user_id', 'left');
         $deportistas = $this->db->get('torneos_inscripciones')->result();
-        $deportistas_array = [];       
+        $deportistas_array = [];
         foreach ($deportistas as $key => $value) {
             $deportistas_array[$value->user_id] = $value;
         }
-        
+
         //se buscan los combates de las eleimnatorias
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
         $this->db->order_by('ncombate', 'DESC');
-        $matches = $this->db->get('matches')->result();   
+        $matches = $this->db->get('matches')->result();
         foreach ($matches as $key => $value) {
-            $deportistas_array[$value->user_rojo]->finalista ++;
-            $deportistas_array[$value->user_azul]->finalista ++;
+            $deportistas_array[$value->user_rojo]->finalista++;
+            $deportistas_array[$value->user_azul]->finalista++;
             $deportistas_array[$value->user_rojo]->puntos_favor += $value->puntos_rojo;
             $deportistas_array[$value->user_azul]->puntos_favor += $value->puntos_azul;
-            $deportistas_array[$value->user_rojo]->total_combates ++;
-            $deportistas_array[$value->user_azul]->total_combates ++;
+            $deportistas_array[$value->user_rojo]->total_combates++;
+            $deportistas_array[$value->user_azul]->total_combates++;
             $loser = ($value->winner == $value->user_rojo) ? $value->user_azul : $value->user_rojo;
-            $deportistas_array[$loser]->derrotas ++;
-            $deportistas_array[$value->winner]->victorias ++;
+            $deportistas_array[$loser]->derrotas++;
+            $deportistas_array[$value->winner]->victorias++;
             $deportistas_array[$value->winner]->puntos_total += 300;
             $deportistas_array[$loser]->puntos_total += 100;
         }
@@ -1555,12 +1620,11 @@ class Database extends CI_Model
         });
 
         return $deportistas_array;
-        
     }
 
     public function getCompeticionesLM($year)
     {
-        $this->db->where_in('torneo_id', [$this->config->item('lm'.$year)]);
+        $this->db->where_in('torneo_id', [$this->config->item('lm' . $year)]);
         $this->db->where('estado !=', 3);
         $this->db->where('deletedAt', '0000-00-00 00:00:00');
         $this->db->order_by('competicion_torneo_id', 'asc');
@@ -1594,13 +1658,13 @@ class Database extends CI_Model
         $this->db->order_by('competicion_torneo_id', 'asc');
         $sibling_ids = $this->db->get('torneos_competiciones')->result();
         $array = [];
-        $array[] = $competicion_torneo_id; 
+        $array[] = $competicion_torneo_id;
         foreach ($sibling_ids as $key => $sibling_id) {
             $array[] = $sibling_id->competicion_torneo_id;
         }
         return $array;
 
-       /* if($sibling_id){
+        /* if($sibling_id){
             $array[] = $sibling_id->competicion_torneo_id;
             return $this->getSiblings($sibling_id->competicion_torneo_id, $array);
         }else{
@@ -1629,7 +1693,7 @@ class Database extends CI_Model
                 $this->db->where('user_id', $comp->user_id);
                 $this->db->where('competicion_torneo_id', $competicion_id);
                 $puntos = $this->db->get('puntos_liga_municipal')->row();
-                $jornada = 'jornada_'.$j;
+                $jornada = 'jornada_' . $j;
                 $comp->$jornada = (isset($puntos)) ? $puntos->puntos : 0;
                 $total = $total + $comp->$jornada;
                 $max = ($max > $comp->$jornada) ? $max : $comp->$jornada;
@@ -1651,9 +1715,10 @@ class Database extends CI_Model
     }
 
 
-    public function limpiar_tipo_competicion($competicion_torneo_id){
+    public function limpiar_tipo_competicion($competicion_torneo_id)
+    {
         $competicion = $this->database->getCompeticion($competicion_torneo_id);
-        if($competicion->tipo == 'puntos'){
+        if ($competicion->tipo == 'puntos') {
             // se borran los matches con la competicion indicada
             $this->db->where('competicion_torneo_id', $competicion_torneo_id);
             $this->db->delete('matches');

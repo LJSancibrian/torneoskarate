@@ -75,66 +75,65 @@
                         </tbody>
                     </table>
                 </div>
-
-                <div class="row">
-                    <?php if(count($finalistas) > 0) { ?>
-                    <div class="col-lg-6">
-                        <h4 class="mt-5">RONDA FINAL</h4>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered text-center" style="max-width:500px;" id="tablakatafinal" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
-                                <thead>
-                                    <tr>
-                                        <th class="bg-white text-primary">#</th>
-                                        <th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
-                                        <th class="bg-white text-primary" colspan="3">Ronda Final</th>
-                                        <th class="bg-white text-primary">Total</th>
-                                        <th class="bg-white text-primary">Media</th>
-                                    </tr>
-                                    <tr>
-                                        <th class="">#</th>
-                                        <th colspan="2" class="text-left columnfixed">Deportista</th>
-                                        <th>J1</th>
-                                        <th>J2</th>
-                                        <th>J3</th>
-                                        <th>Total</th>
-                                        <th>Media</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($finalistas as $key => $value) { ?>
-                                        <tr data-user_id="<?php echo $value->user_id; ?>">
-                                            <td class=""><?php echo $value->orden; ?></td>
-                                            <td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
-                                            <td data-ronda="3" data-j="1"></td>
-                                            <td data-ronda="3" data-j="2"></td>
-                                            <td data-ronda="3" data-j="3"></td>
-                                            <td data-total></td>
-                                            <td data-media-total class="bg-primary text-white">0</td>
+                <?php if(count($finalistas) > 0) { ?>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <h4 class="mt-5">RONDA FINAL</h4>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered text-center" style="max-width:500px;" id="tablakatafinal" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
+                                    <thead>
+                                        <tr>
+                                            <th class="bg-white text-primary">#</th>
+                                            <th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
+                                            <th class="bg-white text-primary" colspan="3">Ronda Final</th>
+                                            <th class="bg-white text-primary">Total</th>
+                                            <th class="bg-white text-primary">Media</th>
                                         </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
+                                        <tr>
+                                            <th class="">#</th>
+                                            <th colspan="2" class="text-left columnfixed">Deportista</th>
+                                            <th>J1</th>
+                                            <th>J2</th>
+                                            <th>J3</th>
+                                            <th>Total</th>
+                                            <th>Media</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($finalistas as $key => $value) { ?>
+                                            <tr data-user_id="<?php echo $value->user_id; ?>">
+                                                <td class=""><?php echo $value->orden; ?></td>
+                                                <td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
+                                                <td data-ronda="3" data-j="1"></td>
+                                                <td data-ronda="3" data-j="2"></td>
+                                                <td data-ronda="3" data-j="3"></td>
+                                                <td data-total></td>
+                                                <td data-media-total class="bg-primary text-white">0</td>
+                                            </tr>
+                                        <?php } ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4 class="mt-5">CLASIFICACIÓN FINAL</h4>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered" id="clasificaionkatafinal">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th class="columnfixed">Deportista</th>
+                                            <th>Equipo</th>
+                                            <th>Puntos</th>
+                                            <th>Media</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="clasificacion_final_competicion"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <?php } ?>
-                    <div class="col-lg-6">
-                        <h4 class="mt-5">CLASIFICACIÓN FINAL</h4>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered" id="clasificaionkatafinal">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th class="columnfixed">Deportista</th>
-                                        <th>Equipo</th>
-                                        <th>Puntos</th>
-                                        <th>Media</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="clasificacion_final_competicion"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <?php } ?>
             </div>
         </div>
     </div>

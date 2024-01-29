@@ -224,7 +224,7 @@ $(document).on('click', '[ver-ronda]', function () {
 
 let fullscreenWindow;
 
-function openFullscreenWindow() {
+function openFullscreenWindow_() {
   // Verificar si la ventana ya está abierta
   if (fullscreenWindow && !fullscreenWindow.closed) {
     // Si la ventana está abierta, cerrarla
@@ -522,6 +522,7 @@ function cargar_puntos(){
     clasificacion('tablakata');
     clasificacion('finaltablakata');
 }
+
 $(document).ready(function () {
     cargar_puntos();
 })
@@ -529,3 +530,31 @@ $(document).ready(function () {
 $(document).on('change', '[name="all"]', function(){
     
 })
+
+
+
+function openFullscreenWindow() {
+        // Verificar si el navegador soporta la propiedad screen
+        if (window.screen) {
+            // Obtener el número total de pantallas
+            const numeroPantallas = window.screen.availWidth / window.screen.width;
+            console.log(numeroPantallas)
+            // Crear un array para almacenar las dimensiones de cada pantalla
+            const dimensionesPantallas = [];
+    
+            // Iterar a través de cada pantalla
+            for (let i = 0; i < numeroPantallas; i++) {
+                const pantalla = {
+                    width: window.screen.width,
+                    height: window.screen.height
+                };
+                dimensionesPantallas.push(pantalla);
+            }
+            console.log(dimensionesPantallas)
+            return dimensionesPantallas;
+        } else {
+            // Si el navegador no soporta la propiedad screen
+            return null;
+        }
+    
+}

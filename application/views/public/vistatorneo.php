@@ -156,44 +156,48 @@
                                                         if($competicion->estado < 3){?>
                                                         <div class="mb-3">
                                                             <h5 class="text-uppercase"><?php echo $competicion->categoria;?> <?php echo $competicion->nivel;?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto');?></h5>
-                                                            <table class="table table-striped table-bordered" id="medallero_<?php echo $competicion->competicion_torneo_id;?>" data-medallero="<?php echo $competicion->competicion_torneo_id;?>">
-                                                                <tbody>
-                                                                    <?php foreach ($competicion->clasificacionfinal as $k => $value) { 
-                                                                        $pos = '';
-                                                                        if( $k + 1 < 4){
-                                                                            switch ($k + 1) {
-                                                                                case 1:
-                                                                                    $classmedal = 'quiz-medal__circle quiz-medal__circle--gold';
-                                                                                    break;
-                                                                                case 2:
-                                                                                    $classmedal = 'quiz-medal__circle quiz-medal__circle--silver';
-                                                                                    break;
-                                                                                case 3:
-                                                                                    $classmedal = 'quiz-medal__circle quiz-medal__circle--bronze';
-                                                                                    break;
-                                                                                default:
-                                                                                    $classmedal = 'quiz-medal__circle';
-                                                                                    break;
-                                                                            } ?>
-                                                                        
-                                                                        
-                                                                        <tr>
-                                                                            <td style="width: 60px"><div class="quiz-medal quiz-medal-sm">
-                                                                                <div class="<?php echo $classmedal;?>">
-                                                                                    <span>
-                                                                                    <?php echo $k + 1;?>
-                                                                                    </span>
-                                                                                </div>
-                                                                                <div class="quiz-medal__ribbon quiz-medal__ribbon--left"></div>
-                                                                                <div class="quiz-medal__ribbon quiz-medal__ribbon--right"></div>
-                                                                                </div>
-                                                                            </td>
-                                                                            <td><strong class="text-uppercase"><?php echo $value->first_name.' '.$value->last_name.'</strong><br><small>'.$value->nombre;?></small></td>
-                                                                        </tr>
+                                                            <?php if($competicion->medallas == 1){?>
+                                                                <table class="table table-striped table-bordered" id="medallero_<?php echo $competicion->competicion_torneo_id;?>" data-medallero="<?php echo $competicion->competicion_torneo_id;?>">
+                                                                    <tbody>
+                                                                        <?php foreach ($competicion->clasificacionfinal as $k => $value) { 
+                                                                            $pos = '';
+                                                                            if( $k + 1 < 4){
+                                                                                switch ($k + 1) {
+                                                                                    case 1:
+                                                                                        $classmedal = 'quiz-medal__circle quiz-medal__circle--gold';
+                                                                                        break;
+                                                                                    case 2:
+                                                                                        $classmedal = 'quiz-medal__circle quiz-medal__circle--silver';
+                                                                                        break;
+                                                                                    case 3:
+                                                                                        $classmedal = 'quiz-medal__circle quiz-medal__circle--bronze';
+                                                                                        break;
+                                                                                    default:
+                                                                                        $classmedal = 'quiz-medal__circle';
+                                                                                        break;
+                                                                                } ?>
+                                                                            
+                                                                            
+                                                                            <tr>
+                                                                                <td style="width: 60px"><div class="quiz-medal quiz-medal-sm">
+                                                                                    <div class="<?php echo $classmedal;?>">
+                                                                                        <span>
+                                                                                        <?php echo $k + 1;?>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div class="quiz-medal__ribbon quiz-medal__ribbon--left"></div>
+                                                                                    <div class="quiz-medal__ribbon quiz-medal__ribbon--right"></div>
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td><strong class="text-uppercase"><?php echo $value->first_name.' '.$value->last_name.'</strong><br><small>'.$value->nombre;?></small></td>
+                                                                            </tr>
+                                                                            <?php } ?>
                                                                         <?php } ?>
-                                                                    <?php } ?>
-                                                                </tbody>
-                                                            </table>
+                                                                    </tbody>
+                                                                </table>
+                                                            <?php }else{?>
+                                                                <p>No se ha establecido la entrega de medallas para esta competición</p>
+                                                            <?php  } ?>
                                                         </div>
                                                     <?php } }?>
                                                 </div>
@@ -209,6 +213,7 @@
                                                         if($competicion->estado < 3 ){?>
                                                         <div class="mb-3">
                                                             <h5 class="text-uppercase"><?php echo $competicion->categoria;?> <?php echo $competicion->nivel;?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto');?></h5>
+                                                            <?php if($competicion->medallas == 1){?>
                                                             <table class="table table-striped table-bordered" id="medallero_<?php echo $competicion->competicion_torneo_id;?>" data-medallero="<?php echo $competicion->competicion_torneo_id;?>">
                                                                 <tbody>
                                                                 <?php if(isset($competicion->clasificacionfinal)){
@@ -230,7 +235,6 @@
                                                                                     break;
                                                                             } ?>
                                                                         
-                                                                        
                                                                         <tr>
                                                                             <td style="width: 60px"><div class="quiz-medal quiz-medal-sm">
                                                                                 <div class="<?php echo $classmedal;?>">
@@ -246,9 +250,11 @@
                                                                         </tr>
                                                                         <?php } ?>
                                                                     <?php } }?>
-                                                                        
                                                                 </tbody>
                                                             </table>
+                                                            <?php }else{?>
+                                                                <p>No se ha establecido la entrega de medallas para esta competición</p>
+                                                            <?php  } ?>
                                                         </div>
                                                     <?php } }?>
                                                 </div>

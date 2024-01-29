@@ -1001,8 +1001,32 @@ class Competiciones extends CI_Controller
             ];
             returnAjax($response);
         }
-        $players = $this->database->clasificacionGrupoKumite(input('competicion_torneo_id'), input('grupo'));
+        $players = $this->database->clasificacionGrupoKumite(input('competicion_torneo_id'), input('grupo'), $competicion->iniciacion);
         //printr($players);
+        $response = [
+            'error' => 0,
+            'users' => $players,
+            'csrf'  => $this->security->get_csrf_hash(),
+        ];
+        returnAjax($response);
+    }
+
+    public function clasificacionGrupoIniciacion()
+    {
+        isAjax();
+        $this->form_validation->set_rules('competicion_torneo_id', 'Competicion ID', 'trim');
+        $this->form_validation->set_rules('grupo', 'Grupo', 'trim');
+        validForm();
+        $competicion = $this->database->getCompeticion(input('competicion_torneo_id'));
+        if (!isset($competicion) || $competicion == FALSE) {
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'Competición no encontrada',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        }
+        $players = $this->database->clasificacionGrupoKumiteIniciacion(input('competicion_torneo_id'), input('grupo'), $competicion->iniciacion);
         $response = [
             'error' => 0,
             'users' => $players,
@@ -1029,7 +1053,7 @@ class Competiciones extends CI_Controller
         }
         $players = [];
         if($competicion->tipo == 'liguilla'){
-            $players = $this->database->clasificacionGrupoKumite(input('competicion_torneo_id'), input('grupo'));
+            $players = $this->database->clasificacionGrupoKumite(input('competicion_torneo_id'), input('grupo'), $competicion->iniciacion);
         }
 
         if($competicion->tipo == 'rey'){

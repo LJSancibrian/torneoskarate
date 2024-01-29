@@ -18,6 +18,9 @@ class Gestion extends CI_Controller
     public function index()
     {
         validUrl();
+        if(!$this->ion_auth->in_group([1,2,3])){
+            redirect('torneos');
+        }
         $data['page_header']    = 'Inicio';
         show($data);
     }

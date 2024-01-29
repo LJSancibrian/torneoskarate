@@ -3,10 +3,10 @@
     <div class="container-fluid">
         <div class="row ">
             <div class="title text-center w-100">
-                <h2 class="text-uppercase"><?php echo $competicion->modalidad;?></h2>
-                <?php if($competicion->tipo == 'liguilla'){?>
+                <h2 class="text-uppercase"><?php echo $competicion->modalidad; ?></h2>
+                <?php if ($competicion->tipo == 'liguilla') { ?>
                     <p>Fase inicial de grupos y fase eliminatoria con los clasificados de cada grupo.</p>
-                <?php } else{ ?>
+                <?php } else { ?>
                     <p>Competición eliminatoria. El ganador pasa a la siguiente ronda.</p>
                 <?php  } ?>
                 <div class="border"></div>
@@ -40,15 +40,16 @@
                         <div class="d-flex justify-content-between">
                             <h4>Grupo <?php echo $grupo->grupo; ?></h4>
 
-
-                            <ul class="nav nav-pills justify-content-center" id="torneotabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link px-3 py-1 active" id="info-tab" data-toggle="tab" href="#comb_<?php echo $grupo->grupo; ?>" role="tab" aria-controls="info" aria-selected="true">Combates</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link px-3 py-1" id="competiciones-tab" data-toggle="tab" href="#clasif_<?php echo $grupo->grupo; ?>" role="tab" aria-controls="competiciones" aria-selected="false">Clasificación</a>
-                                </li>
-                            </ul>
+                            <?php if ($competicion->iniciacion == 0) { ?>
+                                <ul class="nav nav-pills justify-content-center" id="torneotabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link px-3 py-1 active" id="info-tab" data-toggle="tab" href="#comb_<?php echo $grupo->grupo; ?>" role="tab" aria-controls="info" aria-selected="true">Combates</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link px-3 py-1" id="competiciones-tab" data-toggle="tab" href="#clasif_<?php echo $grupo->grupo; ?>" role="tab" aria-controls="competiciones" aria-selected="false">Clasificación</a>
+                                    </li>
+                                </ul>
+                            <?php } ?>
                         </div>
                         <div class="tab-content">
                             <div class="tab-pane active" id="comb_<?php echo $grupo->grupo; ?>" role="tabpanel" aria-labelledby="comb_<?php echo $grupo->grupo; ?>-tab">
@@ -73,34 +74,38 @@
                                     <?php } ?>
                                 </div>
                             </div>
-                            <div class="tab-pane" id="clasif_<?php echo $grupo->grupo; ?>" role="tabpanel" aria-labelledby="clasif_<?php echo $grupo->grupo; ?>-tab">
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-bordered text-center w-100 fixed2" id="tablakumite_<?php echo $grupo->grupo; ?>">
-                                        <thead class="bg-primary text-white">
-                                            <tr>
-                                                <th colspan="8" class="font-weigth-bold">CLASIFICACIÓN</th>
-                                            </tr>
-                                        </thead>
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th class="text-left columnfixed">Deportista</th>
-                                                <th class="text-left">Equipo</th>
-                                                <th class="text-left">Victorias</th>
-                                                <th class="text-left">Puntos favor</th>
-                                                <th class="text-left">Puntos contra</th>
-                                                <th class="text-left">Senshu</th>
-                                                <th class="text-left">Hantei</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="clasificacion_grupo" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">
-                                        </tbody>
-                                    </table>
+
+                            <?php if ($competicion->iniciacion == 0) { ?>
+                                <div class="tab-pane" id="clasif_<?php echo $grupo->grupo; ?>" role="tabpanel" aria-labelledby="clasif_<?php echo $grupo->grupo; ?>-tab">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered text-center w-100 fixed2" id="tablakumite_<?php echo $grupo->grupo; ?>">
+                                            <thead class="bg-primary text-white">
+                                                <tr>
+                                                    <th colspan="8" class="font-weigth-bold">CLASIFICACIÓN</th>
+                                                </tr>
+                                            </thead>
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th class="text-left columnfixed">Deportista</th>
+                                                    <th class="text-left">Equipo</th>
+                                                    <th class="text-left">Victorias</th>
+                                                    <th class="text-left">Puntos favor</th>
+                                                    <th class="text-left">Puntos contra</th>
+                                                    <th class="text-left">Senshu</th>
+                                                    <th class="text-left">Hantei</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="clasificacion_grupo" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
+                            <?php } ?>
                         </div>
                     </div>
                 <?php } ?>
+
                 <?php if (count($eliminatorias) > 0) { ?>
                     <div class="service-item p-3 mb-3">
                         <h4>Eliminatorias</h4>
@@ -134,12 +139,12 @@
                                         <?php foreach ($eliminatoria as $match) { ?>
                                             <ul class="list-group mb-3 p-0 match" data-match_id="<?php echo $match->match_id; ?>">
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1 <?php echo ($match->senshu == 'rojo') ? 'senshu' : (($match->hantei == 'rojo') ? 'hantei' : ''); ?>" style="background: red;" data-user="<?php echo $match->user_rojo; ?>">
-                                                    <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo (isset($match->rojo)) ? $match->rojo->nombre : '' ; ?></span>
+                                                    <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo (isset($match->rojo)) ? $match->rojo->nombre : ''; ?></span>
                                                     <span class="font-weight-bold text-white" style="font-size:1.5rem"><?php echo $match->puntos_rojo; ?></span>
                                                 </li>
 
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1 <?php echo ($match->senshu == 'azul') ? 'senshu' : (($match->hantei == 'azul') ? 'hantei' : ''); ?>" style="background: blue;" data-user="<?php echo $match->user_azul; ?>">
-                                                    <span class="text-white text-truncate text-left"><?php echo (isset($match->azul))?$match->azul->nombre:''; ?></span>
+                                                    <span class="text-white text-truncate text-left"><?php echo (isset($match->azul)) ? $match->azul->nombre : ''; ?></span>
                                                     <span class="font-weight-bold text-white" style="font-size:1.5rem"><?php echo $match->puntos_azul; ?></span>
                                                 </li>
                                             </ul>
@@ -148,6 +153,32 @@
                                 </div>
                             <?php } ?>
                         </div>
+                    </div>
+                <?php } ?>
+
+                <?php if ($competicion->iniciacion == 1) { ?>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered text-center w-100 fixed2" id="tablakumite_iniciacion">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th colspan="8" class="font-weigth-bold">CLASIFICACIÓN</th>
+                                </tr>
+                            </thead>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th class="text-left columnfixed">Deportista</th>
+                                    <th class="text-left">Equipo</th>
+                                    <th class="text-left">Victorias</th>
+                                    <th class="text-left">Empates</th>
+                                    <th class="text-left">Derrotas</th>
+                                    <th class="text-left">Puntos favor</th>
+                                    <th class="text-left">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="clasificacion_grupo" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="iniciacion">
+                            </tbody>
+                        </table>
                     </div>
                 <?php } ?>
             </div>

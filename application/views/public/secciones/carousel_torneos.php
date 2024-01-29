@@ -1,11 +1,15 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<div class="blog-slider row w-100" style="max-width:100%">
-
-        <div class="col-sm-6 col-md-5 col-lg-3  py-3">
-            <img src="<?php echo $torneo->cartel; ?>" alt="" class="img-fluid">
-        </div>
-        <div class="col-sm-6 col-md-7 col-lg-9  py-3" >
+<div class="blog-slider row w-100 mb-4" style="max-width:100%">
+        <?php if($torneo->cartel != ''){?>
+            <div class="col-sm-6 col-md-5 col-lg-3  py-3">
+                <img src="<?php echo $torneo->cartel; ?>" alt="" class="img-fluid">
+            </div>
+            <div class="col-sm-6 col-md-7 col-lg-9 py-3" >
+        <?php } else{ ?>
+            <div class="col-12" >
+        <?php  } ?>
+        
             <span class="blog-slider__code"><?php echo fechaCastellano($torneo->fecha); ?></span>
             <div class="blog-slider__title"><?php echo $torneo->titulo; ?></div>
             <div class="blog-slider__text"><?php echo $torneo->descripcion; ?></div>
@@ -19,5 +23,4 @@
                 <a href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>" class="btn btn-main">Entrar al torneo</a>
             </div>
         </div>
-
 </div>

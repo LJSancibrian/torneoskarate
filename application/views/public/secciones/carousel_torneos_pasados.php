@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<div class="blog-slider row w-100">
+<div class="blog-slider row w-100 mb-3">
     <div class="col py-3">
         <div class="text-center">
             <img src="<?php echo $torneo->cartel;?>" alt="" class="img-fluid">

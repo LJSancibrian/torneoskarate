@@ -240,7 +240,10 @@ $(document).on('click', '[data-mesa]', function() {
     }).then((result) => {
         if (result.isConfirmed) {
             var competicion_torneo_id = $(this).attr('data-mesa');
-            window.location.href = base_url + 'Competiciones/mesa/' + competicion_torneo_id;
+            window.open(
+                base_url + 'Competiciones/mesa/' + competicion_torneo_id,
+                '_blank'
+            )
             /*
             window.open(
                 base_url + 'Competiciones/mesa/' + competicion_torneo_id,

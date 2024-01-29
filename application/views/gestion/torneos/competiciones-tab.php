@@ -1,8 +1,4 @@
 <div class="card mt--3">
-    <div class="card-header">
-        <div class="d-flex align-items-center">
-
-        </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table id="table_competiciones" class="display table table-striped table-sm w-100"></table>

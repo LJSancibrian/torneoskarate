@@ -1,7 +1,7 @@
 <?php $this->load->view('gestion/common/head');?>
 <body>
     
-	<div class="wrapper <?php /*if($this->user->group->id > 3){ echo 'overlay-sidebar';} */?>">
+	<div class="wrapper <?php if($this->user->group->id > 3){ echo 'sidebar_minimize';} ?>">
         <?php $this->load->view('gestion/common/navbar');?>
         <?php $this->load->view('gestion/common/sidebar');?>
         <div class="main-panel">
@@ -13,7 +13,7 @@
                         <div class="page-inner py-5">
                             <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                                 <div>
-                                    <h2 class="text-white pb-2 fw-bold"><?php echo $page_header;?></h2>
+                                    <h2 class="text-white pb-2 fw-bold text-center text-uppercase"><?php echo $page_header;?></h2>
                                     <div class="text-white">
                                     <?php //echo $this->utilidades->breadcrumb();?>
                                     </div>

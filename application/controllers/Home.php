@@ -122,7 +122,11 @@ class Home extends CI_Controller
             if ($competicion->tipo == 'puntos') {
                 $data['rondaspuntos'] = $this->database->getrondaskata($competicion_torneo_id);
                 $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
-                $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
+                if($competicion->iniciacion == 0){
+                        $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
+                }else{
+                    $data['finalistas'] = [];
+                }
                 $data['view'] = 'public/vistacompeticionkata';
                 $data['js_files'] = [
                     base_url() . 'assets/public/js/vistacompeticionkata.js',
@@ -131,7 +135,12 @@ class Home extends CI_Controller
             if ($competicion->tipo == 'liguilla' || $competicion->tipo == 'eliminatoria') {
                 $data['view'] = 'public/vistacompeticionkumite';
                 $data['matches'] = $this->database->getMatchesTree($competicion_torneo_id);
-                $data['eliminatorias'] = $this->database->getEliminatoriasTree($competicion_torneo_id);
+                if($competicion->tipo == 'liguilla' && $competicion->iniciacion == 1){
+                    $data['eliminatorias'] = [];
+                }else{
+                    $data['eliminatorias'] = $this->database->getEliminatoriasTree($competicion_torneo_id);
+                }
+
                 $data['css_files']       = [
                     assets_url() . 'plugins/jquery.gracket/style.css',
                 ];

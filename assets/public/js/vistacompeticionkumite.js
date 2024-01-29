@@ -83,7 +83,13 @@ function clasificacionCompeticion() {
     $('tbody.clasificacion_grupo[data-competicion_torneo_id]').each(function (index, elem) {
         var competicion_torneo_id = $(elem).attr('data-competicion_torneo_id');
         var grupo = $(elem).attr('data-grupo');
-        updateClasificacionGrupoUsers(competicion_torneo_id, grupo)
+        console.log(grupo)
+        if(grupo == 'iniciacion'){
+            updateClasificacionGrupoIniciacion(competicion_torneo_id, grupo)
+        }else{
+            updateClasificacionGrupoUsers(competicion_torneo_id, grupo)
+        }
+        
     })
 }
 
@@ -161,6 +167,82 @@ function updateClasificacionGrupoUsers(competicion_torneo_id, grupo) {
     });
 
 }
+
+function updateClasificacionGrupoIniciacion(competicion_torneo_id, grupo) {
+    var fd = new FormData();
+    fd.append("competicion_torneo_id", competicion_torneo_id);
+    fd.append("grupo", grupo);
+    fd.append("csrf_token", $('[name="csrf_token"]').val());
+    $.ajax({
+        url: base_url + 'Competiciones/clasificacionGrupoIniciacion',
+        method: "POST",
+        contentType: false,
+        processData: false,
+        data: fd
+    }).done(function (response) {
+        var response = JSON.parse(response);
+        $('[name="csrf_token"]').val(response.csrf)
+        if (response.error > 0) {
+            var errorhtml = ''
+            if (response.hasOwnProperty('error_validation')) {
+                $.each(response.error_validation, function (i, value) {
+                    errorhtml += value + '<br>'
+                })
+            }
+            if (response.hasOwnProperty('error_msn')) {
+                errorhtml += response.error_msn
+            }
+            swal.fire({
+                icon: 'error',
+                title: 'ERROR',
+                html: errorhtml,
+                willClose: function () {
+                    if (response.hasOwnProperty('redirect')) {
+                        if (response.redirect == 'refresh') {
+                            location.reload()
+                        } else {
+                            window.location.href = response.redirect
+                        }
+                    }
+                }
+            });
+            return;
+        } else {
+            var tbody = $('tbody.clasificacion_grupo[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="iniciacion"]')
+            tbody.slideUp();
+            tbody.html('');
+            $.each(response.users, function (i, user) {
+                var posicion = i + 1;
+                var deportista = user.first_name + ' ' + user.last_name;
+                var club = user.nombre;
+                var tr = '<tr>';
+                tr += '<td>' + posicion + '</td>';
+                tr += '<td>' + deportista + '</td>';
+                tr += '<td>' + club + '</td>';
+                tr += '<td>' + user.ganados + '</td>';
+                tr += '<td>' + user.empatados + '</td>';
+                tr += '<td>' + user.perdidos + '</td>';
+                tr += '<td>' + user.puntos_favor + '</td>';
+                tr += '<td>' + user.puntos_total + '</td>';
+                tr += '</th>';
+                tbody.append(tr);
+            })
+            tbody.slideDown();
+        }
+    }).always(function (jqXHR, textStatus) {
+        if (textStatus != "success") {
+            swal.fire({
+                icon: 'error',
+                title: 'Ha ocurrido un error AJAX',
+                html: jqXHR.statusText,
+                timer: 5000,
+                willClose: function () { }
+            })
+        }
+    });
+
+}
+
 $(document).ready(function(){
     setInterval(function () { getMatchesCompeticion();clasificacionCompeticion();}, 3000)
 });

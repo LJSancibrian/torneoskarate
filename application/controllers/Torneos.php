@@ -36,8 +36,18 @@ class Torneos extends CI_Controller
             $data['view']           = ['gestion/common/tabla_datatable', 'gestion/torneos/torneos_form_modal'];
             $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos_p.js'];
         } else {
-            $data['view']           = ['gestion/common/tabla_datatable'];
-            $data['js_files']       = [assets_url() . 'admin/js/vistas/torneos_p_aux.js'];
+            $params = [
+                'tabla' => 'torneos',
+                'where' => [
+                    'fecha >=' => date('Y-m-d'),
+                    'deletedAt' => '0000-00-00 00:00:00',
+                    'estado' => 1
+                ],
+                'order_by' => ['fecha' => 'ASC']
+            ];
+            $data['torneos']  = $this->database->getWhere($params);
+            $data['view']           = ['gestion/torneos/tabla_grid'];
+            //$data['js_files']       = [assets_url() . 'admin/js/vistas/torneos_p_aux.js'];
         }
         show($data);
     }
