@@ -857,6 +857,7 @@ class Torneos extends CI_Controller
         $existentes = count($categorias);
         foreach ($categorias as $key => $value) {
             $data = [
+                'sibling_id' => ($value->sibling_id == 0) ? $value->competicion_torneo_id : $value->sibling_id,
                 'torneo_id' => input('torneo_id'),
                 'modalidad' => $value->modalidad,
                 'categoria' => $value->categoria,
@@ -1571,4 +1572,28 @@ class Torneos extends CI_Controller
             }
         }
     }
+
+   /* function arreglar_siblings($torneo2, $torneo1){
+        $this->db->where('torneo_id', $torneo2);
+        $cat = $this->db->get('torneos_competiciones')->result();
+
+        foreach ($cat as $key => $value) {
+            $this->db->where('torneo_id', $torneo1);
+            $this->db->where('modalidad',$value->modalidad);
+            $this->db->where('categoria',$value->categoria);
+            $this->db->where('genero',$value->genero);
+            $this->db->where('nivel',$value->nivel);
+            $sib = $this->db->get('torneos_competiciones')->row();
+
+            if($sib){
+                $this->db->where('competicion_torneo_id', $value->competicion_torneo_id);
+                $this->db->update('torneos_competiciones', ['sibling_id' => $sib->competicion_torneo_id]);
+            }
+        }
+
+
+    }*/
 }
+
+
+

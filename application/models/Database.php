@@ -1570,6 +1570,7 @@ class Database extends CI_Model
         $this->db->select('(1 -1) as finalista', false);
         $this->db->where('torneos_inscripciones.competicion_torneo_id', $competicion_torneo_id);
         $this->db->where('torneos_inscripciones.estado', 1);
+        $this->db->where('puntosrey.competicion_torneo_id', $competicion_torneo_id);
         $this->db->order_by('puntosrey.puntos_total', 'DESC');
         $this->db->order_by('puntosrey.total_combates', 'ASC');
         $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
@@ -1580,14 +1581,19 @@ class Database extends CI_Model
         foreach ($deportistas as $key => $value) {
             $deportistas_array[$value->user_id] = $value;
         }
-
-        //se buscan los combates de las eleimnatorias
-        $this->db->where('competicion_torneo_id', $competicion_torneo_id);
-        $this->db->order_by('ncombate', 'DESC');
-        $matches = $this->db->get('matches')->result();
+        
+        $matches_ = $this->database->getEliminatoriasTree($competicion_torneo_id);
+        $matches_f = [];
+        foreach ($matches_ as $key => $matches_g) {
+            foreach ($matches_g as $k => $m) {
+                $matches_f[] = $m;
+            }
+        }
+        $matches = array_reverse($matches_f);
+        $nummatches = count($matches);
         foreach ($matches as $key => $value) {
-            $deportistas_array[$value->user_rojo]->finalista++;
-            $deportistas_array[$value->user_azul]->finalista++;
+            /*$deportistas_array[$value->user_rojo]->finalista++;
+            $deportistas_array[$value->user_azul]->finalista++;*/
             $deportistas_array[$value->user_rojo]->puntos_favor += $value->puntos_rojo;
             $deportistas_array[$value->user_azul]->puntos_favor += $value->puntos_azul;
             $deportistas_array[$value->user_rojo]->total_combates++;
@@ -1597,6 +1603,16 @@ class Database extends CI_Model
             $deportistas_array[$value->winner]->victorias++;
             $deportistas_array[$value->winner]->puntos_total += 300;
             $deportistas_array[$loser]->puntos_total += 100;
+            if($key == 0){
+                $deportistas_array[$loser]->finalista += $nummatches - 3;
+                $deportistas_array[$value->winner]->finalista += $nummatches - 2; 
+                //$deportistas_array[$value->winner]->puntos_total += $deportistas_array[$value->winner]->puntos_total; 
+            }elseif($key == 1){
+                $deportistas_array[$loser]->finalista = $nummatches - 1;
+                $deportistas_array[$value->winner]->finalista += $nummatches;
+                //$deportistas_array[$loser]->puntos_total += $deportistas_array[$loser]->puntos_total * 2;
+                //$deportistas_array[$value->winner]->puntos_total += $deportistas_array[$value->winner]->puntos_total * 3;
+            }
         }
 
         usort($deportistas_array, function ($a, $b) {

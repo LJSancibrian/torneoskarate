@@ -404,7 +404,7 @@ class Competiciones extends CI_Controller
         $this->pdf->generate($html, $filename, true, 0);
     }
 
-    public function FinalizarCompeticion($competicion_torneo_id)
+    public function FinalizarCompeticion($competicion_torneo_id, $redirect = 'si')
     {
         asistentePage();
         $competicion = $this->database->getCompeticion($competicion_torneo_id);
@@ -464,8 +464,9 @@ class Competiciones extends CI_Controller
             'updatedAt' => date('Y-m-d H:i:s')
         ];
         $this->database->actualizar('torneos_competiciones', $params, 'competicion_torneo_id', $competicion_torneo_id);
-        
-        redirect('torneos/competiciones/' . $torneo->slug, 'refresh');
+        if($redirect == 'si'){
+            redirect('torneos/competiciones/' . $torneo->slug, 'refresh');
+        }
     }
 
     public function guardarClasificacionLM($competicion_torneo_id)
@@ -476,26 +477,51 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == false) {
             show_404();
         }
-        if ($competicion->tipo == 'puntos') {
-            $orden = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3]);
-        } elseif ($competicion->tipo == 'liguilla' || $competicion->tipo == 'eliminatoria'|| $competicion->tipo == 'rey') {
-            $orden = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
-        } else {
-            show_404();
+        
+        if($competicion->tipo == 'puntos'){
+            $orden = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3, 4]);
         }
+        if($competicion->tipo == 'liguilla'){
+            $orden = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
+        }
+        if($competicion->tipo == 'eliminatoria'){
+            $orden = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
+        }
+        if($competicion->tipo == 'rey'){
+            $orden = $this->database->clasificacionGlobalRey($competicion_torneo_id);
+        }
+        $es_iniciacion = $competicion->iniciacion;
+        
         $i = 1;
         foreach ($orden as $key => $value) {
             $puntos =  ($i < 9) ? $this->config->item('puntoskata')[$i] : $this->config->item('puntoskata')[0];
             if ($competicion->tipo != 'puntos') {
-                $puntos = $puntos + (5 * $value->ganados) + $value->puntos;
+                if ($competicion->tipo != 'rey') {
+                    if($es_iniciacion == 1){
+                        $puntos = $value->puntos + 50;
+                        
+                    }else{
+                        $puntos = $puntos + (5 * $value->ganados) + $value->puntos;
+                    }
+                }else{
+                    $puntosrey = [
+                        0 => 50,
+                        1 => 1000,
+                        2 => 500,
+                        3 => 250,
+                        4 => 150,
+                        5 => 100,
+                        6 => 75,
+                    ];
+                    $puntos_clasificacion = ($i < 7) ? $puntosrey[$i] : $puntosrey[0];
+                    $puntos = $value->puntos_favor +  $puntos_clasificacion;
+                }
+            }else{
+                if($es_iniciacion == 1){
+                    $puntos = $value->total;
+                }
             }
-            if($competicion->torneo_id == 4 || $competicion->torneo_id == 5){
-                $puntos = $puntos * 2;
-            }
-
-            if($competicion->torneo_id == 5){
-                $puntos = ($i == 0) ? 500 : $puntos;
-            }
+            
             $datos = [
                 'lm' => date('Y'),
                 'user_id' => $value->user_id,
@@ -510,6 +536,7 @@ class Competiciones extends CI_Controller
                 'posicion' => $i,
                 'puntos ' => $puntos,
             ];
+            //printr($datos);
 
             $this->db->where('user_id', $value->user_id);
             $this->db->where('competicion_torneo_id', $competicion_torneo_id);
@@ -1372,6 +1399,22 @@ class Competiciones extends CI_Controller
             if ($value->estado == 2 && $value->deletedAt == '0000-00-00 00:00:00') {
                 $this->guardarClasificacionLM($value->competicion_torneo_id);
             }
+        }
+    }
+
+    public function finalizar_todas_rey(){
+        $this->db->where('tipo', 'rey');
+        $torneos_competiciones = $this->db->get('torneos_competiciones')->result();
+        foreach ($torneos_competiciones as $key => $tc) {
+            $this->FinalizarCompeticion($tc->competicion_torneo_id, 'no');
+        }
+    }
+
+    public function finalizar_todas_torneo($torneo_id){
+        $this->db->where('torneo_id', $torneo_id);
+        $torneos_competiciones = $this->db->get('torneos_competiciones')->result();
+        foreach ($torneos_competiciones as $key => $tc) {
+            $this->FinalizarCompeticion($tc->competicion_torneo_id, 'no');
         }
     }
 
