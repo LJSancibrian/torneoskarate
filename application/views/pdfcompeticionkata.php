@@ -8,8 +8,25 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
+        @font-face {
+            font-family: 'Lato';
+            src: url('<?php echo FCPATH ?>assets/admin/fonts/Lato/Lato-Regular.ttf') format('truetype');  /* Formato TTF */
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'LatoBlack';
+            src: url('<?php echo FCPATH ?>assets/admin/fonts/Lato/Lato-Black.ttf') format('truetype');  /* Formato TTF */
+            font-weight: bolder;
+        }
+        @font-face {
+            font-family: 'LatoLight';
+            src: url('<?php echo FCPATH ?>assets/admin/fonts/Lato/Lato-Light.ttf') format('truetype');  /* Formato TTF */
+            font-weight: normal;
+            font-style: normal;
+        }
         body {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Lato', Arial, Helvetica, sans-serif;
             font-size: 14px;
         }
 
@@ -29,10 +46,11 @@
             right: 0px;
             height: 30px;
             text-align: center;
-            font-size: 24px;
+            font-size: 20px;
             text-transform: uppercase;
-            font-weight: 900;
-            border: 1px solid #008081;
+            font-family: 'LatoBlack', Arial, Helvetica, sans-serif;
+            font-weight: bolder;
+            border: 4px solid #008081;
             color: #008081;
             vertical-align: middle;
         }
@@ -56,30 +74,34 @@
             width: 100%;
             border-collapse: collapse;
             border-spacing: 2px;
-            border: 0px solid #cccccc;
+            border: 0px dotted #008081;
+            page-break-inside: avoid;
+            margin-top: 20px; 
         }
 
         .table thead th {
             border-bottom-width: 2px;
-            font-weight: 600;
+            font-weight: bolder;
             border-color: #008081;
-            background-color: #008081;
-            color: #ffffff;
+            /*background-color: #008081;
+            color: #ffffff;*/
+            color: #008081;
+            text-transform: uppercase;
+            font-family: 'LatoBlack', Arial, Helvetica, sans-serif;
+
         }
 
-        .table tr.border td,
-        .table tr.border th {
+        .table tr td,
+        .table tr th {
             font-size: 16px;
             border-color: #008081 !important;
-            border: 1px solid #008081;
+            border: 1px dashed #008081;
             padding: 5px 15px;
-
             vertical-align: middle !important;
         }
-
-        .border-y {
-            border-top: 1px solid #008081;
-            border-bottom: 1px solid #008081;
+        .table tr th {
+            border: 4px solid #008081;
+            padding: 4px 14px;
         }
 
         h2,
@@ -89,6 +111,8 @@
             margin-bottom: 10px;
             padding-bottom: 5px;
             padding-top: 5px;
+            font-family: 'LatoBlack', Arial, Helvetica, sans-serif;
+            font-weight: bolder;
         }
 
         .page-number:before {
@@ -118,26 +142,73 @@
     </footer>
     <table class="header">
         <tr>
-            <td style="font-family: Arial, Helvetica, sans-serif;">
-                <?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?>
-            </td>
+            <th style="padding-left: 20px; text-align: left;">
+                <?php echo $competicion->modalidad ; ?>
+            </th>
+            <th style="padding-right: 20px; text-align: right;">
+                <?php echo $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?>
+            </th>
         </tr>
     </table>
 
     <div class="page_break" style="padding-bottom:10px;">
         <h2>Rondas</h2>
+        <?php $grupo = 0;
+        foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
+            <?php if($value->grupo != $grupo){ ?>
+                <?php if($key > 0){ ?>
+                            </tbody>
+                        </table>
+                <?php } 
+                $grupo = $value->grupo; ?>
+                <table class="table" id="tablAOta_<?=$grupo?>">
+                    <thead class="bg">
+                        <tr >
+                            <th>Grupo <?=$grupo?></th>
+                            <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+                                <th colspan="2">Ronda <?=$i?></th>
+                            <?php } ?>
+                            <th>Total</th>
+                        </tr>
+                        <tr >
+                            <th>Deportista</th>
+                            <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+                                <th>J1</th>
+                                <th>J2</th>
+                            <?php } ?>
+                            <th>TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            <?php } ?>
+            <tr >
+                <td><?= mb_convert_case($value->first_name . ' ' . $value->last_name, MB_CASE_TITLE, 'UTF-8'); ?></td>
+                <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+                    <td></td>
+                    <td></td>
+                <?php } ?>
+                <td></td>
+            </tr>
+            <?php if($key == count($ordenparticipacion['ordenados']) - 1){ ?>
+                    </tbody>
+                </table>
+            <?php }
+		} ?>
+
+
+        <?php /*
         <table class="table" id="tablAOta">
             <thead class="bg">
-                <tr class="border">
+                <tr >
                     
-                    <th class="text-left columnfixed"></th>
+                    <th></th>
                     <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
 						<th colspan="2">Ronda <?=$i?></th>
 					<?php } ?>
                     <th>Total</th>
                 </tr>
-                <tr class="border">
-                    <th class="text-left columnfixed">Deportista</th>
+                <tr >
+                    <th>Deportista</th>
                     <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
 						<th>J1</th>
 						<th>J2</th>
@@ -148,7 +219,7 @@
             </thead>
             <tbody>
                 <?php foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
-                    <tr class="border">
+                    <tr >
                         <td><?= mb_convert_case($value->first_name . ' ' . $value->last_name, MB_CASE_TITLE, 'UTF-8'); ?></td>
                         <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
                             <th></th>
@@ -159,14 +230,15 @@
                 <?php } ?>
             </tbody>
         </table>
+        */ ?>
     </div>
 
     <div class="page_break" style="padding-bottom:10px;">
         <h2>Final</h2>
         <table class="table" id="tablAOta">
             <thead class="bg">
-                <tr class="border">
-                    <th class="text-left columnfixed">Deportista</th>
+                <tr >
+                    <th>Deportista</th>
                     <th>J1</th>
                     <th>J2</th>
                     <th>J3</th>
@@ -176,7 +248,7 @@
             </thead>
             <tbody>
                 <?php for ($i = 0; $i < 8; $i++) { ?>
-                    <tr class="border">
+                    <tr >
                         <td style="width:150px;">
                             <div style="height:35px;"></div>
                         </td>

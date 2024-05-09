@@ -8,8 +8,25 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
+        @font-face {
+            font-family: 'Lato';
+            src: url('<?php echo FCPATH ?>assets/admin/fonts/Lato/Lato-Regular.ttf') format('truetype');  /* Formato TTF */
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'LatoBlack';
+            src: url('<?php echo FCPATH ?>assets/admin/fonts/Lato/Lato-Black.ttf') format('truetype');  /* Formato TTF */
+            font-weight: bolder;
+        }
+        @font-face {
+            font-family: 'LatoLight';
+            src: url('<?php echo FCPATH ?>assets/admin/fonts/Lato/Lato-Light.ttf') format('truetype');  /* Formato TTF */
+            font-weight: normal;
+            font-style: normal;
+        }
         body {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Lato', Arial, Helvetica, sans-serif;
             font-size: 14px;
         }
 
@@ -29,10 +46,11 @@
             right: 0px;
             height: 30px;
             text-align: center;
-            font-size: 24px;
+            font-size: 20px;
             text-transform: uppercase;
-            font-weight: 900;
-            border: 1px solid #008081;
+            font-family: 'LatoBlack', Arial, Helvetica, sans-serif;
+            font-weight: bolder;
+            border: 4px solid #008081;
             color: #008081;
             vertical-align: middle;
         }
@@ -56,30 +74,34 @@
             width: 100%;
             border-collapse: collapse;
             border-spacing: 2px;
-            border: 0px solid #cccccc;
+            border: 0px dotted #008081;
+            page-break-inside: avoid;
+            margin-top: 20px; 
         }
 
         .table thead th {
             border-bottom-width: 2px;
-            font-weight: 600;
+            font-weight: bolder;
             border-color: #008081;
-            background-color: #008081;
-            color: #ffffff;
+            /*background-color: #008081;
+            color: #ffffff;*/
+            color: #008081;
+            text-transform: uppercase;
+            font-family: 'LatoBlack', Arial, Helvetica, sans-serif;
+
         }
 
-        .table tr.border td,
-        .table tr.border th {
+        .table tr td,
+        .table tr th {
             font-size: 16px;
             border-color: #008081 !important;
-            border: 1px solid #008081;
+            border: 1px dashed #008081;
             padding: 5px 15px;
-
             vertical-align: middle !important;
         }
-
-        .border-y {
-            border-top: 1px solid #008081;
-            border-bottom: 1px solid #008081;
+        .table tr th {
+            border: 4px solid #008081;
+            padding: 4px 14px;
         }
 
         h2,
@@ -89,6 +111,8 @@
             margin-bottom: 10px;
             padding-bottom: 5px;
             padding-top: 5px;
+            font-family: 'LatoBlack', Arial, Helvetica, sans-serif;
+            font-weight: bolder;
         }
 
         .page-number:before {
@@ -102,7 +126,9 @@
         .page_break:last-child {
             page-break-after: avoid;
         }
-
+        .page_break-inside {
+            page-break-inside: avoid;
+        }
         .text-vertical {
             -webkit-transform: rotate(-90deg);
             -moz-transform: rotate(-90deg);
@@ -113,20 +139,24 @@
 </head>
 
 <body style="word-spacing:normal;padding:10px 0px 0px 0px;">
-    <footer>
+<footer>
         <?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?> - página <span class="page-number"></span>
     </footer>
     <table class="header">
         <tr>
-            <td style="font-family: Arial, Helvetica, sans-serif;">
-                <?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?>
-            </td>
+            <th style="padding-left: 20px; text-align: left;">
+                <?php echo $competicion->modalidad ; ?>
+            </th>
+            <th style="padding-right: 20px; text-align: right;">
+                <?php echo $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?>
+            </th>
         </tr>
     </table>
 
     <?php if (isset($matches)) {
         foreach ($matches as $key => $grupo) { ?>
-            <div class="page_break" style="padding-bottom: 10px;">
+        <div class="page_break">
+            <div class="page_break-inside" style="padding-bottom: 10px;">
                 <h3>Grupo <?= $key ?></h3>
                 <table style="width: 103%;  margin-left: -3%;">
                     <thead>
@@ -188,7 +218,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="page_break" style="padding-bottom: 10px;">
+            <div class="page_break-inside" style="padding-bottom: 10px;">
                 <table class="table" id="tablAOta">
                     <thead>
                         <tr class="border">
@@ -219,10 +249,11 @@
                 </table>
                 <span>V: Victorias. PF: Puntos a favor. PC: Puntos en contra. S: Shenshu. H: Hantei. CF: Clasificación final.</span>
             </div>
+        </div>
         <?php }
     } ?>
 
-<div class="page_break">
+    <div class="page_break">
         <h3>Eliminatorias</h3>
         <?php
         function clasificado($string, $eliminatorias)

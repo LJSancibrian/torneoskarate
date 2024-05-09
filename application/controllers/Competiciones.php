@@ -64,6 +64,7 @@ class Competiciones extends CI_Controller
         $data['torneo'] = $torneo;
         $data['competicion'] = $competicion;
         $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
+
         if($competicion->tipo == 'puntos'){
             $data['view'] = ['gestion/competiciones/mesakata'];
             $data['rondaspuntos'] = $this->database->getrondaskata($competicion_torneo_id);
@@ -257,6 +258,7 @@ class Competiciones extends CI_Controller
                     'error'     => 0,
                     'tipo' => 'KATA',
                     'competicion_tipo' => input('competicion_tipo'),
+                    'competicion_grupos' => input('competicion_grupos'),
                     'inscritos' => $inscripciones,
                     'csrf'      => $this->security->get_csrf_hash(),
                 ];
@@ -279,6 +281,7 @@ class Competiciones extends CI_Controller
                 'error'     => 0,
                 'tipo' => 'KUMITE',
                 'competicion_tipo' => input('competicion_tipo'),
+                'competicion_grupos' => input('competicion_grupos'),
                 'inscritos' => $inscripciones, //array_slice($inscripciones, 0, 24), //$inscripciones,
                 'csrf'      => $this->security->get_csrf_hash(),
             ];
@@ -586,11 +589,24 @@ class Competiciones extends CI_Controller
             ];
             returnAjax($response);
         }
+
         $orden_array = explode(',', input('orden_inscripciones'));
-        $orden = 1;
+        $orden_grupos = explode(',', input('orden_grupos'));
+        $orden = 0;
+        
         foreach ($orden_array as $key => $inscripcion_id) {
-            $this->database->actualizarorden(input('competicion_torneo_id'), $inscripcion_id, $orden);
-            $orden++;
+            if(!isset($last_grupo)){
+                $last_grupo = $orden_grupos[$key];
+            } 
+            if($last_grupo == $orden_grupos[$key]){
+                $orden++;
+            }else{
+                $orden = 1;
+                $last_grupo = $orden_grupos[$key];
+            }
+            $this->database->actualizarorden(input('competicion_torneo_id'), $inscripcion_id, $orden, $orden_grupos[$key]);
+            
+            
         }
         $params = [
             'tipo' => 'puntos',
@@ -1203,9 +1219,12 @@ class Competiciones extends CI_Controller
                 if ($retval == 0) {
                     $retval = $b->puntos <=> $a->puntos;
                     if ($retval == 0) {
-                        $retval = $b->senshu <=> $a->senshu;
+                        $retval = $a->puntos_contra <=> $b->puntos_contra;
                         if ($retval == 0) {
-                            $retval = $b->hantei <=> $a->hantei;
+                            $retval = $b->senshu <=> $a->senshu;
+                            if ($retval == 0) {
+                                $retval = $b->hantei <=> $a->hantei;
+                            }
                         }
                     }
                 }

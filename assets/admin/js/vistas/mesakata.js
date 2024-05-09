@@ -119,14 +119,15 @@ $(document).on('click', '#guardar-finalistas', function () {
     var competicion_torneo_id = $('[data-competicion]').attr('data-competicion');
     var users_id = [];
     console.log(num_finalistas)
-    $('#clasificacion_competicion tr').each(function (pos, depor) {
-        console.log(pos)
-        if (pos < num_finalistas) {
-            users_id.push($(depor).attr('clasificado_user'))
-        }
-
+    $('[id^="clasificacion_competicion_"]').each(function() {
+        var id_tbody = $(this).attr('id');
+        $('#'+id_tbody+' tr').each(function (pos, depor) {
+            if (pos < num_finalistas) {
+                users_id.push($(depor).attr('clasificado_user'))
+            }
+        })
     })
-    console.log(users_id)
+
     var fd = new FormData();
     fd.append("competicion_torneo_id", competicion_torneo_id);
     fd.append("csrf_token", $('[name="csrf_token"]').val());
@@ -312,7 +313,7 @@ function clasificacion(table_ID) {
     fd.append("competicion_torneo_id", competicion_torneo_id);
     fd.append("csrf_token", $('[name="csrf_token"]').val());
     var urlfetch = (table_ID == 'tablakata') ? base_url + 'Competiciones/clasificacionkata' : base_url + 'Competiciones/clasificacionfinalkata';
-    var bodytable = (table_ID == 'tablakata') ? '#clasificacion_competicion' : '#clasificacion_final_competicion'
+    var bodytable = (table_ID == 'tablakata') ? '[id^="clasificacion_competicion_"]' : '#clasificacion_final_competicion'
     $.ajax({
         url: urlfetch,
         method: "POST",
@@ -351,7 +352,9 @@ function clasificacion(table_ID) {
         } else {
             $(bodytable).slideUp('500', function () {
                 $(bodytable).html('');
+                
                 $.each(response.clasificacion, function (i, row) {
+                    console.log(row)
                     var tr = `<tr clasificado_user="${row.user_id}" clasificado_inscripcion="${row.inscripcion_id}">
                     <td>${i + 1}</td>
                     <td class="columnfixed">${row.first_name} ${row.last_name}</td>
@@ -372,9 +375,9 @@ function clasificacion(table_ID) {
                     </tr>`;
 
                     var trrow = (table_ID == 'tablakata') ? tr : tr2;
+                    console.log(row)
 
-
-                    $(bodytable).append(trrow)
+                    $('#clasificacion_competicion_'+row.grupo).append(trrow)
                 })
                 setTimeout(function () {
                     $(bodytable).slideDown();

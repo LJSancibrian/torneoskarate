@@ -23,7 +23,66 @@
 		</a>
 	</div>
 	<div class="card-body p-1 bg-white" id="tablero-competicion">
-		<div class="table-responsive">
+
+
+		
+			<?php $grupo = 0;
+			foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
+				<?php if($value->grupo != $grupo){ ?>
+                    <?php if($key > 0){ ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php } 
+                    $grupo = $value->grupo; ?>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered text-center" id="tablakata_<?=$grupo?>" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
+							<thead>
+								<tr>
+									<th class="bg-white text-primary">#</th>
+									<th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
+									<?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+										<th class="bg-white text-primary" colspan="2">Ronda <?=$i?></th>
+									<?php } ?>
+									<th class="bg-white text-primary">Total</th>
+									<th class="bg-white text-primary">Media</th>
+								</tr>
+								<tr>
+									<th class="">#</th>
+									<th colspan="2" class="text-left columnfixed">Deportista</th>
+									<?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+										<th>J1</th>
+										<th>J2</th>
+									<?php } ?>
+									<th>Total</th>
+									<th>Media</th>
+								</tr>
+							</thead>
+            	            <tbody>
+                <?php } ?>
+				<tr data-user_id="<?php echo $value->user_id; ?>">
+					<td class=""><?php echo $value->orden; ?></td>
+					<td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
+
+					<?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>								
+						<td data-ronda="<?=$i?>" data-j="1"></td>
+						<td data-ronda="<?=$i?>" data-j="2"></td>
+						<td data-media="<?=$i?>" class="bg-success text-white d-none">0</td>
+					<?php } ?>
+
+					<td data-total></td>
+					<td data-media-total class="bg-primary text-white">0</td>
+				</tr>
+				<?php if($key == count($ordenparticipacion['ordenados']) - 1){ ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php }
+			} ?>
+
+
+			<?php /*
+			<div class="table-responsive">
 			<table class="table table-striped table-bordered text-center" id="tablakata" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
 				<thead>
 					<tr>
@@ -47,7 +106,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
+					
 						<tr data-user_id="<?php echo $value->user_id; ?>">
 							<td class=""><?php echo $value->orden; ?></td>
 							<td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
@@ -65,7 +124,9 @@
 					<?php } ?>
 				</tbody>
 			</table>
-		</div>
+			</div>
+			*/?>
+		
 	</div>
 
 	<div class="card-header d-flex justify-content-between">
@@ -153,23 +214,28 @@
 							</div>
 						</div>
 					</div>
-					<div class="table-responsive" style="overflow: auto;height: calc( 100vh - 250px);">
-						<table class="table table-striped w-100" id="clasificaicon">
-							<thead style="position: sticky; top: 0; z-index: 1;">
-								<tr>
-									<th>#</th>
-									<th class="columnfixed">Deportista</th>
-									<th>Equipo</th>
-									<th>Puntos</th>
-									<th>Media</th>
-									<th>Max 1</th>
-									<th>Max.2</th>
-									<th>Max 3</th>
-								</tr>
-							</thead>
-							<tbody id="clasificacion_competicion"></tbody>
-						</table>
-					</div>
+					<?php for ($i=1; $i <= $grupo; $i++) { ?>
+						
+					
+						<div class="table-responsive" style="overflow: auto;min-height: 200px;">
+						<h4>Grupo <?=$i?></h4>
+							<table class="table table-striped w-100" id="clasificaicon_grupo_<?=$i?>">
+								<thead style="position: sticky; top: 0; z-index: 1;">
+									<tr>
+										<th>#</th>
+										<th class="columnfixed">Deportista</th>
+										<th>Equipo</th>
+										<th>Puntos</th>
+										<th>Media</th>
+										<th>Max 1</th>
+										<th>Max.2</th>
+										<th>Max 3</th>
+									</tr>
+								</thead>
+								<tbody id="clasificacion_competicion_<?=$i?>"></tbody>
+							</table>
+						</div>
+					<?php } ?>
 				</div>
 			</div>
 		</div>

@@ -15,8 +15,25 @@ function dividirArray(array, max) {
     return grupos;
 }
 
+function dividirArrayGrupos(array, numeroGrupos) {
+    const grupos = [];
+    const numElementos = array.length;
+    const inscripcionesPorGrupo = Math.ceil(numElementos / numeroGrupos);
+    let indiceGrupo = 0;
+    for (let i = 0; i < numElementos; i++) {
+        if (!grupos[indiceGrupo]) {
+            grupos[indiceGrupo] = { elementos: [] };
+        }
+        const elemento = array[i];
+        grupos[indiceGrupo].elementos.push(elemento);
+        indiceGrupo = (indiceGrupo + 1) % numeroGrupos;
+    }
+    return grupos;
+}
 
-$(document).on('click', '[data-generar-tablero]', function() {
+
+
+$(document).on('click', '[data-generar-tablero]', function () {
     var competicion_torneo_id = $(this).attr('data-generar-tablero');
     var competicion_tipo = $(this).attr('data-generar-tipo');
     var competicion_grupos = $(this).closest('tr').find('[name="competicion_grupos"]').val();
@@ -32,13 +49,13 @@ $(document).on('click', '[data-generar-tablero]', function() {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function(response) {
+    }).done(function (response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
+                $.each(response.error_validation, function (i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -49,7 +66,7 @@ $(document).on('click', '[data-generar-tablero]', function() {
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function() {
+                willClose: function () {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -67,24 +84,40 @@ $(document).on('click', '[data-generar-tablero]', function() {
             var competicion_tipo = response.competicion_tipo;
             // KATA
             if (competicion_tipo == 'puntos' && tipo == 'KATA') {
-                var tabla = ` <div class="table-responsive">
-                <table class="table table-striped table-bordered text-center" id="tablakata">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th colspan="2" class="text-left">Deportista</th>
-                            <th class="text-left">Equipo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                    </table>
-                </div>
-                <button type="button" data-guardar-puntos="${competicion_torneo_id}" class="btn btn-sm btn-default m-3">Guardar orden</button>`;
-                $('#tablero-competicion').html(tabla);
+                var ngrupos = response.competicion_grupos;
+                var grupos = dividirArrayGrupos(response.inscritos, ngrupos);
+                $('#tablero-competicion').html('');
+                
+                $.each(grupos, function (indice, grupo) { 
+                    var n_grupo = indice + 1;
+                    var tabla = `<div class="table-responsive">
+                        <table class="table table-striped table-bordered text-center" id="tablakata_${n_grupo}">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th colspan="2" class="text-left">Deportista</th>
+                                    <th class="text-left">Equipo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            </table>
+                        </div>`;
+                    $('#tablero-competicion').append(tabla);
+                    $.each(grupo.elementos, function (i, elem) {
+                        var tr = `<tr>
+                            <td>${i + 1}</td>
+                            <td colspan="2" class="text-left text-nowrap" data-inscripcion="${elem.inscripcion_id}" data-grupo="${n_grupo}">${elem.first_name + ' ' + elem.last_name}</td>
+                            <td class="text-left text-nowrap">${elem.nombre}</td>
+                        </tr>`
+                        $('#tablakata_'+n_grupo).append(tr);
+                    })
+                });
+                $('#tablero-competicion').append('<button type="button" data-guardar-puntos="'+competicion_torneo_id+'" class="btn btn-sm btn-default m-3">Guardar orden</button>');
+                /*
                 var totalinscritos = response.inscritos.length;
                 if (totalinscritos > 0) {
-                    $.each(response.inscritos, function(i, elem) {
+                    $.each(response.inscritos, function (i, elem) {
                         var tr = `<tr>
                             <td>${i + 1}</td>
                             <td colspan="2" class="text-left text-nowrap" data-inscripcion="${elem.inscripcion_id}">${elem.first_name + ' ' + elem.last_name}</td>
@@ -92,7 +125,7 @@ $(document).on('click', '[data-generar-tablero]', function() {
                         </tr>`
                         $('#tablakata').append(tr);
                     })
-                }
+                }*/
                 $('#tablero-competicion tbody').sortable({});
                 $('#tablero-competicion').slideDown();
             }
@@ -109,13 +142,18 @@ $(document).on('click', '[data-generar-tablero]', function() {
                 $('#tablero-competicion').html(html);
                 var totalinscritos = response.inscritos.length;
                 var grupos = [];
-                var grupos = dividirArray(response.inscritos, 6);
+                if (response.competicion_grupos == 0) {
+                    var grupos = dividirArray(response.inscritos, 6);
+                } else {
+                    var ngrupos = response.competicion_grupos;
+                    var grupos = dividirArrayGrupos(response.inscritos, ngrupos);
+                }
+
                 $('[id^="grupokumite_"]').remove();
 
                 //for (let index = 0; index < grupos.length; index++) {
                 $.each(grupos, function (indice, grupo) {
                     var n_grupo = indice + 1;
-                    console.log(grupo)
                     var html = `<div class="border-bottom d-flex flex-row justify-content-start my-3" id="grupokumite_${n_grupo}" grupo="${n_grupo}">
                     <table class="table table-striped table-bordered text-center w-auto" id="tablakumite_${n_grupo}" data-rondas="si">
                     <thead>
@@ -132,11 +170,11 @@ $(document).on('click', '[data-generar-tablero]', function() {
                     </thead>
                     <tbody>
                         <tr class="no-sort"><td colspan="4"></td></tr>`;
-                        $.each(grupo.elementos, function(i, elem) {
-                            var deportista = elem.first_name + ' ' + elem.last_name;
-                            var posicion = i + 1;
-                            html += `<tr data-user="${elem.user_id}" data-inscripcion_id="${elem.inscripcion_id}"><td>${posicion}</td><td colspan="2" class="text-nowrap">${deportista}</td><td>${elem.nombre}</td></tr>`;
-                        })
+                    $.each(grupo.elementos, function (i, elem) {
+                        var deportista = elem.first_name + ' ' + elem.last_name;
+                        var posicion = i + 1;
+                        html += `<tr data-user="${elem.user_id}" data-inscripcion_id="${elem.inscripcion_id}"><td>${posicion}</td><td colspan="2" class="text-nowrap">${deportista}</td><td>${elem.nombre}</td></tr>`;
+                    })
 
                     html += `</tbody></table></div>`;
                     $('#fasegrupos').append(html);
@@ -173,7 +211,7 @@ $(document).on('click', '[data-generar-tablero]', function() {
 
                 // se genera una tabla 
                 grupos.push(1)
-               
+
                 $('[id^="grupokumite_"]').remove();
                 for (let index = 0; index < grupos.length; index++) {
                     var html = `<div class="border-bottom d-flex flex-row justify-content-start my-3" id="grupokumite_${grupos[index]}" grupo="${grupos[index]}">
@@ -197,7 +235,7 @@ $(document).on('click', '[data-generar-tablero]', function() {
                     $('#fasegrupos').append(html);
                 }
                 // recorrer las inscripciones y colocar una en cada grupo de forma
-                $.each(response.inscritos, function(i, elem) {
+                $.each(response.inscritos, function (i, elem) {
                     var deportista = elem.first_name + ' ' + elem.last_name;
                     var posicion = i + 1;
                     var tr = `<tr data-user="${elem.user_id}" data-inscripcion_id="${elem.inscripcion_id}"><td>${posicion}</td><td colspan="2" class="text-nowrap">${deportista}</td><td>${elem.nombre}</td></tr>`;
@@ -256,7 +294,7 @@ $(document).on('click', '[data-generar-tablero]', function() {
                     $('#fasegrupos').append(html);
                 }
                 // recorrer las inscripciones y colocar una en cada grupo de forma
-                $.each(response.inscritos, function(i, elem) {
+                $.each(response.inscritos, function (i, elem) {
                     var deportista = elem.first_name + ' ' + elem.last_name;
                     var posicion = i + 1;
                     var tr = `<tr data-user="${elem.user_id}" data-inscripcion_id="${elem.inscripcion_id}"><td>${posicion}</td><td colspan="2" class="text-nowrap">${deportista}</td><td>${elem.nombre}</td></tr>`;
@@ -276,14 +314,14 @@ $(document).on('click', '[data-generar-tablero]', function() {
             }
 
         }
-    }).always(function(jqXHR, textStatus) {
+    }).always(function (jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function() {}
+                willClose: function () { }
             })
         }
     });
@@ -292,8 +330,8 @@ $(document).on('click', '[data-generar-tablero]', function() {
 $('#tablakata tbody').sortable({
     opacity: 0.9,
     connectWith: $('tbody'),
-    stop: function() {
-        $.each($('#tablero-competicion tbody tr'), function(i, elem) {
+    stop: function () {
+        $.each($('#tablero-competicion tbody tr'), function (i, elem) {
             $(elem).find('td').eq(0).html(i + 1)
         })
     }
@@ -305,8 +343,8 @@ function tabassortable() {
         opacity: 0.9,
         items: '>*:not(.no-sort)',
         connectWith: $('tbody'),
-        start: function(event, ui) {},
-        receive: function(event, ui) {
+        start: function (event, ui) { },
+        receive: function (event, ui) {
             var item = $(ui.item);
             var sender = $(ui.sender);
             if (item.next().length > 0) {
@@ -315,9 +353,9 @@ function tabassortable() {
                 sender.append(item.prev());
             }
         },
-        stop: function(event, ui) {
-            $.each($('#tablero-competicion table'), function(i, table) {
-                $.each($(table).find('tbody tr:not(.no-sort)'), function(n, elem) {
+        stop: function (event, ui) {
+            $.each($('#tablero-competicion table'), function (i, table) {
+                $.each($(table).find('tbody tr:not(.no-sort)'), function (n, elem) {
                     $(elem).find('td').eq(0).html(n + 1)
                 })
             })
@@ -328,16 +366,16 @@ function tabassortable() {
 
 function dibujar_cruces_grupos() {
     var n_combate = 0;
-    $('table[id^="tablakumite_"]').each(function(index, tabla) {
+    $('table[id^="tablakumite_"]').each(function (index, tabla) {
         var tabla_id = $(tabla).attr('id');
         var rondas = $(tabla).attr('data-rondas');
-        if(rondas != 'no'){
+        if (rondas != 'no') {
             var competidores = [];
             var inscripciones_id = [];
             var nombres = [];
             var equipos = [];
             var posiciones = [];
-            $('#' + tabla_id + ' tbody tr:not(.no-sort)').each(function(row, tr) {
+            $('#' + tabla_id + ' tbody tr:not(.no-sort)').each(function (row, tr) {
                 var user_id = $(tr).attr('data-user')
                 var inscripcion_id = $(tr).attr('data-inscripcion_id')
                 var nombre = $(tr).find('td').eq(1).html();
@@ -394,7 +432,7 @@ function generar_enfrentamientos(competidores) {
             league.push('None')
         }
         let rounds = league.length
-            //for (let j=0; j<(rounds-1)*2; j ++) { // ida y vuelta
+        //for (let j=0; j<(rounds-1)*2; j ++) { // ida y vuelta
         for (let j = 0; j < (rounds - 1) * 1; j++) {
             schedule[j] = []
             for (let i = 0; i < rounds / 2; i++) {
@@ -415,7 +453,7 @@ function generar_enfrentamientos(competidores) {
 }
 
 function dibujarRondas(tabla_id, cuadroFinal, nombres, equipos, posiciones) {
-    $('table[id^="tablakumite_"]').each(function(index, tabla) {
+    $('table[id^="tablakumite_"]').each(function (index, tabla) {
         var tabla_id = $(tabla).attr('id');
         $('#' + tabla_id).next('div').remove();
         $('<div class="text-nowrap ml-3" style="overflow-x: auto;margin-top: 2.5rem;"></div>').insertAfter('#' + tabla_id);
@@ -454,13 +492,13 @@ function dibujarRondas(tabla_id, cuadroFinal, nombres, equipos, posiciones) {
 function dibulareliminatorias() {
     var rounds = [];
     grupos = $('table[id^="tablakumite_"]').length;
-   
+
     if (grupos == 1) {
         var ronda = [
             [
                 { name: "Primero", id: "g1|1" },
                 { name: "Cuarto", id: "g1|4" }
-                
+
             ],
             [
                 { name: "Segundo", id: "g1|2" },
@@ -503,7 +541,6 @@ function dibulareliminatorias() {
             ]
         ];
         rounds.push(ronda);
-        console.log(rounds)
     }
     if (grupos == 3) {
         var ronda = [
@@ -716,7 +753,6 @@ function dibular_competicion_eliminatoria(inscripciones) {
         matches = matches / 2;
         rounds.push(ronda);
     }
-    console.log(rounds)
     $(".brackets").html('');
     $(".brackets").gracket({ src: rounds });
     eliminatoriasortable()
@@ -724,9 +760,7 @@ function dibular_competicion_eliminatoria(inscripciones) {
 }
 
 
-function dibujarLiga(inscripciones)
-{
-    console.log(inscripciones);
+function dibujarLiga(inscripciones) {
 
     let teams = [
         'Tigers',
@@ -734,39 +768,39 @@ function dibujarLiga(inscripciones)
         'Drampamdom',
         'Lakebaka'
     ]
-      
-      const roundRobin = (teams) => {
+
+    const roundRobin = (teams) => {
         let schedule = []
         let league = teams.slice()
-        
+
         if (league.length % 2) {
-          league.push('None')
+            league.push('None')
         }
-        
+
         let rounds = league.length
-        
-        for (let j=0; j<(rounds-1)*2; j ++) {
-          schedule[j] = []
-          for (let i=0; i<rounds/2; i++) {
-            if (league[i] !== 'None' && league[rounds-1-i] !== 'None') {
-              if (j % 2 == 1) {
-                schedule[j].push([league[i], league[rounds-1-i]])
-              } else {
-                schedule[j].push([league[rounds-1-i], league[i]])
-              }
+
+        for (let j = 0; j < (rounds - 1) * 2; j++) {
+            schedule[j] = []
+            for (let i = 0; i < rounds / 2; i++) {
+                if (league[i] !== 'None' && league[rounds - 1 - i] !== 'None') {
+                    if (j % 2 == 1) {
+                        schedule[j].push([league[i], league[rounds - 1 - i]])
+                    } else {
+                        schedule[j].push([league[rounds - 1 - i], league[i]])
+                    }
+                }
             }
-          }
-          league.splice(1, 0, league.pop())
+            league.splice(1, 0, league.pop())
         }
         return schedule
-      }
-      
-      let leagueSchedule = roundRobin(teams)
-      
-      for (let p=0; p<leagueSchedule.length; p++) {
+    }
+
+    let leagueSchedule = roundRobin(teams)
+
+    for (let p = 0; p < leagueSchedule.length; p++) {
         console.log(leagueSchedule[p])
-      }
-      
+    }
+
 }
 
 function eliminatoriasortable() {
@@ -774,8 +808,8 @@ function eliminatoriasortable() {
         opacity: 0.9,
         items: '>*:not(.no-sort)',
         connectWith: $('.g_round:first >.g_game'),
-        start: function(event, ui) {},
-        receive: function(event, ui) {
+        start: function (event, ui) { },
+        receive: function (event, ui) {
             var item = $(ui.item);
             var sender = $(ui.sender);
             if (item.next().length > 0) {
@@ -784,7 +818,7 @@ function eliminatoriasortable() {
                 sender.append(item.prev());
             }
         },
-        stop: function(event, ui) {}
+        stop: function (event, ui) { }
     });
 }
 
@@ -801,13 +835,15 @@ function actualizar_datos_combates() {
     $('#totalcomabtes').html('Nº de combates: ' + (matches2 + matchesel))
 }
 
-$(document).on('click', '[data-guardar-puntos]', function() {
+$(document).on('click', '[data-guardar-puntos]', function () {
     var competicion_torneo_id = $(this).attr('data-guardar-puntos');
     var elementos = $(this).attr('data-inscripcion');
     var orderninscripciones = [];
-    $.each($('[data-inscripcion]'), function(i, elem) {
-        if ($(elem).attr('data-inscripcion') != '') {
-            orderninscripciones.push($(elem).attr('data-inscripcion'))
+    var orderngrupos = [];
+    $.each($('[data-inscripcion]'), function (i, elem) {
+        if ($(elem).attr('data-inscripcion') != '') {            
+            orderninscripciones.push($(elem).attr('data-inscripcion'));
+            orderngrupos.push($(elem).attr('data-grupo'))
         }
     })
     if (orderninscripciones.length > 0) {
@@ -823,6 +859,7 @@ $(document).on('click', '[data-guardar-puntos]', function() {
                 var fd = new FormData();
                 fd.append("competicion_torneo_id", competicion_torneo_id);
                 fd.append("orden_inscripciones", orderninscripciones);
+                fd.append("orden_grupos", orderngrupos);
                 fd.append("csrf_token", $('[name="csrf_token"]').val());
                 $.ajax({
                     url: base_url + 'Competiciones/guardar_orden_competicion',
@@ -830,13 +867,13 @@ $(document).on('click', '[data-guardar-puntos]', function() {
                     contentType: false,
                     processData: false,
                     data: fd
-                }).done(function(response) {
+                }).done(function (response) {
                     var response = JSON.parse(response);
                     $('[name="csrf_token"]').val(response.csrf)
                     if (response.error > 0) {
                         var errorhtml = ''
                         if (response.hasOwnProperty('error_validation')) {
-                            $.each(response.error_validation, function(i, value) {
+                            $.each(response.error_validation, function (i, value) {
                                 errorhtml += value + '<br>'
                             })
                         }
@@ -847,7 +884,7 @@ $(document).on('click', '[data-guardar-puntos]', function() {
                             icon: 'error',
                             title: 'ERROR',
                             html: errorhtml,
-                            willClose: function() {
+                            willClose: function () {
                                 if (response.hasOwnProperty('redirect')) {
                                     if (response.redirect == 'refresh') {
                                         location.reload()
@@ -863,21 +900,21 @@ $(document).on('click', '[data-guardar-puntos]', function() {
                             icon: 'success',
                             title: 'Correcto',
                             html: response.msn,
-                            willClose: function() {
+                            willClose: function () {
                                 if (response.hasOwnProperty('redirect')) {
                                     window.location.href = response.redirect
                                 }
                             }
                         })
                     }
-                }).always(function(jqXHR, textStatus) {
+                }).always(function (jqXHR, textStatus) {
                     if (textStatus != "success") {
                         swal.fire({
                             icon: 'error',
                             title: 'Ha ocurrido un error AJAX',
                             html: jqXHR.statusText,
                             timer: 5000,
-                            willClose: function() {}
+                            willClose: function () { }
                         })
                     }
                 });
@@ -888,12 +925,12 @@ $(document).on('click', '[data-guardar-puntos]', function() {
             icon: 'error',
             title: 'No hay participantes en el tablero de competición',
             timer: 3000,
-            willClose: function() {}
+            willClose: function () { }
         })
     }
 })
 
-$(document).on('click', '[data-guardar-liguilla]', function() {
+$(document).on('click', '[data-guardar-liguilla]', function () {
     swal.fire({
         icon: 'question',
         title: 'Guardar orden de competición',
@@ -906,20 +943,20 @@ $(document).on('click', '[data-guardar-liguilla]', function() {
             var competicion_torneo_id = $(this).attr('data-guardar-liguilla');
             var inscripciones_id = [];
             var matches = [];
-            $.each($('tr[data-user]'), function(i, elem) {
+            $.each($('tr[data-user]'), function (i, elem) {
                 var incripcion = {};
                 var grupo = $(elem).closest('[grupo]').attr('grupo')
-                    //grupo = grupo.toLowerCase().charCodeAt(0) - 97 + 1;
+                //grupo = grupo.toLowerCase().charCodeAt(0) - 97 + 1;
                 incripcion.grupo = grupo
                 var inscripcion_id = $(elem).attr('data-inscripcion_id');
                 incripcion.inscripcion_id = inscripcion_id;
                 inscripciones_id.push(incripcion)
             })
-            $.each($('ul[data-ncombate]'), function(i, elem) {
+            $.each($('ul[data-ncombate]'), function (i, elem) {
                 var match = {};
                 var ncombate = $(elem).attr('data-ncombate');
                 var grupo = $(elem).closest('[grupo]').attr('grupo')
-                    //grupo = grupo.toLowerCase().charCodeAt(0) - 97 + 1;
+                //grupo = grupo.toLowerCase().charCodeAt(0) - 97 + 1;
                 var ronda = $(elem).closest('[data-ronda]').attr('data-ronda');
                 var rojo = $(elem).find('[data-color="rojo"]');
                 var azul = $(elem).find('[data-color="azul"]');
@@ -940,9 +977,9 @@ $(document).on('click', '[data-guardar-liguilla]', function() {
             })
 
 
-            $.each($('.brackets .g_round'), function(i, elem_ronda) {
+            $.each($('.brackets .g_round'), function (i, elem_ronda) {
                 var ronda = i + 1;
-                $(elem_ronda).children('.g_game').each(function(m, elem) {
+                $(elem_ronda).children('.g_game').each(function (m, elem) {
                     var match = {};
                     var ncombate = matches.length + 1;
                     var grupo = 0
@@ -950,7 +987,7 @@ $(document).on('click', '[data-guardar-liguilla]', function() {
                     var inscripcion_rojo = 0
                     var user_azul = 0;
                     var inscripcion_azul = 0
-                        //if($(elem).children().length > 1){
+                    //if($(elem).children().length > 1){
                     match.ncombate = ncombate;
                     match.grupo = grupo;
                     match.ronda = ronda;
@@ -961,7 +998,7 @@ $(document).on('click', '[data-guardar-liguilla]', function() {
                     match.parent_rojo = $(elem).find(">:first-child").attr('data-user');
                     match.parent_azul = $(elem).find(">:last-child").attr('data-user');
                     matches.push(match)
-                        //}
+                    //}
                 })
             })
             var fd = new FormData();
@@ -976,13 +1013,13 @@ $(document).on('click', '[data-guardar-liguilla]', function() {
                 contentType: false,
                 processData: false,
                 data: fd
-            }).done(function(response) {
+            }).done(function (response) {
                 var response = JSON.parse(response);
                 $('[name="csrf_token"]').val(response.csrf)
                 if (response.error > 0) {
                     var errorhtml = ''
                     if (response.hasOwnProperty('error_validation')) {
-                        $.each(response.error_validation, function(i, value) {
+                        $.each(response.error_validation, function (i, value) {
                             errorhtml += value + '<br>'
                         })
                     }
@@ -993,7 +1030,7 @@ $(document).on('click', '[data-guardar-liguilla]', function() {
                         icon: 'error',
                         title: 'ERROR',
                         html: errorhtml,
-                        willClose: function() {
+                        willClose: function () {
                             if (response.hasOwnProperty('redirect')) {
                                 if (response.redirect == 'refresh') {
                                     location.reload()
@@ -1009,21 +1046,21 @@ $(document).on('click', '[data-guardar-liguilla]', function() {
                         icon: 'success',
                         title: 'Correcto',
                         html: response.msn,
-                        willClose: function() {
+                        willClose: function () {
                             if (response.hasOwnProperty('redirect')) {
                                 window.location.href = response.redirect
                             }
                         }
                     })
                 }
-            }).always(function(jqXHR, textStatus) {
+            }).always(function (jqXHR, textStatus) {
                 if (textStatus != "success") {
                     swal.fire({
                         icon: 'error',
                         title: 'Ha ocurrido un error AJAX',
                         html: jqXHR.statusText,
                         timer: 5000,
-                        willClose: function() {}
+                        willClose: function () { }
                     })
                 }
             });
@@ -1031,7 +1068,7 @@ $(document).on('click', '[data-guardar-liguilla]', function() {
     })
 })
 
-$(document).on('click', '[data-guardar-eliminatoria]', function() {
+$(document).on('click', '[data-guardar-eliminatoria]', function () {
     swal.fire({
         icon: 'question',
         title: 'Guardar el sorteo de la eliminatoria',
@@ -1045,47 +1082,43 @@ $(document).on('click', '[data-guardar-eliminatoria]', function() {
             var inscripciones_id = [];
             var matches = [];
 
-            $.each($('.brackets .g_round'), function(i, elem_ronda) {
-                    var ronda = i + 1;
-                    $(elem_ronda).children('.g_game').each(function(m, elem) {
-                        var match = {};
-                        var ncombate = matches.length + 1;
-                        var grupo = 0
-                        var user_rojo = 0;
-                        var inscripcion_rojo = 0
-                        var user_azul = 0;
-                        var inscripcion_azul = 0
-                        if (ronda > 1) {
-                            match.ncombate = ncombate;
-                            match.grupo = grupo;
-                            match.ronda = ronda;
-                            match.user_rojo = user_rojo;
-                            match.inscripcion_rojo = inscripcion_rojo;
-                            match.user_azul = user_azul;
-                            match.inscripcion_azul = inscripcion_azul;
-                            match.parent_rojo = $(elem).find(">:first-child").attr('data-user');
-                            match.parent_azul = $(elem).find(">:last-child").attr('data-user');
-                        } else {
-                            match.ncombate = ncombate;
-                            match.grupo = grupo;
-                            match.ronda = ronda;
-                            match.user_rojo = $(elem).find(">:first-child").attr('data-user');
-                            match.inscripcion_rojo = $(elem).find(">:first-child").attr('data-inscripcion_id');
-                            match.user_azul = $(elem).find(">:last-child").attr('data-user');
-                            match.inscripcion_azul = $(elem).find(">:last-child").attr('data-inscripcion_id');
-                            match.parent_rojo = 0;
-                            match.parent_azul = 0;
-                            inscripciones_id.push($(elem).find(">:first-child").attr('data-inscripcion_id'));
-                            inscripciones_id.push($(elem).find(">:last-child").attr('data-inscripcion_id'));
-                        }
+            $.each($('.brackets .g_round'), function (i, elem_ronda) {
+                var ronda = i + 1;
+                $(elem_ronda).children('.g_game').each(function (m, elem) {
+                    var match = {};
+                    var ncombate = matches.length + 1;
+                    var grupo = 0
+                    var user_rojo = 0;
+                    var inscripcion_rojo = 0
+                    var user_azul = 0;
+                    var inscripcion_azul = 0
+                    if (ronda > 1) {
+                        match.ncombate = ncombate;
+                        match.grupo = grupo;
+                        match.ronda = ronda;
+                        match.user_rojo = user_rojo;
+                        match.inscripcion_rojo = inscripcion_rojo;
+                        match.user_azul = user_azul;
+                        match.inscripcion_azul = inscripcion_azul;
+                        match.parent_rojo = $(elem).find(">:first-child").attr('data-user');
+                        match.parent_azul = $(elem).find(">:last-child").attr('data-user');
+                    } else {
+                        match.ncombate = ncombate;
+                        match.grupo = grupo;
+                        match.ronda = ronda;
+                        match.user_rojo = $(elem).find(">:first-child").attr('data-user');
+                        match.inscripcion_rojo = $(elem).find(">:first-child").attr('data-inscripcion_id');
+                        match.user_azul = $(elem).find(">:last-child").attr('data-user');
+                        match.inscripcion_azul = $(elem).find(">:last-child").attr('data-inscripcion_id');
+                        match.parent_rojo = 0;
+                        match.parent_azul = 0;
+                        inscripciones_id.push($(elem).find(">:first-child").attr('data-inscripcion_id'));
+                        inscripciones_id.push($(elem).find(">:last-child").attr('data-inscripcion_id'));
+                    }
 
-                        matches.push(match)
-                    })
+                    matches.push(match)
                 })
-                /* console.log(inscripciones_id);
-
-                 return;*/
-
+            })
 
             var fd = new FormData();
             fd.append("competicion_torneo_id", competicion_torneo_id);
@@ -1099,13 +1132,13 @@ $(document).on('click', '[data-guardar-eliminatoria]', function() {
                 contentType: false,
                 processData: false,
                 data: fd
-            }).done(function(response) {
+            }).done(function (response) {
                 var response = JSON.parse(response);
                 $('[name="csrf_token"]').val(response.csrf)
                 if (response.error > 0) {
                     var errorhtml = ''
                     if (response.hasOwnProperty('error_validation')) {
-                        $.each(response.error_validation, function(i, value) {
+                        $.each(response.error_validation, function (i, value) {
                             errorhtml += value + '<br>'
                         })
                     }
@@ -1116,7 +1149,7 @@ $(document).on('click', '[data-guardar-eliminatoria]', function() {
                         icon: 'error',
                         title: 'ERROR',
                         html: errorhtml,
-                        willClose: function() {
+                        willClose: function () {
                             if (response.hasOwnProperty('redirect')) {
                                 if (response.redirect == 'refresh') {
                                     location.reload()
@@ -1132,21 +1165,21 @@ $(document).on('click', '[data-guardar-eliminatoria]', function() {
                         icon: 'success',
                         title: 'Correcto',
                         html: response.msn,
-                        willClose: function() {
+                        willClose: function () {
                             if (response.hasOwnProperty('redirect')) {
                                 window.location.href = response.redirect
                             }
                         }
                     })
                 }
-            }).always(function(jqXHR, textStatus) {
+            }).always(function (jqXHR, textStatus) {
                 if (textStatus != "success") {
                     swal.fire({
                         icon: 'error',
                         title: 'Ha ocurrido un error AJAX',
                         html: jqXHR.statusText,
                         timer: 5000,
-                        willClose: function() {}
+                        willClose: function () { }
                     })
                 }
             });
@@ -1154,7 +1187,7 @@ $(document).on('click', '[data-guardar-eliminatoria]', function() {
     })
 })
 
-$(document).on('click', '[data-guardar-rey]', function() {
+$(document).on('click', '[data-guardar-rey]', function () {
     swal.fire({
         icon: 'question',
         title: 'Guardar orden de competición',
@@ -1167,7 +1200,7 @@ $(document).on('click', '[data-guardar-rey]', function() {
             var competicion_torneo_id = $(this).attr('data-guardar-rey');
             var inscripciones_id = [];
             var matches = [];
-            $.each($('tr[data-user]'), function(i, elem) {
+            $.each($('tr[data-user]'), function (i, elem) {
                 var incripcion = {};
                 var grupo = $(elem).closest('[grupo]').attr('grupo');
                 incripcion.grupo = grupo
@@ -1175,10 +1208,10 @@ $(document).on('click', '[data-guardar-rey]', function() {
                 incripcion.inscripcion_id = inscripcion_id;
                 inscripciones_id.push(incripcion)
             })
-           
-            $.each($('.brackets .g_round'), function(i, elem_ronda) {
+
+            $.each($('.brackets .g_round'), function (i, elem_ronda) {
                 var ronda = i + 1;
-                $(elem_ronda).children('.g_game').each(function(m, elem) {
+                $(elem_ronda).children('.g_game').each(function (m, elem) {
                     var match = {};
                     var ncombate = matches.length + 1;
                     var grupo = 0
@@ -1186,7 +1219,7 @@ $(document).on('click', '[data-guardar-rey]', function() {
                     var inscripcion_rojo = 0
                     var user_azul = 0;
                     var inscripcion_azul = 0
-                   
+
                     match.ncombate = ncombate;
                     match.grupo = grupo;
                     match.ronda = ronda;
@@ -1211,13 +1244,13 @@ $(document).on('click', '[data-guardar-rey]', function() {
                 contentType: false,
                 processData: false,
                 data: fd
-            }).done(function(response) {
+            }).done(function (response) {
                 var response = JSON.parse(response);
                 $('[name="csrf_token"]').val(response.csrf)
                 if (response.error > 0) {
                     var errorhtml = ''
                     if (response.hasOwnProperty('error_validation')) {
-                        $.each(response.error_validation, function(i, value) {
+                        $.each(response.error_validation, function (i, value) {
                             errorhtml += value + '<br>'
                         })
                     }
@@ -1228,7 +1261,7 @@ $(document).on('click', '[data-guardar-rey]', function() {
                         icon: 'error',
                         title: 'ERROR',
                         html: errorhtml,
-                        willClose: function() {
+                        willClose: function () {
                             if (response.hasOwnProperty('redirect')) {
                                 if (response.redirect == 'refresh') {
                                     location.reload()
@@ -1244,21 +1277,21 @@ $(document).on('click', '[data-guardar-rey]', function() {
                         icon: 'success',
                         title: 'Correcto',
                         html: response.msn,
-                        willClose: function() {
+                        willClose: function () {
                             if (response.hasOwnProperty('redirect')) {
                                 window.location.href = response.redirect
                             }
                         }
                     })
                 }
-            }).always(function(jqXHR, textStatus) {
+            }).always(function (jqXHR, textStatus) {
                 if (textStatus != "success") {
                     swal.fire({
                         icon: 'error',
                         title: 'Ha ocurrido un error AJAX',
                         html: jqXHR.statusText,
                         timer: 5000,
-                        willClose: function() {}
+                        willClose: function () { }
                     })
                 }
             });
@@ -1266,12 +1299,12 @@ $(document).on('click', '[data-guardar-rey]', function() {
     })
 })
 
-$(document).on('click', '#exportar_grupos', function() {
+$(document).on('click', '#exportar_grupos', function () {
     var competicion_torneo_id = $(this).attr('data-competicion_torneo_id');
     window.open(base_url + 'Competiciones/pdfdoc/' + competicion_torneo_id, '_blank');
 })
 
-$(document).ready(function() {
+$(document).ready(function () {
     tabassortable();
     dibujar_cruces_grupos();
     dibulareliminatorias();
@@ -1285,9 +1318,8 @@ $(document).ready(function() {
             method: "GET",
             contentType: false,
             processData: false,
-        }).done(function(response) {
+        }).done(function (response) {
             var response = JSON.parse(response);
-            console.log(response)
             $(".brackets").html('');
             $(".brackets").gracket({ src: response });
             eliminatoriasortable()
@@ -1296,7 +1328,7 @@ $(document).ready(function() {
     }
 })
 
-$(document).on('click', '#add_inscripcion', function() {
+$(document).on('click', '#add_inscripcion', function () {
     // enviar
     var fd = new FormData();
     fd.append("torneo_id", $('[name="torneo_id"]').val());
@@ -1311,13 +1343,13 @@ $(document).on('click', '#add_inscripcion', function() {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function(response) {
+    }).done(function (response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
+                $.each(response.error_validation, function (i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -1328,7 +1360,7 @@ $(document).on('click', '#add_inscripcion', function() {
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function() {
+                willClose: function () {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -1343,19 +1375,19 @@ $(document).on('click', '#add_inscripcion', function() {
         } else {
             window.location.reload()
         }
-    }).always(function(jqXHR, textStatus) {
+    }).always(function (jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function() {}
+                willClose: function () { }
             })
         }
     });
 })
 
-$(document).ready(function() {
+$(document).ready(function () {
     $(".select2").select2();
 });

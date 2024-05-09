@@ -362,6 +362,7 @@ class Database extends CI_Model
             case 2:
             case 3:
             case 6:
+            case 16:
                 $valoraciones = 2;
                 break;
             case 8:
@@ -429,6 +430,7 @@ class Database extends CI_Model
             $this->db->where('user_id', $user->user_id);
             $inscripcion = $this->db->get('torneos_inscripciones')->row();
             $user->inscripcion_id = $inscripcion->inscripcion_id;
+            $user->grupo = $inscripcion->grupo;
 
             $puntos = $this->getPuntosordenadosKata($competicion_torneo_id, $user->user_id);
             $user->puntos_max = (isset($puntos[0])) ? $puntos[0]->puntos : 0;
@@ -437,6 +439,25 @@ class Database extends CI_Model
             $user->puntos_max4 = (isset($puntos[3])) ? $puntos[3]->puntos : 0;
         }
 
+        usort($clasificacion, function($a, $b) {
+            $retval = $b->grupo <=> $a->grupo;
+            if ($retval == 0) {
+                $retval = $b->total <=> $a->total;
+                if ($retval == 0) {
+                    $retval = $b->puntos_max <=> $a->puntos_max;
+                    if ($retval == 0) {
+                        $retval = $b->puntos_max2 <=> $a->puntos_max2;
+                        if ($retval == 0) {
+                            $retval = $b->puntos_max3 <=> $a->puntos_max3;
+                            if ($retval == 0) {
+                                $retval = $b->puntos_max4 <=> $a->puntos_max4;
+                            }
+                        }
+                    }
+                }
+            }
+            return $retval;
+        });
 
         return $clasificacion;
     }

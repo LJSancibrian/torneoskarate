@@ -7,10 +7,28 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
-        body{
-            font-family: Arial, Helvetica, sans-serif;
+        @font-face {
+            font-family: 'Lato';
+            src: url('<?php echo FCPATH ?>assets/admin/fonts/Lato/Lato-Regular.ttf') format('truetype');  /* Formato TTF */
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'LatoBlack';
+            src: url('<?php echo FCPATH ?>assets/admin/fonts/Lato/Lato-Black.ttf') format('truetype');  /* Formato TTF */
+            font-weight: bolder;
+        }
+        @font-face {
+            font-family: 'LatoLight';
+            src: url('<?php echo FCPATH ?>assets/admin/fonts/Lato/Lato-Light.ttf') format('truetype');  /* Formato TTF */
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'Lato', Arial, Helvetica, sans-serif;
             font-size: 14px;
         }
+
         p {
             font-size: 14px;
         }
@@ -25,16 +43,17 @@
             top: -30px;
             left: 0px;
             right: 0px;
-            height: 40px;
+            height: 30px;
             text-align: center;
-            font-size: 24px;
+            font-size: 20px;
             text-transform: uppercase;
-            font-weight: 900;
-            border: 1px solid #008081;
+            font-family: 'LatoBlack', Arial, Helvetica, sans-serif;
+            font-weight: bolder;
+            border: 4px solid #008081;
             color: #008081;
-            vertical-align:middle;
+            vertical-align: middle;
         }
-        
+
         footer {
             position: fixed;
             bottom: -50px;
@@ -49,48 +68,69 @@
         .bg-secondary {
             background-color: #008081;
         }
+
         .table {
             width: 100%;
             border-collapse: collapse;
             border-spacing: 2px;
-            border: 0px solid #cccccc;
+            border: 0px dotted #008081;
+            page-break-inside: avoid;
+            margin-top: 20px; 
         }
 
         .table thead th {
             border-bottom-width: 2px;
-            font-weight: 600;
+            font-weight: bolder;
             border-color: #008081;
-            background-color: #008081;
-            color: #ffffff;
+            /*background-color: #008081;
+            color: #ffffff;*/
+            color: #008081;
+            text-transform: uppercase;
+            font-family: 'LatoBlack', Arial, Helvetica, sans-serif;
+
         }
-        .table tr.border td, .table tr.border th{
+
+        .table tr td,
+        .table tr th {
             font-size: 16px;
             border-color: #008081 !important;
-            border: 1px solid #008081;
+            border: 1px dashed #008081;
             padding: 5px 15px;
-           
             vertical-align: middle !important;
         }
-        .border-y{
-            border-top: 1px solid #008081;
-            border-bottom: 1px solid #008081;
+        .table tr th {
+            border: 4px solid #008081;
+            padding: 4px 14px;
         }
 
         h2,
         h3,
         h4,
         h5 {
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             padding-bottom: 5px;
-            padding-top: 0px;
+            padding-top: 5px;
+            font-family: 'LatoBlack', Arial, Helvetica, sans-serif;
+            font-weight: bolder;
         }
-        .page-number:before {  content: counter(page);}
-        .page_break { page-break-after: always; }
+
+        .page-number:before {
+            content: counter(page);
+        }
+
+        .page_break {
+            page-break-after: always;
+        }
+
         .page_break:last-child {
             page-break-after: avoid;
         }
-        .nopagebreak{
-            margin-bottom: 30px;
+
+        .text-vertical {
+            -webkit-transform: rotate(-90deg);
+            -moz-transform: rotate(-90deg);
+            -o-transform: rotate(-90deg);
+            transform: rotate(-90deg);
         }
     </style>
 </head>
