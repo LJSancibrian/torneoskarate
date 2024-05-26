@@ -866,6 +866,10 @@ table_competiciones = $("#table_competiciones").DataTable({
         title: "Modalidad",
         name: "Modalidad",
         data: "modalidad",
+    }, { //2
+        title: "Categoría",
+        name: "categoria",
+        data: "categoria",
     }, { //3
         title: "Género",
         name: "genero",
@@ -879,10 +883,6 @@ table_competiciones = $("#table_competiciones").DataTable({
             html = '<span class="badge badge-info">' + genero + '</span>';
             return html
         }
-    }, { //2
-        title: "Categoría",
-        name: "categoria",
-        data: "categoria",
     }, { //3 
         title: "Peso",
         name: "peso",

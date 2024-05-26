@@ -959,8 +959,8 @@ class Torneos extends CI_Controller
         $tabla  = 'torneos_competiciones';
         $campos = [
             'torneos_competiciones.modalidad',
-            'torneos_competiciones.genero',
             'torneos_competiciones.categoria',
+            'torneos_competiciones.genero',
             'torneos_competiciones.nivel',
             $tabla . '.estado',
             '(SELECT COUNT(*) FROM `torneos_inscripciones` WHERE competicion_torneo_id = torneos_competiciones.competicion_torneo_id) AS n_inscripciones',
