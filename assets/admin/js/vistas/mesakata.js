@@ -313,7 +313,8 @@ function clasificacion(table_ID) {
     fd.append("competicion_torneo_id", competicion_torneo_id);
     fd.append("csrf_token", $('[name="csrf_token"]').val());
     var urlfetch = (table_ID == 'tablakata') ? base_url + 'Competiciones/clasificacionkata' : base_url + 'Competiciones/clasificacionfinalkata';
-    var bodytable = (table_ID == 'tablakata') ? '[id^="clasificacion_competicion_"]' : '#clasificacion_final_competicion'
+    var bodytable = (table_ID == 'tablakata') ? '[id^="clasificacion_competicion_"]' : '#clasificacion_final_competicion';
+    var esFinal = (table_ID == 'tablakata') ? false : true;
     $.ajax({
         url: urlfetch,
         method: "POST",
@@ -354,7 +355,6 @@ function clasificacion(table_ID) {
                 $(bodytable).html('');
                 
                 $.each(response.clasificacion, function (i, row) {
-                    console.log(row)
                     var tr = `<tr clasificado_user="${row.user_id}" clasificado_inscripcion="${row.inscripcion_id}">
                     <td>${i + 1}</td>
                     <td class="columnfixed">${row.first_name} ${row.last_name}</td>
@@ -371,13 +371,18 @@ function clasificacion(table_ID) {
                     <td class="columnfixed">${row.first_name} ${row.last_name}</td>
                     <td>${row.nombre}</td>
                     <td>${row.total}</td>
+                    <td>${row.puntos_max}</td>
+                    <td>${row.puntos_max2}</td>
+                    <td>${row.puntos_max3}</td>
                     <td>${row.media}</td>
                     </tr>`;
 
                     var trrow = (table_ID == 'tablakata') ? tr : tr2;
-                    console.log(row)
-
-                    $('#clasificacion_competicion_'+row.grupo).append(trrow)
+                    if(table_ID == 'tablakata'){
+                        $('#clasificacion_competicion_'+row.grupo).append(trrow);
+                    }else{
+                        $('#clasificacion_final_competicion').append(trrow);
+                    }
                 })
                 setTimeout(function () {
                     $(bodytable).slideDown();

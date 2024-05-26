@@ -66,7 +66,7 @@ class Home extends CI_Controller
             $data['competicioneskata'] = $this->database->getCompeticionesTorneo($torneo->torneo_id, 'KATA');
             foreach ($data['competicioneskata'] as $key => $competicionkata) {
                 if ($competicionkata->tipo == 'puntos') {
-                    $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionFinalKata($competicionkata->competicion_torneo_id, [1, 2, 3]);
+                    $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionFinalKata($competicionkata->competicion_torneo_id);
                 } else {
                     $data['competicioneskata'][$key]->clasificacionfinal = $this->database->clasificacionGlobalKumite($competicionkata->competicion_torneo_id, [1, 2, 3]);
                 }

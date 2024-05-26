@@ -440,8 +440,8 @@ class Database extends CI_Model
         }
 
         usort($clasificacion, function($a, $b) {
-            $retval = $b->grupo <=> $a->grupo;
-            if ($retval == 0) {
+            /*$retval = $b->grupo <=> $a->grupo;
+            if ($retval == 0) {*/
                 $retval = $b->total <=> $a->total;
                 if ($retval == 0) {
                     $retval = $b->puntos_max <=> $a->puntos_max;
@@ -455,7 +455,7 @@ class Database extends CI_Model
                         }
                     }
                 }
-            }
+            /*}*/
             return $retval;
         });
 

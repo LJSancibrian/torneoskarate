@@ -691,7 +691,7 @@ class Competiciones extends CI_Controller
         $this->form_validation->set_rules('puntos', 'Puntos', 'trim|required');
         validForm();
 
-        $this->utilidades->competicionEditable(input('competicion_torneo_id'));
+        //$this->utilidades->competicionEditable(input('competicion_torneo_id'));
 
         $guardado = $this->database->actualizarPuntosKata(input('competicion_torneo_id'), input('user_id'), input('ronda'), input('juez'), input('puntos'));
         if (is_numeric($guardado)) {

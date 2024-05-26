@@ -182,6 +182,9 @@
 								<th class="columnfixed">Deportista</th>
 								<th>Equipo</th>
 								<th>Puntos</th>
+								<th>Max 1</th>
+										<th>Max.2</th>
+										<th>Max 3</th>
 								<th>Media</th>
 							</tr>
 						</thead>

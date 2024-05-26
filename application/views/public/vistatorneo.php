@@ -145,6 +145,7 @@
                                 </div>
                                 <div class="blog-slider">
                                     <div class="blog-slider__content w-100 p-0 pb-3">
+                                        
                                         <div class="row">
                                             <?php if ($torneo->tipo != 2) { ?>
                                                 <div class="col-12 col-sm-6">
