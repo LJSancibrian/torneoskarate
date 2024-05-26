@@ -28,15 +28,74 @@
         </ul>
         <div class="blog-slider">
             <div class="blog-slider__content w-100 p-0 pb-3">
-                <div class="price-title">
+                <div class="price-title d-flex justify-content-between">
                     <strong class="value p-0"><?php echo $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto'); ?></strong>
+                    <button class="btn btn-info" data-clasificacion="<?php echo $competicion->competicion_torneo_id; ?>">Ver la clasificación</button>
                 </div>
+
+                <?php $grupo = 0;
+                foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
+                    <?php if($value->grupo != $grupo){ ?>
+                        <?php if($key > 0){ ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php } 
+                        $grupo = $value->grupo; ?>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered text-center fixed2 mb-5" id="tablakata_<?=$grupo?>" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-white text-primary"></th>
+                                        <th class="bg-white text-primary">GRUPO <?=$grupo?></th>
+                                        <?php for ($i=1; $i <= $rondaspuntos; $i++) { 
+                                            echo '<th class="bg-white text-primary" colspan="3">Ronda'.$i.'</th>';
+                                        }?>
+                                        <th class="bg-white text-primary">Total</th>
+                                        <th class="bg-white text-primary">Media</th>
+                                    </tr>
+
+                                    <tr>
+                                        <th class="">#</th>
+                                        <th class="text-left columnfixed">Deportista</th>
+                                        <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+                                            <th>P1</th>
+                                            <th>P2</th>
+                                            <th>T1</th>
+                                        <?php } ?>
+                                        <th>Total</th>
+                                        <th>Media</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    <?php } ?>
+                    <tr data-user_id="<?php echo $value->user_id; ?>">
+                        <td class=""><?php echo $value->orden; ?></td>
+                        <td class="text-left text-nowrap">
+                            <?php echo $value->first_name; ?> <?php echo $value->last_name; ?>
+                        </td>
+                        <?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
+                            <td data-ronda="<?=$i?>" data-j="1"></td>
+                            <td data-ronda="<?=$i?>" data-j="2"></td>
+                            <td data-media="<?=$i?>" class="bg-success text-white">0</td>
+                        <?php } ?>
+                        <td data-total></td>
+                        <td data-media-total class="bg-primary text-white">0</td>
+                    </tr>
+                    <?php if($key == count($ordenparticipacion['ordenados']) - 1){ ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php }
+                } ?>
+
+                <?php /*
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered text-center fixed2" id="tablavistakata" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
                         <thead>
                             <tr>
                                 <th class="bg-white text-primary"></th>
-                                <th class="bg-white text-primary"> <button class="btn btn-info btn-block" data-clasificacion="<?php echo $competicion->competicion_torneo_id; ?>">Ver la clasificación</button></th>
+                                <th class="bg-white text-primary"></th>
                                 <?php for ($i=1; $i <= $rondaspuntos; $i++) { 
                                     echo '<th class="bg-white text-primary" colspan="3">Ronda'.$i.'</th>';
                                 }?>
@@ -75,6 +134,8 @@
                         </tbody>
                     </table>
                 </div>
+                */ ?>
+
                 <?php if(count($finalistas) > 0) { ?>
                     <div class="row">
                         <div class="col-lg-6">
@@ -149,20 +210,23 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table table-striped w-100">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th class="columnfixed">Deportista</th>
-                                <th>Equipo</th>
-                                <th>Puntos</th>
-                                <th>Media</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clasificacion_competicion"></tbody>
-                    </table>
-                </div>
+                <?php for ($i=1; $i <= $grupo; $i++) { ?>
+                    <div class="table-responsive">
+                        <h4>Grupo <?=$i?></h4>
+                        <table class="table table-striped w-100">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th class="columnfixed">Deportista</th>
+                                    <th>Equipo</th>
+                                    <th>Puntos</th>
+                                    <th>Media</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clasificacion_competicion_<?=$i?>"></tbody>
+                        </table>
+                    </div>
+                <?php } ?>
             </div>
         </div>
     </div>

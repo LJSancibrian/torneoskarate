@@ -39,6 +39,62 @@
 <div class="card">
     <div class="card-body">
         <h4 class="border-bottom card-title font-weight-bold mb-4 text-uppercase">Clasificación <?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;?></h4>
+
+
+        <h3>FINAL</h3>
+        <div class="table-responsive">
+			<table class="table table-striped w-100" id="clasificaionkatafinal">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th class="columnfixed">Deportista</th>
+						<th>Equipo</th>
+						<th>Puntos</th>
+						<th>Max 1</th>
+						<th>Max.2</th>
+						<th>Max 3</th>
+						<th>Media</th>
+					</tr>
+				</thead>
+				<tbody id="clasificacion_final_competicion">
+                    <?php 
+                    $finalistas = [];
+                    $class = 0;
+                    $pos = 0;
+                    $lasttotal = 0;
+                    $lastmedia = 0;
+                    foreach ($final as $key => $competidor) { 
+                        if($lasttotal != $competidor->total){
+                            $lasttotal = $competidor->total;
+                            $lastmedia = $competidor->media;
+                            $pos = $class + 1;
+                        }elseif($lastmedia != $competidor->media){
+                            $lasttotal = $competidor->total;
+                            $lastmedia = $competidor->media;
+                            $pos = $class + 1;                     
+                        }else{
+                            $lasttotal = $competidor->total;
+                            $lastmedia = $competidor->media;           
+                        }
+                        $finalistas[] = $competidor->user_id;
+                        ?>
+                            <tr>
+                                <td><?php echo $pos;?></td>
+                                <td class="columnfixed"><?php echo $competidor->first_name.' '. $competidor->last_name;?></td>
+                                <td><?php echo $competidor->nombre;?></td>
+                                <td><?php echo $competidor->total;?></td>
+                                <td><?php echo $competidor->valoraciones;?></td>
+                                <td><?php echo $competidor->media;?></td>
+                                <td><?php echo (isset($competidor->rondas[1]))?$competidor->rondas[1]->total.' / '.$competidor->rondas[1]->media:'';?></td>
+                                <td><?php echo (isset($competidor->rondas[2]))?$competidor->rondas[2]->total.' / '.$competidor->rondas[2]->media:'';?></td>
+                                <td class="bg-primary text-white"><?php echo (isset($competidor->rondas[3]))?$competidor->rondas[3]->total.' / '.$competidor->rondas[3]->media:'';?></td>
+                                
+                            </tr>
+                    <?php  $class++; } ?>
+                </tbody>
+			</table>
+		</div>
+
         <div class="table-responsive" id="tablero-competicion">
             <table class="table table-striped w-100 dataTable" id="clasificaicon">
                     <thead style="position: sticky; top: 0; z-index: 1;">
@@ -57,24 +113,23 @@
                     </thead>
                 <tbody>
                     <?php 
-                    $class = 0;
-                    $pos = 0;
                     $lasttotal = 0;
                     $lastmedia = 0;
                     foreach ($general as $key => $competidor) { 
-                        if($lasttotal != $competidor->total){
-                            $lasttotal = $competidor->total;
-                            $lastmedia = $competidor->media;
-                            $pos = $class + 1;
-                        }elseif($lastmedia != $competidor->media){
-                            $lasttotal = $competidor->total;
-                            $lastmedia = $competidor->media;
-                            $pos = $class + 1;                     
-                        }else{
-                            $lasttotal = $competidor->total;
-                            $lastmedia = $competidor->media;           
-                        }
-                        ?>
+                        if(!in_array($competidor->user_id, $finalistas)){
+                            if($lasttotal != $competidor->total){
+                                $lasttotal = $competidor->total;
+                                $lastmedia = $competidor->media;
+                                $pos = $class + 1;
+                            }elseif($lastmedia != $competidor->media){
+                                $lasttotal = $competidor->total;
+                                $lastmedia = $competidor->media;
+                                $pos = $class + 1;                     
+                            }else{
+                                $lasttotal = $competidor->total;
+                                $lastmedia = $competidor->media;           
+                            }
+                            ?>
                             <tr>
                                 <td><?php echo $pos;?></td>
                                 <td class="columnfixed"><?php echo $competidor->first_name.' '. $competidor->last_name;?></td>
@@ -87,7 +142,9 @@
                                 <td class="bg-primary text-white"><?php echo (isset($competidor->rondas[3]))?$competidor->rondas[3]->total.' / '.$competidor->rondas[3]->media:'';?></td>
                                 
                             </tr>
-                    <?php  $class++; } ?>
+                        <?php  $class++; 
+                        }
+                    } ?>
                 </tbody>
             </table>
         </div>

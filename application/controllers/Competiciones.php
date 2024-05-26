@@ -144,7 +144,10 @@ class Competiciones extends CI_Controller
         $data['competicion'] = $competicion;
         $data['tabactive'] = 'competiciones-tab';
         if($competicion->tipo == 'puntos'){
-            $data['general'] = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3, 4]);
+            $rondas_normal = $this->database->getrondaskata($competicion_torneo_id);
+            $rondas = range(1, $rondas_normal);
+            $data['general'] = $this->database->clasificacionFinalKata($competicion_torneo_id, $rondas);
+            $data['final'] = $this->database->clasificacionFinalKata($competicion_torneo_id);
             $data['view'] = ['gestion/competiciones/clasificacionkata'];
         }
         if($competicion->tipo == 'liguilla'){

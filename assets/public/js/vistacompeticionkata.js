@@ -11,7 +11,7 @@
  });*/
 
 $(document).on('click', '[data-clasificacion]', function () {
-    var competicion_torneo_id = $('#tablavistakata').attr('data-competicion');
+    var competicion_torneo_id = $('[data-competicion]').attr('data-competicion');
     var fd = new FormData();
     fd.append("competicion_torneo_id", competicion_torneo_id);
     fd.append("csrf_token", $('[name="csrf_token"]').val());
@@ -62,8 +62,7 @@ $(document).on('click', '[data-clasificacion]', function () {
                         <td>${row.total}</td>
                         <td>${row.media}</td>
                         </tr>`;
-
-                    $('#clasificacion_competicion').append(tr)
+                    $('#clasificacion_competicion_'+row.grupo).append(tr);
                 })
                 setTimeout(function () {
                     
@@ -86,7 +85,7 @@ $(document).on('click', '[data-clasificacion]', function () {
 });
 
 function obtener_puntos_kata_competicion(){
-    var competicion_torneo_id = $('#tablavistakata').attr('data-competicion');
+    var competicion_torneo_id = $('[data-competicion]').attr('data-competicion');
     var fd = new FormData();
     fd.append("competicion_torneo_id", competicion_torneo_id);
     fd.append("csrf_token", $('[name="csrf_token"]').val());
@@ -131,7 +130,6 @@ function obtener_puntos_kata_competicion(){
             var ronda = 0;
             var juez = 0;
             $.each(response.puntos, function (i, punto) {
-                console.log(punto)
                 ronda = punto.ronda;
                 juez = punto.juez;
                 user_id = punto.user_id;
