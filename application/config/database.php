@@ -70,35 +70,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | The $query_builder variables lets you determine whether or not to load
 | the query builder class.
 */
-$active_group = 'default2';
+$active_group = 'local';
 $query_builder = TRUE;
-$db['default'] = array(
+$db['local'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
+	'hostname' => 'db',
 	'username' => 'root',
-	'password' => '',
-	'database' => 'apiservices_torneos',
-	'dbdriver' => 'mysqli',
-	'dbprefix' => '',
-	'pconnect' => FALSE,
-	'db_debug' => (ENVIRONMENT !== 'production'),
-	'cache_on' => FALSE,
-	'cachedir' => '',
-	'char_set' => 'utf8',
-	'dbcollat' => 'utf8_general_ci',
-	'swap_pre' => '',
-	'encrypt' => FALSE,
-	'compress' => FALSE,
-	'stricton' => FALSE,
-	'failover' => array(),
-	'save_queries' => TRUE
-);
-
-$db['default2'] = array(
-	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '',
+	'password' => 'playoffps',
 	'database' => 'playoff',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
@@ -115,6 +93,7 @@ $db['default2'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
 $db['server'] = array(
 	'dsn'	=> '',
 	'hostname' => 'bbdd.karatepielagos.com',

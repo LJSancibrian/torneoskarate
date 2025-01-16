@@ -179,7 +179,7 @@ $(document).on('click', '#guardar-marcador', function() {
                 } else if (hantei == 'rojo'){
                     winner = user_rojo
                 } else {
-                    swal.fire({
+                    /*swal.fire({
                         icon: 'error',
                         title: 'ERROR',
                         html: 'En caso de empate, es necesario indicar un ganador. Marcar ganador por HANTEI',
@@ -187,7 +187,7 @@ $(document).on('click', '#guardar-marcador', function() {
                           
                         }
                     });
-                    return;
+                    return;*/
                 }
             }
         }

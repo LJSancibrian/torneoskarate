@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2019 - 2022, CodeIgniter Foundation
+ * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -47,7 +46,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	CodeIgniter
  * @category	Common Functions
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/userguide3/
+ * @link		https://codeigniter.com/user_guide/
  */
 
 // ------------------------------------------------------------------------
@@ -82,7 +81,8 @@ if ( ! function_exists('is_really_writable'))
 	 * Tests for file writability
 	 *
 	 * is_writable() returns TRUE on Windows servers when you really can't write to
-	 * the file, based on the read-only attribute.
+	 * the file, based on the read-only attribute. is_writable() is also unreliable
+	 * on Unix servers if safe_mode is on.
 	 *
 	 * @link	https://bugs.php.net/bug.php?id=54709
 	 * @param	string
@@ -90,8 +90,8 @@ if ( ! function_exists('is_really_writable'))
 	 */
 	function is_really_writable($file)
 	{
-		// If we're on a UNIX-like server, just is_writable()
-		if (DIRECTORY_SEPARATOR === '/')
+		// If we're on a Unix server with safe_mode off we call is_writable
+		if (DIRECTORY_SEPARATOR === '/' && (is_php('5.4') OR ! ini_get('safe_mode')))
 		{
 			return is_writable($file);
 		}
@@ -499,7 +499,6 @@ if ( ! function_exists('set_status_header'))
 			$stati = array(
 				100	=> 'Continue',
 				101	=> 'Switching Protocols',
-				103	=> 'Early Hints',
 
 				200	=> 'OK',
 				201	=> 'Created',
@@ -508,7 +507,6 @@ if ( ! function_exists('set_status_header'))
 				204	=> 'No Content',
 				205	=> 'Reset Content',
 				206	=> 'Partial Content',
-				207	=> 'Multi-Status',
 
 				300	=> 'Multiple Choices',
 				301	=> 'Moved Permanently',
@@ -517,7 +515,6 @@ if ( ! function_exists('set_status_header'))
 				304	=> 'Not Modified',
 				305	=> 'Use Proxy',
 				307	=> 'Temporary Redirect',
-				308	=> 'Permanent Redirect',
 
 				400	=> 'Bad Request',
 				401	=> 'Unauthorized',
@@ -537,13 +534,11 @@ if ( ! function_exists('set_status_header'))
 				415	=> 'Unsupported Media Type',
 				416	=> 'Requested Range Not Satisfiable',
 				417	=> 'Expectation Failed',
-				421	=> 'Misdirected Request',
 				422	=> 'Unprocessable Entity',
 				426	=> 'Upgrade Required',
 				428	=> 'Precondition Required',
 				429	=> 'Too Many Requests',
 				431	=> 'Request Header Fields Too Large',
-				451	=> 'Unavailable For Legal Reasons',
 
 				500	=> 'Internal Server Error',
 				501	=> 'Not Implemented',
@@ -570,7 +565,7 @@ if ( ! function_exists('set_status_header'))
 			return;
 		}
 
-		$server_protocol = (isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], array('HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'), TRUE))
+		$server_protocol = (isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], array('HTTP/1.0', 'HTTP/1.1', 'HTTP/2'), TRUE))
 			? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
 		header($server_protocol.' '.$code.' '.$text, TRUE, $code);
 	}
@@ -630,7 +625,7 @@ if ( ! function_exists('_error_handler'))
 
 		// If the error is fatal, the execution of the script should be stopped because
 		// errors can't be recovered from. Halting the script conforms with PHP's
-		// default error handling. See https://secure.php.net/manual/en/errorfunc.constants.php
+		// default error handling. See http://www.php.net/manual/en/errorfunc.constants.php
 		if ($is_error)
 		{
 			exit(1); // EXIT_ERROR
@@ -783,9 +778,11 @@ if ( ! function_exists('_stringify_attributes'))
 	 */
 	function _stringify_attributes($attributes, $js = FALSE)
 	{
+		$atts = NULL;
+
 		if (empty($attributes))
 		{
-			return NULL;
+			return $atts;
 		}
 
 		if (is_string($attributes))
@@ -795,7 +792,6 @@ if ( ! function_exists('_stringify_attributes'))
 
 		$attributes = (array) $attributes;
 
-		$atts = '';
 		foreach ($attributes as $key => $val)
 		{
 			$atts .= ($js) ? $key.'='.$val.',' : ' '.$key.'="'.$val.'"';

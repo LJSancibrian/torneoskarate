@@ -1,0 +1,48 @@
+services:
+  web:
+    container_name: playoff-web
+    build:
+      context: .
+    user: "www-data:www-data"
+    volumes:
+      - .:/var/www/html:rw
+      - .docker/config/apache2/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - .docker/config/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+    ports:
+      - "98:80"
+    networks:
+      - playoff-net
+  db:
+    container_name: playoff-db
+    image: mariadb:10.2
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: playoffps
+      TZ: Europe/Madrid
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - .docker/config/mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - playoff-net
+    ports:
+      - "3398:3306"
+
+  phpmyadmin:
+    container_name: playoff-phpmyadmin
+    image: phpmyadmin:latest
+    restart: always
+    networks:
+      - playoff-net
+    ports:
+      - "8898:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: playoffps
+      TZ: Europe/Madrid
+networks:
+  playoff-net: {}
+
+volumes:
+  db-data:

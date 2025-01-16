@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2019 - 2022, CodeIgniter Foundation
+ * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
@@ -45,8 +44,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Libraries
  * @category	Logging
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/userguide3/general/errors.html
+ * @link		https://codeigniter.com/user_guide/general/errors.html
  */
+#[\AllowDynamicProperties]
 class CI_Log {
 
 	/**
@@ -55,13 +55,6 @@ class CI_Log {
 	 * @var string
 	 */
 	protected $_log_path;
-
-	/**
-	 * Log filename
-	 *
-	 * @var string
-	 */
-	protected $_log_filename;
 
 	/**
 	 * File permissions
@@ -90,6 +83,13 @@ class CI_Log {
 	 * @var string
 	 */
 	protected $_date_fmt = 'Y-m-d H:i:s';
+
+	/**
+	 * Filename extension
+	 *
+	 * @var	string
+	 */
+	protected $_file_ext;
 
 	/**
 	 * Whether or not the logger can write to the log files
@@ -123,13 +123,11 @@ class CI_Log {
 	{
 		$config =& get_config();
 
-		isset(self::$func_overload) OR self::$func_overload = ( ! is_php('8.0') && extension_loaded('mbstring') && @ini_get('mbstring.func_overload'));
+		isset(self::$func_overload) OR self::$func_overload = (extension_loaded('mbstring') && ini_get('mbstring.func_overload'));
 
-		$this->_log_path = ($config['log_path'] !== '')
-			? rtrim($config['log_path'], '/\\').DIRECTORY_SEPARATOR : APPPATH.'logs'.DIRECTORY_SEPARATOR;
-
-		$this->_log_filename = (isset($config['log_filename']) && $config['log_filename'] !== '')
-			? $config['log_filename'] : 'log-'.date('Y-m-d').'.php';
+		$this->_log_path = ($config['log_path'] !== '') ? $config['log_path'] : APPPATH.'logs/';
+		$this->_file_ext = (isset($config['log_file_extension']) && $config['log_file_extension'] !== '')
+			? ltrim($config['log_file_extension'], '.') : 'php';
 
 		file_exists($this->_log_path) OR mkdir($this->_log_path, 0755, TRUE);
 
@@ -185,14 +183,14 @@ class CI_Log {
 			return FALSE;
 		}
 
-		$filepath = $this->_log_path.$this->_log_filename;
+		$filepath = $this->_log_path.'log-'.date('Y-m-d').'.'.$this->_file_ext;
 		$message = '';
 
 		if ( ! file_exists($filepath))
 		{
 			$newfile = TRUE;
 			// Only add protection to php files
-			if (substr($this->_log_filename, -3, 3) === 'php')
+			if ($this->_file_ext === 'php')
 			{
 				$message .= "<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>\n\n";
 			}
@@ -250,11 +248,11 @@ class CI_Log {
 	 * @param	string	$level 	The error level
 	 * @param	string	$date 	Formatted date string
 	 * @param	string	$message 	The log message
-	 * @return	string	Formatted log line with a new line character at the end
+	 * @return	string	Formatted log line with a new line character '\n' at the end
 	 */
 	protected function _format_line($level, $date, $message)
 	{
-		return $level.' - '.$date.' --> '.$message.PHP_EOL;
+		return $level.' - '.$date.' --> '.$message."\n";
 	}
 
 	// --------------------------------------------------------------------
@@ -286,6 +284,9 @@ class CI_Log {
 	{
 		if (self::$func_overload)
 		{
+			// mb_substr($str, $start, null, '8bit') returns an empty
+			// string on PHP 5.3
+			isset($length) OR $length = ($start >= 0 ? self::strlen($str) - $start : -$start);
 			return mb_substr($str, $start, $length, '8bit');
 		}
 

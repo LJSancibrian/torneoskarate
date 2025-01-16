@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2019 - 2022, CodeIgniter Foundation
+ * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.3.0
@@ -49,7 +48,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Drivers
  * @category	Database
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/userguide3/database/
+ * @link		https://codeigniter.com/user_guide/database/
  */
 class CI_DB_mysqli_driver extends CI_DB {
 
@@ -117,13 +116,6 @@ class CI_DB_mysqli_driver extends CI_DB {
 	 */
 	public function db_connect($persistent = FALSE)
 	{
-		// PHP 8.1 changes default error handling mode from silent to exceptions - reverse that
-		if (is_php('8.1'))
-		{
-			$mysqli_driver = new mysqli_driver();
-			$mysqli_driver->report_mode = MYSQLI_REPORT_OFF;
-		}
-
 		// Do we have a socket path?
 		if ($this->hostname[0] === '/')
 		{
@@ -223,13 +215,6 @@ class CI_DB_mysqli_driver extends CI_DB {
 				return ($this->db_debug) ? $this->display_error($message, '', TRUE) : FALSE;
 			}
 
-			if ( ! $this->_mysqli->set_charset($this->char_set))
-			{
-				log_message('error', "Database: Unable to set the configured connection charset ('{$this->char_set}').");
-				$this->_mysqli->close();
-				return ($this->db->db_debug) ? $this->display_error('db_unable_to_set_charset', $this->char_set) : FALSE;
-			}
-
 			return $this->_mysqli;
 		}
 
@@ -277,6 +262,19 @@ class CI_DB_mysqli_driver extends CI_DB {
 		}
 
 		return FALSE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Set client character set
+	 *
+	 * @param	string	$charset
+	 * @return	bool
+	 */
+	protected function _db_set_charset($charset)
+	{
+		return $this->conn_id->set_charset($charset);
 	}
 
 	// --------------------------------------------------------------------
@@ -392,7 +390,11 @@ class CI_DB_mysqli_driver extends CI_DB {
 	 */
 	protected function _escape_str($str)
 	{
-		return $this->conn_id->real_escape_string($str);
+		if ($str !== null) {
+			return $this->conn_id->real_escape_string($str);
+		} else {
+			return '';
+		}
 	}
 
 	// --------------------------------------------------------------------
@@ -431,7 +433,7 @@ class CI_DB_mysqli_driver extends CI_DB {
 	 */
 	protected function _list_tables($prefix_limit = FALSE)
 	{
-		$sql = 'SHOW TABLES FROM '.$this->_escape_char.$this->database.$this->_escape_char;
+		$sql = 'SHOW TABLES FROM '.$this->escape_identifiers($this->database);
 
 		if ($prefix_limit !== FALSE && $this->dbprefix !== '')
 		{

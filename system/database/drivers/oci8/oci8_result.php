@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2019 - 2022, CodeIgniter Foundation
+ * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
  * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.4.1
@@ -45,9 +44,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * @category	Database
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/userguide3/database/
+ * @link		https://codeigniter.com/user_guide/database/
  */
 class CI_DB_oci8_result extends CI_DB_result {
+
+	/**
+	 * Statement ID
+	 *
+	 * @var	resource
+	 */
+	public $stmt_id;
+
+	/**
+	 * Cursor ID
+	 *
+	 * @var	resource
+	 */
+	public $curs_id;
 
 	/**
 	 * Limit used flag
@@ -75,10 +88,11 @@ class CI_DB_oci8_result extends CI_DB_result {
 	{
 		parent::__construct($driver_object);
 
-		$this->result_id = $driver_object->result_id;
+		$this->stmt_id = $driver_object->stmt_id;
+		$this->curs_id = $driver_object->curs_id;
 		$this->limit_used = $driver_object->limit_used;
 		$this->commit_mode =& $driver_object->commit_mode;
-		$driver_object->result_id = FALSE;
+		$driver_object->stmt_id = FALSE;
 	}
 
 	// --------------------------------------------------------------------
@@ -90,7 +104,7 @@ class CI_DB_oci8_result extends CI_DB_result {
 	 */
 	public function num_fields()
 	{
-		$count = oci_num_fields($this->result_id);
+		$count = oci_num_fields($this->stmt_id);
 
 		// if we used a limit we subtract it
 		return ($this->limit_used) ? $count - 1 : $count;
@@ -110,7 +124,7 @@ class CI_DB_oci8_result extends CI_DB_result {
 		$field_names = array();
 		for ($c = 1, $fieldCount = $this->num_fields(); $c <= $fieldCount; $c++)
 		{
-			$field_names[] = oci_field_name($this->result_id, $c);
+			$field_names[] = oci_field_name($this->stmt_id, $c);
 		}
 		return $field_names;
 	}
@@ -130,9 +144,9 @@ class CI_DB_oci8_result extends CI_DB_result {
 		for ($c = 1, $fieldCount = $this->num_fields(); $c <= $fieldCount; $c++)
 		{
 			$F		= new stdClass();
-			$F->name	= oci_field_name($this->result_id, $c);
-			$F->type	= oci_field_type($this->result_id, $c);
-			$F->max_length	= oci_field_size($this->result_id, $c);
+			$F->name	= oci_field_name($this->stmt_id, $c);
+			$F->type	= oci_field_type($this->stmt_id, $c);
+			$F->max_length	= oci_field_size($this->stmt_id, $c);
 
 			$retval[] = $F;
 		}
@@ -154,6 +168,17 @@ class CI_DB_oci8_result extends CI_DB_result {
 			oci_free_statement($this->result_id);
 			$this->result_id = FALSE;
 		}
+
+		if (is_resource($this->stmt_id))
+		{
+			oci_free_statement($this->stmt_id);
+		}
+
+		if (is_resource($this->curs_id))
+		{
+			oci_cancel($this->curs_id);
+			$this->curs_id = NULL;
+		}
 	}
 
 	// --------------------------------------------------------------------
@@ -167,7 +192,8 @@ class CI_DB_oci8_result extends CI_DB_result {
 	 */
 	protected function _fetch_assoc()
 	{
-		return oci_fetch_assoc($this->result_id);
+		$id = ($this->curs_id) ? $this->curs_id : $this->stmt_id;
+		return oci_fetch_assoc($id);
 	}
 
 	// --------------------------------------------------------------------
@@ -182,7 +208,9 @@ class CI_DB_oci8_result extends CI_DB_result {
 	 */
 	protected function _fetch_object($class_name = 'stdClass')
 	{
-		$row = oci_fetch_object($this->result_id);
+		$row = ($this->curs_id)
+			? oci_fetch_object($this->curs_id)
+			: oci_fetch_object($this->stmt_id);
 
 		if ($class_name === 'stdClass' OR ! $row)
 		{
@@ -198,18 +226,4 @@ class CI_DB_oci8_result extends CI_DB_result {
 		return $class_name;
 	}
 
-	// --------------------------------------------------------------------
-
-	/**
-	 * Destructor
-	 *
-	 * Attempt to free remaining statement IDs.
-	 *
-	 * @see	https://github.com/bcit-ci/CodeIgniter/pull/5896
-	 * @return	void
-	 */
-	public function __destruct()
-	{
-		$this->free_result();
-	}
 }
