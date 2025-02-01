@@ -15,9 +15,11 @@
 	<input type="hidden" id="competicion_torneo_id" value="<?= $competicion->competicion_torneo_id; ?>">
 	<div class="card-header d-flex justify-content-between">
 		<div class="card-title fw-mediumbold">Tablero competición</div>
-		<a href="<?php echo base_url(); ?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id; ?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
-			<i class="fas fa-file-pdf"></i>
-		</a>
+		<?php if($this->ion_auth->in_group([1,2,3])){?>
+			<a href="<?php echo base_url(); ?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id; ?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
+				<i class="fas fa-file-pdf"></i>
+			</a>
+		<?php } ?>
 	</div>
 	<div class="card-body" id="tablero-competicion">
 		<ul class="nav nav-pills nav-secondary nav-pills-no-bd mb-3" role="tablist">
@@ -41,12 +43,12 @@
 										<thead>
 											<tr>
 												<th class="bg-white text-primary text-left columnfixed">Deportista</th>
-												<th class="bg-white text-primary">Penal.</th>
 												<th class="bg-white text-primary">V</th>
 												<th class="bg-white text-primary">E</th>
 												<th class="bg-white text-primary">D</th>
 												<th class="bg-white text-primary">Pt.F</th>
 												<th class="bg-white text-primary">Com.</th>
+												<th class="bg-white text-primary">Desem.</th>
 												<th class="bg-white text-primary">Total</th>
 											</tr>
 										</thead>
@@ -56,12 +58,13 @@
 													<td class="text-left text-nowrap columnfixed">
 														<button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button>
 													</td>
-													<td data-editable data-field="penalizaciones">0</td>
+													
 													<td data-editable data-field="victorias" data-valor="100">0</td>
 													<td data-editable data-field="empates" data-valor="50">0</td>
 													<td data-editable data-field="derrotas" data-valor="0">0</td>
 													<td data-editable data-field="puntos_favor" data-valor="1">0</td>
 													<td data-field="total_combates">0</td>
+													<td data-editable data-field="penalizaciones">0</td>
 													<td data-field="puntos_total">0</td>
 												</tr>
 											<?php } ?>
@@ -75,13 +78,15 @@
 									<table class="table table-striped table-bordered text-center w-auto" id="clasificacion_grupo_<?= $key ?>">
 										<thead>
 											<tr>
-											<th class="bg-white text-primary" colspan="9">
-												<div class="d-flex justify-content-between">
-												<h4>Clasificación </h4>
-														<button class="btn btn-primary btn-sm ml-3 mb-2" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?= $key ?>" data-toggle="tooltip" title="Confirmar clasificación y enviar clasificados a las eliminatorias">
-																<i class="fas fa-code-branch"></i> Confirmar clasificados
-															</button>
-														
+												<th class="bg-white text-primary" colspan="9">
+													<div class="d-flex justify-content-between">
+														<h4>Clasificación </h4>
+														<?php if($this->ion_auth->in_group([1,2,3])){?>
+															<button class="btn btn-primary btn-sm ml-3 mb-2" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?= $key ?>" data-toggle="tooltip" title="Confirmar clasificación y enviar clasificados a las eliminatorias">
+																	<i class="fas fa-code-branch"></i> Confirmar clasificados
+																</button>
+														<?php } ?>
+															
 													</div>
 												</th>
 											</tr>
@@ -181,16 +186,14 @@
 						<?php } ?>
 					</div>
 				</div>
-				<div class="card-header d-flex justify-content-between">
-					<div class="card-title fw-mediumbold w-100"><a data-finalizar-competicion href="<?php echo base_url(); ?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
-				</div>
+				<?php if($this->ion_auth->in_group([1,2,3])){?>
+					<div class="card-header d-flex justify-content-between">
+						<div class="card-title fw-mediumbold w-100"><a data-finalizar-competicion href="<?php echo base_url(); ?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
+					</div>
+				<?php } ?>
 				<?php $this->load->view('gestion/competiciones/marcadorauxiliar'); ?>
 			<?php } ?>
-
-
-
-
-<?php $this->load->view('gestion/competiciones/marcadorauxiliar'); ?>
+			<?php $this->load->view('gestion/competiciones/marcadorauxiliar'); ?>
 		</div>
 	</div>
 </div>

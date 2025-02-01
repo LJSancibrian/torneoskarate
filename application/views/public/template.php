@@ -1,4 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php registrar_visita();?>
 <?php $this->load->view('public/common/head'); ?>
 
 <body id="body">

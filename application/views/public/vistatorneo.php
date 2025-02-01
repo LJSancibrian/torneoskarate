@@ -15,6 +15,7 @@
                         <a class="nav-link" id="medallero-tab" data-toggle="tab" href="#medallero" role="tab" aria-controls="medallero" aria-selected="false">Medallero</a>
                     </li>
                 </ul>
+                <?php $this->load->view('public/sponsors');?>
 
                 <div class="tab-content">
                     <div class="tab-pane active" id="info" role="tabpanel" aria-labelledby="info-tab">

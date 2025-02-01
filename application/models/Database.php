@@ -596,6 +596,7 @@ class Database extends CI_Model
 
         $this->db->order_by('puntosrey.puntos_total', 'DESC');
         $this->db->order_by('puntosrey.total_combates', 'ASC');
+        $this->db->order_by('puntosrey.penalizaciones', 'DESC');
         $this->db->join('users', 'users.id = torneos_inscripciones.user_id');
         $this->db->join('clubs', 'clubs.club_id = users.club_id');
         $this->db->join('puntosrey', 'torneos_inscripciones.user_id = puntosrey.user_id', 'left');
@@ -1615,24 +1616,26 @@ class Database extends CI_Model
         foreach ($matches as $key => $value) {
             /*$deportistas_array[$value->user_rojo]->finalista++;
             $deportistas_array[$value->user_azul]->finalista++;*/
-            $deportistas_array[$value->user_rojo]->puntos_favor += $value->puntos_rojo;
-            $deportistas_array[$value->user_azul]->puntos_favor += $value->puntos_azul;
-            $deportistas_array[$value->user_rojo]->total_combates++;
-            $deportistas_array[$value->user_azul]->total_combates++;
-            $loser = ($value->winner == $value->user_rojo) ? $value->user_azul : $value->user_rojo;
-            $deportistas_array[$loser]->derrotas++;
-            $deportistas_array[$value->winner]->victorias++;
-            $deportistas_array[$value->winner]->puntos_total += 300;
-            $deportistas_array[$loser]->puntos_total += 100;
-            if($key == 0){
-                $deportistas_array[$loser]->finalista += $nummatches - 3;
-                $deportistas_array[$value->winner]->finalista += $nummatches - 2; 
-                //$deportistas_array[$value->winner]->puntos_total += $deportistas_array[$value->winner]->puntos_total; 
-            }elseif($key == 1){
-                $deportistas_array[$loser]->finalista = $nummatches - 1;
-                $deportistas_array[$value->winner]->finalista += $nummatches;
-                //$deportistas_array[$loser]->puntos_total += $deportistas_array[$loser]->puntos_total * 2;
-                //$deportistas_array[$value->winner]->puntos_total += $deportistas_array[$value->winner]->puntos_total * 3;
+            if($value->user_rojo > 0 && $value->user_azul > 0 && $value->winner > 0){
+                $deportistas_array[$value->user_rojo]->puntos_favor += $value->puntos_rojo;
+                $deportistas_array[$value->user_azul]->puntos_favor += $value->puntos_azul;
+                $deportistas_array[$value->user_rojo]->total_combates++;
+                $deportistas_array[$value->user_azul]->total_combates++;
+                $loser = ($value->winner == $value->user_rojo) ? $value->user_azul : $value->user_rojo;
+                $deportistas_array[$loser]->derrotas++;
+                $deportistas_array[$value->winner]->victorias++;
+                $deportistas_array[$value->winner]->puntos_total += 300;
+                $deportistas_array[$loser]->puntos_total += 100;
+                if($key == 0){
+                    $deportistas_array[$loser]->finalista += $nummatches - 3;
+                    $deportistas_array[$value->winner]->finalista += $nummatches - 2; 
+                    //$deportistas_array[$value->winner]->puntos_total += $deportistas_array[$value->winner]->puntos_total; 
+                }elseif($key == 1){
+                    $deportistas_array[$loser]->finalista = $nummatches - 1;
+                    $deportistas_array[$value->winner]->finalista += $nummatches;
+                    //$deportistas_array[$loser]->puntos_total += $deportistas_array[$loser]->puntos_total * 2;
+                    //$deportistas_array[$value->winner]->puntos_total += $deportistas_array[$value->winner]->puntos_total * 3;
+                }
             }
         }
 

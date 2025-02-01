@@ -26,6 +26,7 @@
                 <a class="nav-link" id="medallero-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#medallero" role="tab">Medallero</a>
             </li>
         </ul>
+        <?php $this->load->view('public/sponsors');?>
         <div class="blog-slider">
             <div class="blog-slider__content w-100 p-0 pb-3">
                 <div class="price-title d-flex justify-content-between">

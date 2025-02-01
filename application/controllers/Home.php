@@ -254,6 +254,11 @@ class Home extends CI_Controller
         show($data);
     }
 
+    public function patrocinadores(){
+        
+        $this->load->view('public/patrocinadores');
+    }
+
 
     /**************
      * 

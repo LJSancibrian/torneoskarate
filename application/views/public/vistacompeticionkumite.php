@@ -17,6 +17,7 @@
 
 <section class="pricing-table pt-0" competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
     <div class="container-fluid">
+    
         <ul class="nav nav-pills justify-content-center" id="torneotabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link" role="tab" id="info-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#info">Info</a>
@@ -28,6 +29,7 @@
                 <a class="nav-link" id="medallero-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#medallero" role="tab">Medallero</a>
             </li>
         </ul>
+        <?php $this->load->view('public/sponsors');?>
         <div class="blog-slider">
             <div class="blog-slider__content w-100 p-0">
                 <div class="price-title">

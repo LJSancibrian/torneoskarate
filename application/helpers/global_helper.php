@@ -391,3 +391,50 @@ function fechaCastellano($fecha)
     $nombreMes = str_replace($meses_EN, $meses_ES, $mes);
     return $nombredia . ", " . $numeroDia . " de " . $nombreMes . " de " . $anio;
 }
+
+if (!function_exists('registrar_visita')) {
+    function registrar_visita() {
+        $CI =& get_instance();
+        $CI->load->database();
+        $CI->load->library('user_agent'); // Cargar la librería user_agent
+
+        // Obtener datos de la visita
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        $navegador = $CI->agent->browser() ?: 'Desconocido';
+        $sistema_operativo = $CI->agent->platform() ?: 'Desconocido';
+        $dispositivo = detectar_dispositivo($user_agent);
+        $url = current_url(); // Obtiene la URL actual en CodeIgniter
+
+        // Insertar en la base de datos
+        $data = array(
+            'ip'                => $ip,
+            'user_agent'        => $user_agent,
+            'navegador'         => $navegador,
+            'sistema_operativo' => $sistema_operativo,
+            'dispositivo'       => $dispositivo,
+            'url'               => $url
+        );
+
+        $CI->db->insert('visitas', $data);
+    }
+}
+
+// Función para detectar si es un móvil, tablet o escritorio
+if (!function_exists('detectar_dispositivo')) {
+    function detectar_dispositivo($user_agent) {
+        $CI = get_instance();
+        $tablet_keywords = array('tablet', 'ipad', 'playbook', 'silk', 'kindle', 'nexus 7', 'nexus 9');
+        
+        // Si user_agent indica móvil y no es tablet, es un móvil
+        if ($CI->agent->is_mobile()) {
+            foreach ($tablet_keywords as $keyword) {
+                if (stripos($user_agent, $keyword) !== false) {
+                    return 'Tablet';
+                }
+            }
+            return 'Móvil';
+        }
+        return 'Escritorio'; // Si no es móvil ni tablet, es PC
+    }
+}

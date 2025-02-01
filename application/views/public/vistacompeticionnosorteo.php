@@ -2,6 +2,7 @@
 <input type="hidden" id="competicion_torneo_id" value="<?= $competicion->competicion_torneo_id; ?>">
 <section class="portfolio mt-3" id="portfolio">
 	<div class="container-fluid">
+	<?php $this->load->view('public/sponsors');?>
 		<div class="row ">
 			<div class="title text-center w-100">
 				<h2 class="text-uppercase"><?php echo $competicion->modalidad; ?></h2>
