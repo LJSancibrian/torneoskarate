@@ -24,12 +24,12 @@ $(document).on('focusout', '[data-editable]', function () {
     if ($(this).text() == '') {
         return;
     }
-	var tr = $(this).closest('tr');
+    var tr = $(this).closest('tr');
     var user_id = $(tr).attr('data-user_id');
     var competicion_torneo_id = $('#competicion_torneo_id').val();
     var field = $(this).attr('data-field');
     var valor = parseFloat($(this).text());
-   
+
     var fd = new FormData();
     fd.append("competicion_torneo_id", competicion_torneo_id);
     fd.append("user_id", user_id);
@@ -91,9 +91,9 @@ $(document).on('keypress', 'td[contenteditable]', function (e) {
     if (isNaN(String.fromCharCode(e.which))) e.preventDefault();
 });
 
-function cargar_puntos(){
+function cargar_puntos() {
     var competicion_torneo_id = $('#competicion_torneo_id').val();
-	var fd = new FormData();
+    var fd = new FormData();
     fd.append("competicion_torneo_id", competicion_torneo_id);
     fd.append("csrf_token", $('[name="csrf_token"]').val());
     $.ajax({
@@ -102,13 +102,13 @@ function cargar_puntos(){
         contentType: false,
         processData: false,
         data: fd
-    }).done(function(response) {
+    }).done(function (response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
+                $.each(response.error_validation, function (i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -119,7 +119,7 @@ function cargar_puntos(){
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function() {
+                willClose: function () {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -131,9 +131,9 @@ function cargar_puntos(){
             });
             return;
         } else {
-            $.each(response.deportistas, function(i, deportista) {
-                var tr = $('tr[data-user_id="'+deportista.user_id+'"]');
-				tr.find('[data-field="penalizaciones"]').html(deportista.penalizaciones)
+            $.each(response.deportistas, function (i, deportista) {
+                var tr = $('tr[data-user_id="' + deportista.user_id + '"]');
+                tr.find('[data-field="penalizaciones"]').html(deportista.penalizaciones)
                 tr.find('[data-field="victorias"]').html(deportista.victorias)
                 tr.find('[data-field="empates"]').html(deportista.empates)
                 tr.find('[data-field="derrotas"]').html(deportista.derrotas)
@@ -142,10 +142,10 @@ function cargar_puntos(){
                 tr.find('[data-field="puntos_total"]').html(deportista.puntos_total)
             })
 
-			$.each($('tbody[data-competicion_torneo_id][data-grupo]'), function(g, grupo){
-				console.log(g)
-				updateClasificacionGrupo(competicion_torneo_id, g + 1 )
-			})
+            $.each($('tbody[data-competicion_torneo_id][data-grupo]'), function (g, grupo) {
+                console.log(g)
+                updateClasificacionGrupo(competicion_torneo_id, g + 1)
+            })
         }
     }).always(function (jqXHR, textStatus) {
         if (textStatus != "success") {
@@ -171,13 +171,13 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function(response) {
+    }).done(function (response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
+                $.each(response.error_validation, function (i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -188,7 +188,7 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function() {
+                willClose: function () {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -203,7 +203,7 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
             var tbody = $('tbody[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
             tbody.slideUp();
             tbody.html('');
-            $.each(response.users, function(i, user) {
+            $.each(response.users, function (i, user) {
                 var posicion = i + 1;
                 var deportista = user.first_name + ' ' + user.last_name;
                 var club = user.nombre;
@@ -212,12 +212,12 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
                 tr += '<td>' + posicion + '</td>';
                 tr += '<td>' + deportista + '</td>';
                 tr += '<td>' + club + '</td>';
-				tr += '<td>' + user.puntos_total + '</td>';
+                tr += '<td>' + user.puntos_total + '</td>';
                 tr += '<td>' + user.victorias + '</td>';
                 tr += '<td>' + user.empates + '</td>';
                 tr += '<td>' + user.derrotas + '</td>';
                 tr += '<td>' + user.puntos_favor + '</td>';
-				tr += '<td>' + user.total_combates + '</td>';  
+                tr += '<td>' + user.total_combates + '</td>';
                 tr += '</th>';
                 tbody.append(tr);
             })
@@ -226,7 +226,7 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
             var tbodyg = $('#tablakumite_' + grupo + ' tbody[data-competicion_torneo_id="' + competicion_torneo_id + '"][data-grupo="' + grupo + '"]')
             tbodyg.slideUp();
             tbodyg.html('');
-            $.each(response.users, function(i, user) {
+            $.each(response.users, function (i, user) {
                 var posicion = i + 1;
                 var deportista = user.first_name + ' ' + user.last_name;
                 var club = user.nombre;
@@ -241,14 +241,14 @@ function updateClasificacionGrupo(competicion_torneo_id, grupo) {
             })
             tbodyg.slideDown();
         }
-    }).always(function(jqXHR, textStatus) {
+    }).always(function (jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function() {}
+                willClose: function () { }
             })
         }
     });
@@ -267,7 +267,7 @@ function dibujar_cruces_grupos() {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function(response) {
+    }).done(function (response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.data.length > 0) {
@@ -279,14 +279,14 @@ function dibujar_cruces_grupos() {
             $(".brackets").slideDown(300)
         }
 
-    }).always(function(jqXHR, textStatus) {
+    }).always(function (jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function() {}
+                willClose: function () { }
             })
         }
     });
@@ -327,7 +327,7 @@ function dibujar_cruces_grupos() {
 
 }
 
-$(document).on('click', '[data-guardar-clasificaicon]', function() {
+$(document).on('click', '[data-guardar-clasificaicon]', function () {
     var competicion_torneo_id = $(this).attr('data-guardar-clasificaicon');
     var grupo = $(this).attr('data-grupo');
     var fd = new FormData();
@@ -340,13 +340,13 @@ $(document).on('click', '[data-guardar-clasificaicon]', function() {
         contentType: false,
         processData: false,
         data: fd
-    }).done(function(response) {
+    }).done(function (response) {
         var response = JSON.parse(response);
         $('[name="csrf_token"]').val(response.csrf)
         if (response.error > 0) {
             var errorhtml = ''
             if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
+                $.each(response.error_validation, function (i, value) {
                     errorhtml += value + '<br>'
                 })
             }
@@ -357,7 +357,7 @@ $(document).on('click', '[data-guardar-clasificaicon]', function() {
                 icon: 'error',
                 title: 'ERROR',
                 html: errorhtml,
-                willClose: function() {
+                willClose: function () {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -373,7 +373,7 @@ $(document).on('click', '[data-guardar-clasificaicon]', function() {
                 icon: 'success',
                 title: 'OK',
                 html: response.msn,
-                willClose: function() {
+                willClose: function () {
                     if (response.hasOwnProperty('redirect')) {
                         if (response.redirect == 'refresh') {
                             location.reload()
@@ -386,305 +386,36 @@ $(document).on('click', '[data-guardar-clasificaicon]', function() {
             return;
         }
 
-    }).always(function(jqXHR, textStatus) {
+    }).always(function (jqXHR, textStatus) {
         if (textStatus != "success") {
             swal.fire({
                 icon: 'error',
                 title: 'Ha ocurrido un error AJAX',
                 html: jqXHR.statusText,
                 timer: 5000,
-                willClose: function() {}
+                willClose: function () { }
             })
         }
     });
 });
 
 
-
-
-
-
-// ELIMINATORIAS
-$(document).on('click', '[data-match_id]', function() {
-    var match = $(this)
-    var match_id = match.attr('data-match_id');
-    var fd = new FormData();
-    fd.append("match_id", match_id);
-    fd.append("csrf_token", $('[name="csrf_token"]').val());
-    $.ajax({
-        url: base_url + 'Competiciones/getMatch',
-        method: "POST",
-        contentType: false,
-        processData: false,
-        data: fd
-    }).done(function(response) {
-        var response = JSON.parse(response);
-        $('[name="csrf_token"]').val(response.csrf)
-        if (response.error > 0) {
-            var errorhtml = ''
-            if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
-                    errorhtml += value + '<br>'
-                })
-            }
-            if (response.hasOwnProperty('error_msn')) {
-                errorhtml += response.error_msn
-            }
-            swal.fire({
-                icon: 'error',
-                title: 'ERROR',
-                html: errorhtml,
-                willClose: function() {
-                    if (response.hasOwnProperty('redirect')) {
-                        if (response.redirect == 'refresh') {
-                            location.reload()
-                        } else {
-                            window.location.href = response.redirect
-                        }
-                    }
-                }
-            });
-            return;
-        } else {
-            //return;
-            var thismath = response.match;
-            $('#marcadorauxiliar').find('[data-match-id]').attr('data-match-id', thismath.match_id)
-            var nombre_rojo = (thismath.hasOwnProperty('rojo')) ? thismath.rojo.nombre : '';
-            var nombre_azul = (thismath.hasOwnProperty('azul')) ? thismath.azul.nombre : '';
-            $('#user_rojo').html(nombre_rojo)
-            $('#user_azul').html(nombre_azul)
-            $('#puntostotalesrojo').html(thismath.puntos_rojo)
-            $('#puntostotalesazul').html(thismath.puntos_azul)
-            $('#marcadorauxiliar [type="radio"]').prop("checked", false);
-            var senshu = '';
-            if (thismath.senshu != '') {
-                $('[name="senshu"][value="' + thismath.senshu + '"]').prop('checked', true)
-            }
-            if (thismath.hantei != '') {
-                $('[name="hantei"][value="' + thismath.hantei + '"]').prop('checked', true)
-            }
-            if (thismath.hasOwnProperty('rojo')) {
-                $('[data-match-rojo]').show();
-            } else {
-                $('[data-match-rojo]').hide();
-            }
-            if (thismath.hasOwnProperty('azul')) {
-                $('[data-match-azul]').show();
-            } else {
-                $('[data-match-azul]').hide();
-            }
-            $('#marcadorauxiliar').modal('show');
-        }
-    }).always(function(jqXHR, textStatus) {
-        if (textStatus != "success") {
-            swal.fire({
-                icon: 'error',
-                title: 'Ha ocurrido un error AJAX',
-                html: jqXHR.statusText,
-                timer: 5000,
-                willClose: function() {}
-            })
-        }
-    });
-
-
-
-    // si es ul 
-    var user_rojo = match.find('[data-user]')[0];
-    var user_azul = match.find('[data-user]')[1];
-    var user_rojo_name = $(user_rojo).children(":first").html()
-    var user_azul_name = $(user_azul).children(":first").html()
-    var user_rojo_puntos = $(user_rojo).children(":last").html()
-    var user_azul_puntos = $(user_azul).children(":last").html()
-        // si es div
-    $('#marcadorauxiliar').find('[data-match-id]').attr('data-match-id', match_id)
-    $('#user_rojo').html(user_rojo_name)
-    $('#user_azul').html(user_azul_name)
-    $('#puntostotalesrojo').html(user_rojo_puntos)
-    $('#puntostotalesazul').html(user_azul_puntos)
-    $('#marcadorauxiliar [type="tadio"]').prop("checked", false);
-    var senshu = '';
-    if ($(user_rojo).children(":last").hasClass('senshu')) {
-        var senshu = 'rojo';
-    }
-    if ($(user_azul).children(":last").hasClass('senshu')) {
-        var senshu = 'azul';
-    }
-    if (senshu != '') {
-        $('[name="senshu"][value="' + senshu + '"]').prop('checked', true)
-    }
-    var hantei = '';
-    if ($(user_rojo).children(":last").hasClass('hantei')) {
-        var hantei = 'rojo';
-    }
-    if ($(user_azul).children(":last").hasClass('hantei')) {
-        var hantei = 'azul';
-    }
-    if (hantei != '') {
-        $('[name="hantei"][value="' + hantei + '"]').prop('checked', true)
-    }
-
-    $('#marcadorauxiliar').modal('show');
-});
-
-$(document).on('click', '[data-plus]', function() {
-    var color = $(this).attr('data-plus')
-    var puntos = $('#puntostotales' + color).html()
-    var puntosnuevos = (parseFloat(puntos) + 1 < 0) ? 0 : parseFloat(puntos) + 1
-    $('#puntostotales' + color).html(puntosnuevos)
-})
-
-$(document).on('click', '[data-minus]', function() {
-    var color = $(this).attr('data-minus')
-    var puntos = $('#puntostotales' + color).html()
-    var puntosnuevos = (parseFloat(puntos) - 1 < 0) ? 0 : parseFloat(puntos) - 1
-    $('#puntostotales' + color).html(puntosnuevos)
-})
-
-$(document).on('click', '[name="senshu"]', function() {
-    var estado = $(this).prop('checked');
-    $('[name="senshu"]').prop('checked', false);
-    $(this).prop('checked', estado);
-});
-
-$(document).on('click', '[name="hantei"]', function() {
-    var estado = $(this).prop('checked');
-    $('[name="hantei"]').prop('checked', false);
-    $(this).prop('checked', estado);
-});
-
-$(document).on('click', '#guardar-marcador', function() {
-    var match_id = $('#marcadorauxiliar').find('[data-match-id]').attr('data-match-id');
-    var ul = $('[data-match_id="' + match_id + '"]');
-    var user_rojo = ul.find('[data-user]')[0];
-    user_rojo = $(user_rojo).attr('data-user');
-    var user_azul = ul.find('[data-user]')[1];
-    user_azul = $(user_azul).attr('data-user');
-    var puntos_rojo = $('#puntostotalesrojo').html()
-    var puntos_azul = $('#puntostotalesazul').html()
-    var senshu = $('[name="senshu"]:checked').val()
-    var hantei = $('[name="hantei"]:checked').val()
-    var winner = 0;
-    if (puntos_rojo - puntos_azul < 0) {
-        winner = user_azul
-    }else if (puntos_rojo - puntos_azul > 0) {
-        winner = user_rojo
-    } else if (puntos_rojo - puntos_azul == 0) {
-        if (senshu == 'rojo') {
-            winner = user_rojo
-        } else {
-            if (senshu == 'azul') {
-                winner = user_azul
-            } else {
-                if (hantei == 'azul') {
-                    winner = user_azul
-                } else if (hantei == 'rojo'){
-                    winner = user_rojo
-                } else {
-                    swal.fire({
-                        icon: 'error',
-                        title: 'ERROR',
-                        html: 'En caso de empate, es necesario indicar un ganador. Marcar ganador por HANTEI',
-                        willClose: function() {
-                          
-                        }
-                    });
-                    return;
-                }
-            }
-        }
-    }
+$(document).ready(function () {
+    cargar_puntos();
+    $('[crear_combate_rey="true"]').each(function (i, btn_crear) {
+        var competicion_torneo_id = $(btn_crear).attr('data-competicion_torneo_id');
+        var grupo = $(btn_crear).attr('data-grupo');
+        updateMatchesListGrupo(competicion_torneo_id, grupo);
+    })
     
-    var fd = new FormData();
-    fd.append("match_id", match_id);
-    fd.append("puntos_rojo", puntos_rojo);
-    fd.append("puntos_azul", puntos_azul);
-    fd.append("senshu", senshu);
-    fd.append("hantei", hantei);
-    fd.append("winner", winner);
-    fd.append("estado", 'completado');
-    fd.append("csrf_token", $('[name="csrf_token"]').val());
-    $.ajax({
-        url: base_url + 'Competiciones/updateMatch',
-        method: "POST",
-        contentType: false,
-        processData: false,
-        data: fd
-    }).done(function(response) {
-        var response = JSON.parse(response);
-        $('[name="csrf_token"]').val(response.csrf)
-        if (response.error > 0) {
-            var errorhtml = ''
-            if (response.hasOwnProperty('error_validation')) {
-                $.each(response.error_validation, function(i, value) {
-                    errorhtml += value + '<br>'
-                })
-            }
-            if (response.hasOwnProperty('error_msn')) {
-                errorhtml += response.error_msn
-            }
-            swal.fire({
-                icon: 'error',
-                title: 'ERROR',
-                html: errorhtml,
-                willClose: function() {
-                    if (response.hasOwnProperty('redirect')) {
-                        if (response.redirect == 'refresh') {
-                            location.reload()
-                        } else {
-                            window.location.href = response.redirect
-                        }
-                    }
-                }
-            });
-            return;
-        } else {
-            // actualizar el combate
-            var match = response.match
-            swal.fire({
-                icon: 'success',
-                title: 'OK',
-                html: errorhtml,
-                willClose: function() {
-                    $('#marcadorauxiliar').modal('hide');
-                    updateClasificacionGrupo(match.competicion_torneo_id, match.grupo)
-                    location.reload()
-                    if (response.hasOwnProperty('redirect')) {
-                        if (response.redirect == 'refresh') {
-                            location.reload()
-                        } else {
-                            window.location.href = response.redirect
-                        }
-                    }
-                }
-            });
-        }
-    }).always(function(jqXHR, textStatus) {
-        if (textStatus != "success") {
-            swal.fire({
-                icon: 'error',
-                title: 'Ha ocurrido un error AJAX',
-                html: jqXHR.statusText,
-                timer: 5000,
-                willClose: function() {}
-            })
-        }
-    });
-
 })
 
-
-
-$(document).ready(function() {
-	cargar_puntos();
-})
-
-$(document).on('click', '#exportar_grupos', function() {
+$(document).on('click', '#exportar_grupos', function () {
     var competicion_torneo_id = $(this).attr('data-competicion_torneo_id');
     window.open(base_url + 'Competiciones/pdfdoc/' + competicion_torneo_id, '_blank');
 })
 
-$(document).on('click', '[data-finalizar-competicion]', function(event) {
+$(document).on('click', '[data-finalizar-competicion]', function (event) {
     event.preventDefault();
     var url = $(this).attr('href');
     swal.fire({
@@ -699,3 +430,217 @@ $(document).on('click', '[data-finalizar-competicion]', function(event) {
         }
     })
 })
+
+
+$(document).on('click', '[crear_combate_rey="true"]', function () {
+    var btn = $(this);
+    var ao = $('#add_ao').val();
+    var aoText = $('#add_ao').select2('data')[0].text;
+    var aoInscripcion = $('#add_ao option:selected').attr('data-inscripcion');
+    var aka = $('#add_aka').val();
+    var akaText = $('#add_aka').select2('data')[0].text;
+    var akaInscripcion = $('#add_aka option:selected').attr('data-inscripcion');
+
+    var competicion_torneo_id = $(this).attr('data-competicion_torneo_id');
+    var grupo = $(this).attr('data-grupo');
+
+
+    swal.fire({
+        html: '¿Crear combate entre <br>' + aoText + ' (AO)<br>' + akaText + ' (AKA)?',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Crear combate',
+        cancelButtonText: 'Cerrar',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var fd = new FormData();
+            fd.append("competicion_torneo_id", competicion_torneo_id);
+            fd.append("grupo", grupo);
+            fd.append("user_rojo", aka);
+            fd.append("inscripcion_rojo", akaInscripcion);
+            fd.append("user_azul", ao);
+            fd.append("inscripcion_azul", aoInscripcion);
+            fd.append("csrf_token", $('[name="csrf_token"]').val());
+            $.ajax({
+                url: base_url + 'Competiciones/addMatch',
+                method: "POST",
+                contentType: false,
+                processData: false,
+                data: fd
+            }).done(function (response) {
+                var response = JSON.parse(response);
+                $('[name="csrf_token"]').val(response.csrf)
+                if (response.error > 0) {
+                    var errorhtml = ''
+                    if (response.hasOwnProperty('error_validation')) {
+                        $.each(response.error_validation, function (i, value) {
+                            errorhtml += value + '<br>'
+                        })
+                    }
+                    if (response.hasOwnProperty('error_msn')) {
+                        errorhtml += response.error_msn
+                    }
+                    swal.fire({
+                        icon: 'error',
+                        title: 'ERROR',
+                        html: errorhtml,
+                        willClose: function () {
+                            if (response.hasOwnProperty('redirect')) {
+                                if (response.redirect == 'refresh') {
+                                    location.reload()
+                                } else {
+                                    window.location.href = response.redirect
+                                }
+                            }
+                        }
+                    });
+                    return;
+                } else {
+                    // actualizar la lista de combates
+                    var match = response.match
+                    swal.fire({
+                        icon: 'success',
+                        title: 'OK',
+                        html: errorhtml,
+                        willClose: function () {
+                            updateMatchesListGrupo(competicion_torneo_id, grupo);
+                        }
+                    });
+                }
+            })
+        }
+    });
+});
+
+function updateMatchesListGrupo(competicion_torneo_id, grupo) {
+    var fd = new FormData();
+    fd.append("competicion_torneo_id", competicion_torneo_id);
+    fd.append("grupo", grupo);
+    fd.append("csrf_token", $('[name="csrf_token"]').val());
+    $.ajax({
+        url: base_url + 'Competiciones/getMatchesRey',
+        method: "POST",
+        contentType: false,
+        processData: false,
+        data: fd
+    }).done(function (response) {
+        var response = JSON.parse(response);
+        $('[name="csrf_token"]').val(response.csrf)
+        if (response.error > 0) {
+            var errorhtml = ''
+            if (response.hasOwnProperty('error_validation')) {
+                $.each(response.error_validation, function (i, value) {
+                    errorhtml += value + '<br>'
+                })
+            }
+            if (response.hasOwnProperty('error_msn')) {
+                errorhtml += response.error_msn
+            }
+            swal.fire({
+                icon: 'error',
+                title: 'ERROR',
+                html: errorhtml,
+                willClose: function () {
+                    if (response.hasOwnProperty('redirect')) {
+                        if (response.redirect == 'refresh') {
+                            location.reload()
+                        } else {
+                            window.location.href = response.redirect
+                        }
+                    }
+                }
+            });
+            return;
+        } else {
+            var tbody = $('#matches_rey_' + grupo).find('tbody');
+            tbody.slideUp();
+            tbody.html('');
+
+            $.each(response.matches, function (i, match) {
+                console.log(match)
+                var match_id = match.match_id
+
+                var deportista_azul = match.first_name_azul + ' '+ match.last_name_azul;
+                var club_azul = match.club_azul;
+                var puntos_azul = match.puntos_azul
+
+                var deportista_rojo = match.first_name_rojo + ' '+ match.last_name_rojo;
+                var club_rojo = match.club_rojo;
+                var puntos_rojo = match.puntos_rojo
+
+
+                var senshu_azul = '';
+                var senshu_rojo = '';
+                if (match.senshu == 'azul') {
+                    senshu_azul = 'background-color: yellow;';
+                } else if (match.senshu == 'rojo') {
+                    senshu_rojo = 'background-color: yellow;';
+                } else if (match.hantei == 'azul') {
+                    senshu_azul = 'background-color: black;';
+                } else if (match.hantei == 'rojo') {
+                    senshu_rojo = 'background-color: black;';
+                }
+
+                var row = `
+                    <tr>
+                        <td><button type="button" class="btn btn-primary px-2 py-1" style="font-size: 12px;" data-manage-match="${match_id}">${match_id}</button></td>
+                        <td style="height:40px; vertical-align:bottom; text-align: left; padding:2px 4px; color:blue; font-weight:bold;position:relative;">
+                            ${deportista_azul}<br>${club_azul}
+                            ${generateBoxes('azul', match.penalizaciones_azul)}
+                        </td>
+                        <td style="border: 1px solid blue; background-color: blue; color: #ffffff; height:40px; width: 40px;  text-align: center; font-size: 18px; position: relative;">
+                            <div style="height:10px; width:10px;border-radius: 5px; display:inline-block; position:absolute; top: 0; left: 0; ${senshu_azul}"></div>
+                            ${puntos_azul}
+                        </td>
+                        <td style="border: 1px solid red; background-color: red; color: #ffffff; height:40px; width: 40px; text-align: right; text-align: center; font-size: 18px; position: relative;">
+                            ${puntos_rojo}
+                            <div style="height:10px; width:10px; border-radius: 5px; display:inline-block; position:absolute; top: 0; rigth: 0; ${senshu_rojo}"></div>
+                        </td>
+                        <td style="height:40px; vertical-align:bottom; text-align: right; padding:2px 4px;color:red; font-weight:bold; position:relative;">
+                            ${deportista_rojo}<br>${club_rojo}
+                            ${generateBoxes('rojo', match.penalizaciones_rojo)}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge badge-info">${match.tatami}</span>
+                        </td>  
+                    </tr>
+                    <tr style="border: 0px !important">
+                        <td colspan="4" style="padding:2px;border: 0px !important"></td>
+                    </tr>
+                `;
+
+                tbody.append(row);
+            });
+
+            // Volver a mostrar con animación
+            tbody.slideDown();
+
+            // Función para generar los cuadritos dinámicamente
+            function generateBoxes(color, count, marcados) {
+                var classcss = (color == 'azul') ? 'right: 0' : 'left: 0';
+                let boxes = `<div style="position: absolute; top: 0; ${classcss}">`;
+                for (let i = 0; i < count; i++) {
+                    var marcado = '';
+                    if(marcado <= i){
+                        marcado = 'background-color: red;';
+                    }
+                    boxes += `<div style="height:5.5px; width:5px; display:block; margin: 3px; ${marcado}"></div>`;
+                }
+                boxes += `</div>`;
+                return boxes;
+            }
+
+        }
+    }).always(function (jqXHR, textStatus) {
+        if (textStatus != "success") {
+            swal.fire({
+                icon: 'error',
+                title: 'Ha ocurrido un error AJAX',
+                html: jqXHR.statusText,
+                timer: 5000,
+                willClose: function () { }
+            })
+        }
+    });
+
+}

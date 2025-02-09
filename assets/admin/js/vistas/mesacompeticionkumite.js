@@ -151,7 +151,7 @@ $(".check-female").click(function() {
     $("#female").prop("checked", true);
 });
 
-$(document).on('click', '#guardar-marcador', function() {
+$(document).on('click', '#guardar-marcador_old', function() {
     var match_id = $('#marcadorauxiliar').find('[data-match-id]').attr('data-match-id');
     var ul = $('[data-match_id="' + match_id + '"]');
     var user_rojo = ul.find('[data-user]')[0];

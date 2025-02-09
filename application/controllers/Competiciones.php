@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Competiciones extends CI_Controller
 {
-
+//ALTER TABLE `matches` ADD `penalizaciones_rojo` INT(1) NOT NULL DEFAULT '0' AFTER `puntos_azul`, ADD `penalizaciones_azul` INT(1) NOT NULL DEFAULT '0' AFTER `penalizaciones_rojo`;//
     public function __construct()
     {
         parent::__construct();
@@ -65,7 +65,7 @@ class Competiciones extends CI_Controller
         $data['competicion'] = $competicion;
         $data['ordenparticipacion'] = $this->database->inscritosOrdenCompeticion($competicion_torneo_id);
 
-        if($competicion->tipo == 'puntos'){
+        if ($competicion->tipo == 'puntos') {
             $data['view'] = ['gestion/competiciones/mesakata'];
             $data['rondaspuntos'] = $this->database->getrondaskata($competicion_torneo_id);
             $data['finalistas'] = $this->database->finalKata($competicion_torneo_id);
@@ -73,7 +73,7 @@ class Competiciones extends CI_Controller
                 assets_url() . 'admin/js/vistas/mesakata.js',
             ];
         }
-        if($competicion->tipo == 'liguilla'){
+        if ($competicion->tipo == 'liguilla') {
             $data['view'] = ['gestion/competiciones/mesaliguilla'];
             $data['tipo'] = $tipo;
             $matches = $this->database->getMatchesTree($competicion_torneo_id);
@@ -85,10 +85,11 @@ class Competiciones extends CI_Controller
                 assets_url() . 'plugins/ezcountimer/ez.countimer.js',
                 assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
                 assets_url() . 'admin/js/vistas/mesacompeticionkumite.js',
+                assets_url() . 'admin/js/vistas/marcadorauxiliar.js',
             ];
         }
 
-        if($competicion->tipo == 'eliminatoria'){
+        if ($competicion->tipo == 'eliminatoria') {
             $data['view'] = ['gestion/competiciones/mesaeliminatoria'];
             $matches = $this->database->getMatchesTree($competicion_torneo_id);
             $eliminatorias = $this->database->getEliminatoriasTree($competicion_torneo_id);
@@ -99,16 +100,17 @@ class Competiciones extends CI_Controller
                 assets_url() . 'plugins/ezcountimer/ez.countimer.js',
                 assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
                 assets_url() . 'admin/js/vistas/mesacompeticionkumite.js',
+                assets_url() . 'admin/js/vistas/marcadorauxiliar.js',
             ];
         }
 
-        if($competicion->tipo == 'rey'){
+        if ($competicion->tipo == 'rey') {
             $grupos = [];
             foreach ($data['ordenparticipacion']['ordenados'] as $key => $part) {
                 $grupos[$part->grupo][] = $part;
             }
             $data['grupos'] = $grupos;
-            
+
             $data['view'] = ['gestion/competiciones/mesarey'];
             $data['tipo'] = $tipo;
             $matches = $this->database->getMatchesTree($competicion_torneo_id);
@@ -116,10 +118,11 @@ class Competiciones extends CI_Controller
             $data['matches'] = $matches;
             $data['eliminatorias'] = $eliminatorias;
             $data['js_files']       = [
-                assets_url() . 'plugins/moment.min.js',
-                assets_url() . 'plugins/ezcountimer/ez.countimer.js',
-                assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
+                //assets_url() . 'plugins/moment.min.js',
+                //assets_url() . 'plugins/ezcountimer/ez.countimer.js',
+                //assets_url() . 'plugins/jquery.gracket/jquery.gracket.js',
                 assets_url() . 'admin/js/vistas/mesacompeticionrey.js',
+                assets_url() . 'admin/js/vistas/marcadorauxiliar.js',
             ];
         }
 
@@ -143,23 +146,23 @@ class Competiciones extends CI_Controller
         $data['torneo'] = $torneo;
         $data['competicion'] = $competicion;
         $data['tabactive'] = 'competiciones-tab';
-        if($competicion->tipo == 'puntos'){
+        if ($competicion->tipo == 'puntos') {
             $rondas_normal = $this->database->getrondaskata($competicion_torneo_id);
             $rondas = range(1, $rondas_normal);
             $data['general'] = $this->database->clasificacionFinalKata($competicion_torneo_id, $rondas);
             $data['final'] = $this->database->clasificacionFinalKata($competicion_torneo_id);
             $data['view'] = ['gestion/competiciones/clasificacionkata'];
         }
-        if($competicion->tipo == 'liguilla'){
+        if ($competicion->tipo == 'liguilla') {
             $data['clasificacion'] = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
             $data['view'] = ['gestion/competiciones/clasificacionkumite'];
         }
-        if($competicion->tipo == 'eliminatoria'){
+        if ($competicion->tipo == 'eliminatoria') {
             $data['clasificacion'] = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
             $data['view'] = ['gestion/competiciones/clasificacionkumite'];
         }
 
-        if($competicion->tipo == 'rey'){
+        if ($competicion->tipo == 'rey') {
             $data['clasificacion'] = $this->database->clasificacionGlobalRey($competicion_torneo_id);
             $data['view'] = ['gestion/competiciones/clasificacionrey'];
         }
@@ -171,20 +174,21 @@ class Competiciones extends CI_Controller
         show($data);
     }
 
-    public function eliminatoriaMatches($competicion_torneo_id){
+    public function eliminatoriaMatches($competicion_torneo_id)
+    {
         $matches = $this->database->getMatches($competicion_torneo_id);
         $rondas = [];
         foreach ($matches as $key => $match) {
             $ronda = $match->ronda;
             $array = [];
-            if($ronda > 1){
+            if ($ronda > 1) {
                 $prev = explode('|', $match->parent_rojo)[1];
-                $name = ((substr($match->parent_rojo, -1) == '-') ? 'Perdedor '.$prev : 'Ganador '.$prev);
-            }else{
-                if($match->user_rojo > 0){
+                $name = ((substr($match->parent_rojo, -1) == '-') ? 'Perdedor ' . $prev : 'Ganador ' . $prev);
+            } else {
+                if ($match->user_rojo > 0) {
                     $user = $this->ion_auth->user($match->user_rojo)->row();
-                    $name = $user->first_name.' '.$user->last_name;
-                }else{
+                    $name = $user->first_name . ' ' . $user->last_name;
+                } else {
                     $name = '';
                 }
             }
@@ -193,34 +197,33 @@ class Competiciones extends CI_Controller
                 'id' => ($ronda > 1) ? $match->parent_rojo : $match->user_rojo,
                 'inscripcion_id' => $match->inscripcion_rojo
             ];
-            $array[]=$rojo;
-            if($ronda > 1){
+            $array[] = $rojo;
+            if ($ronda > 1) {
                 $prev = explode('|', $match->parent_azul)[1];
-                $name = ((substr($match->parent_azul, -1) == '-') ? 'Perdedor '.$prev : 'Ganador '.$prev);
-            }else{
-                if($match->user_azul > 0){
+                $name = ((substr($match->parent_azul, -1) == '-') ? 'Perdedor ' . $prev : 'Ganador ' . $prev);
+            } else {
+                if ($match->user_azul > 0) {
                     $user = $this->ion_auth->user($match->user_azul)->row();
-                    $name = $user->first_name.' '.$user->last_name;
-                }else{
+                    $name = $user->first_name . ' ' . $user->last_name;
+                } else {
                     $name = '';
                 }
             }
-           
+
             $azul = [
                 'name' => $name,
                 'id' => ($ronda > 1) ? $match->parent_azul : $match->user_azul,
                 'inscripcion_id' => $match->inscripcion_azul
             ];
-            $array[]=$azul;
-           
+            $array[] = $azul;
+
             $rondas[$ronda][] = $array;
         }
         $return = [];
         foreach ($rondas as $key => $value) {
             $return[] = $value;
         }
-       echo json_encode($return);
-       
+        echo json_encode($return);
     }
 
     public function generar_tablero_competicion_tipo()
@@ -253,7 +256,7 @@ class Competiciones extends CI_Controller
         $inscripciones = $this->database->inscritosCompeticion(input('competicion_torneo_id'));
 
         // valorar si es kata o kumite
-        if(input('competicion_tipo') == 'puntos'){
+        if (input('competicion_tipo') == 'puntos') {
             if ($competicion->modalidad == 'KATA' || $competicion->modalidad == 'kata') {
                 // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
                 shuffle($inscripciones);
@@ -266,7 +269,7 @@ class Competiciones extends CI_Controller
                     'csrf'      => $this->security->get_csrf_hash(),
                 ];
                 returnAjax($response);
-            }else{
+            } else {
                 $response = [
                     'error'     => 1,
                     'error_msn' => 'La competicion por puntos solo esta disponible para la modalidad de KATA',
@@ -275,9 +278,9 @@ class Competiciones extends CI_Controller
                 returnAjax($response);
             }
         }
-        
 
-        if(input('competicion_tipo') == 'liguilla'){
+
+        if (input('competicion_tipo') == 'liguilla') {
             // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
             shuffle($inscripciones);
             $response = [
@@ -291,7 +294,7 @@ class Competiciones extends CI_Controller
             returnAjax($response);
         }
 
-        if(input('competicion_tipo') == 'eliminatoria'){
+        if (input('competicion_tipo') == 'eliminatoria') {
             // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
             shuffle($inscripciones);
             $response = [
@@ -304,7 +307,7 @@ class Competiciones extends CI_Controller
             returnAjax($response);
         }
 
-        if(input('competicion_tipo') == 'liga'){
+        if (input('competicion_tipo') == 'liga') {
             // es kata. Se ordenan de forma aleatoria las inscripciones y se retornan los valores de ronda y jueces, por si los quiere variar
             shuffle($inscripciones);
             $response = [
@@ -317,8 +320,8 @@ class Competiciones extends CI_Controller
             returnAjax($response);
         }
 
-        if(input('competicion_tipo') == 'rey'){
-            if(input('competicion_grupos') != '' && input('competicion_grupos') > 0){
+        if (input('competicion_tipo') == 'rey') {
+            if (input('competicion_grupos') != '' && input('competicion_grupos') > 0) {
                 shuffle($inscripciones);
                 $response = [
                     'error'     => 0,
@@ -329,8 +332,7 @@ class Competiciones extends CI_Controller
                     'csrf'      => $this->security->get_csrf_hash(),
                 ];
                 returnAjax($response);
-
-            }else{
+            } else {
                 $response = [
                     'error'     => 1,
                     'error_msn' => 'El número mínimo de grupos es 1',
@@ -373,8 +375,8 @@ class Competiciones extends CI_Controller
             $data['torneo'] = $torneo;
             $data['competicion'] = $competicion;
             $data['page_header']    =   $torneo->titulo . ': ' . $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->genero . ' ' . $competicion->nivel;
-        }else{
-     
+        } else {
+
             $plantilla = 'pdfcompeticionkumite';
             $matches = $this->database->getMatchesTreePdf($competicion_torneo_id);
             $grupos = [];
@@ -399,10 +401,10 @@ class Competiciones extends CI_Controller
 
     public function pdfdoccombates()
     {
-       
-            $plantilla = 'pdfcompeticionreycombates';
-            $data['page_header']    =   'Registro de combates';
-        
+
+        $plantilla = 'pdfcompeticionreycombates';
+        $data['page_header']    =   'Registro de combates';
+
 
         $this->load->library('pdf');
         $html     = $this->load->view($plantilla, $data, true);
@@ -414,17 +416,17 @@ class Competiciones extends CI_Controller
     {
         asistentePage();
         $competicion = $this->database->getCompeticion($competicion_torneo_id);
-        
+
         if (!isset($competicion) || $competicion == false) {
             show_404();
         }
         $torneo = $this->database->buscarDato('torneos', 'torneo_id', $competicion->torneo_id);
-        
+
         if (!isset($torneo) || $torneo == false || $torneo->deletedAt != '0000-00-00 00:00:00') {
             show_404();
         }
-       
-        if($competicion_torneo_id == 128){
+
+        if ($competicion_torneo_id == 128) {
             // copiar en competiciones 121 y 119
             // buscar las inscripciones y las copia
 
@@ -463,14 +465,14 @@ class Competiciones extends CI_Controller
             $this->guardarClasificacionLM(121);
             $this->guardarClasificacionLM(119);
         }
-        
+
         $this->guardarClasificacionLM($competicion_torneo_id);
         $params = [
             'estado' => 2,
             'updatedAt' => date('Y-m-d H:i:s')
         ];
         $this->database->actualizar('torneos_competiciones', $params, 'competicion_torneo_id', $competicion_torneo_id);
-        if($redirect == 'si'){
+        if ($redirect == 'si') {
             redirect('torneos/competiciones/' . $torneo->slug, 'refresh');
         }
     }
@@ -483,33 +485,32 @@ class Competiciones extends CI_Controller
         if (!isset($competicion) || $competicion == false) {
             show_404();
         }
-        
-        if($competicion->tipo == 'puntos'){
+
+        if ($competicion->tipo == 'puntos') {
             $orden = $this->database->clasificacionFinalKata($competicion_torneo_id, [1, 2, 3, 4]);
         }
-        if($competicion->tipo == 'liguilla'){
+        if ($competicion->tipo == 'liguilla') {
             $orden = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
         }
-        if($competicion->tipo == 'eliminatoria'){
+        if ($competicion->tipo == 'eliminatoria') {
             $orden = $this->database->clasificacionGlobalKumite($competicion_torneo_id);
         }
-        if($competicion->tipo == 'rey'){
+        if ($competicion->tipo == 'rey') {
             $orden = $this->database->clasificacionGlobalRey($competicion_torneo_id);
         }
         $es_iniciacion = $competicion->iniciacion;
-        
+
         $i = 1;
         foreach ($orden as $key => $value) {
             $puntos =  ($i < 9) ? $this->config->item('puntoskata')[$i] : $this->config->item('puntoskata')[0];
             if ($competicion->tipo != 'puntos') {
                 if ($competicion->tipo != 'rey') {
-                    if($es_iniciacion == 1){
+                    if ($es_iniciacion == 1) {
                         $puntos = $value->puntos + 50;
-                        
-                    }else{
+                    } else {
                         $puntos = $puntos + (5 * $value->ganados) + $value->puntos;
                     }
-                }else{
+                } else {
                     $puntosrey = [
                         0 => 50,
                         1 => 1000,
@@ -522,12 +523,12 @@ class Competiciones extends CI_Controller
                     $puntos_clasificacion = ($i < 7) ? $puntosrey[$i] : $puntosrey[0];
                     $puntos = $value->puntos_favor +  $puntos_clasificacion;
                 }
-            }else{
-                if($es_iniciacion == 1){
+            } else {
+                if ($es_iniciacion == 1) {
                     $puntos = $value->total;
                 }
             }
-            
+
             $datos = [
                 'lm' => date('Y'),
                 'user_id' => $value->user_id,
@@ -557,7 +558,7 @@ class Competiciones extends CI_Controller
             $i++;
         }
     }
-    
+
     // sorteo competicion tipo puntos
     public function guardar_orden_competicion()
     {
@@ -596,20 +597,18 @@ class Competiciones extends CI_Controller
         $orden_array = explode(',', input('orden_inscripciones'));
         $orden_grupos = explode(',', input('orden_grupos'));
         $orden = 0;
-        
+
         foreach ($orden_array as $key => $inscripcion_id) {
-            if(!isset($last_grupo)){
+            if (!isset($last_grupo)) {
                 $last_grupo = $orden_grupos[$key];
-            } 
-            if($last_grupo == $orden_grupos[$key]){
+            }
+            if ($last_grupo == $orden_grupos[$key]) {
                 $orden++;
-            }else{
+            } else {
                 $orden = 1;
                 $last_grupo = $orden_grupos[$key];
             }
             $this->database->actualizarorden(input('competicion_torneo_id'), $inscripcion_id, $orden, $orden_grupos[$key]);
-            
-            
         }
         $params = [
             'tipo' => 'puntos',
@@ -655,13 +654,13 @@ class Competiciones extends CI_Controller
         $inscripciones_id = json_decode(input('inscripciones_id'));
         $orden = 1;
         foreach ($inscripciones_id as $key => $value) {
-            if(!is_object($value)){
+            if (!is_object($value)) {
                 $grupo = 0;
                 $inscripcion_id = $value;
-            }else{
+            } else {
                 $grupo = $value->grupo;
                 $inscripcion_id = $value->inscripcion_id;
-            }   
+            }
             $this->database->actualizarorden(input('competicion_torneo_id'), $inscripcion_id, $orden, $grupo);
             $orden++;
         }
@@ -784,7 +783,7 @@ class Competiciones extends CI_Controller
         $this->form_validation->set_rules('competicion_torneo_id', 'Competición', 'trim|required');
         validForm();
 
-       
+
 
         $clasificacion = $this->database->clasificacionFinalKata(input('competicion_torneo_id'));
         $response = [
@@ -879,7 +878,74 @@ class Competiciones extends CI_Controller
         ];
         returnAjax($response);
     }
-    
+
+    // match
+    public function addMatch()
+    {
+        asistentePage();
+        isAjax();
+        $this->form_validation->set_rules('user_rojo', 'Competidor AKA', 'trim|required');
+        $this->form_validation->set_rules('inscripcion_rojo', 'Inscripcion AKA', 'trim|required');
+        $this->form_validation->set_rules('user_azul', 'Competidor AO', 'trim|required');
+        $this->form_validation->set_rules('inscripcion_azul', 'Inscripcion AO', 'trim|required');
+        $this->form_validation->set_rules('competicion_torneo_id', 'Competición ID', 'trim|required');
+        $this->form_validation->set_rules('grupo', 'Grupo ID', 'trim|required');
+        validForm();
+        
+        // buscar el nuero de combate
+        $matches_rey = $this->database->getMatchesRey(input('competicion_torneo_id'), input('grupo'));
+        $ncombate = isset($matches_rey[0]) ? $matches_rey[0]->ncombate + 1 : 1;
+        $tatami = preg_match('/(\d+)@([^@]+)/', $this->user->email, $matches) ? $matches[1] : 0;
+        $datos = [
+            'competicion_torneo_id' => input('competicion_torneo_id'),
+            'grupo' => input('grupo'),
+            'inscripcion_azul' => input('inscripcion_azul'),
+            'user_azul' => input('user_azul'),
+            'inscripcion_rojo' => input('inscripcion_rojo'),
+            'user_rojo' => input('user_rojo'),
+            'ncombate' => $ncombate,
+            'ronda' => 0,
+            'tatami' => $tatami,
+            'estado' => 'pendiente',
+        ];
+
+        $macht_id = $this->database->insert('matches', $datos);
+        if ($macht_id != FALSE) {
+            $response = [
+                'error'     => 0,
+                'match_id' => $macht_id,
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        } else {
+            $response = [
+                'error'     => 1,
+                'error_msn' => 'El combate no ha sido creado',
+                'csrf'      => $this->security->get_csrf_hash(),
+            ];
+            returnAjax($response);
+        }
+    }
+
+    // matches
+
+    public function getMatchesRey()
+    {
+        asistentePage();
+        isAjax();
+        $this->form_validation->set_rules('competicion_torneo_id', 'Competición ID', 'trim|required');
+        $this->form_validation->set_rules('grupo', 'Grupo ID', 'trim|required');
+        validForm();
+        $matches = $this->database->getMatchesRey(input('competicion_torneo_id'), input('grupo'));
+        $response = [
+            'error'     => 0,
+            'matches' => $matches,
+            'csrf'      => $this->security->get_csrf_hash(),
+        ];
+        returnAjax($response);
+        
+    }
+
     // matches
     public function getMatch()
     {
@@ -928,23 +994,31 @@ class Competiciones extends CI_Controller
         }
 
         $params = [];
-        if ($this->input->post('estado') != '') {
+        if ($this->input->post('estado') != $match->estado) {
             $params['estado'] = input('estado');
         }
-        if ($this->input->post('puntos_rojo') != '') {
+        if ($this->input->post('puntos_rojo') != $match->puntos_rojo) {
             $params['puntos_rojo'] = input('puntos_rojo');
         }
-        if ($this->input->post('puntos_azul') != '') {
+        if ($this->input->post('puntos_azul') != $match->puntos_azul) {
             $params['puntos_azul'] = input('puntos_azul');
         }
-        if ($this->input->post('senshu') != '') {
+        if ($this->input->post('senshu') != $match->senshu) {
             $params['senshu'] = input('senshu');
         }
-        if ($this->input->post('hantei') != '') {
+        if ($this->input->post('hantei') != $match->hantei) {
             $params['hantei'] = input('hantei');
         }
-        if ($this->input->post('winner') != '') {
+        if ($this->input->post('winner') != $match->winner) {
             $params['winner'] = input('winner');
+        }
+
+        if ($this->input->post('penalizaciones_rojo') != $match->penalizaciones_rojo) {
+            $params['penalizaciones_rojo'] = input('penalizaciones_rojo');
+        }
+
+        if ($this->input->post('penalizaciones_azul') != $match->penalizaciones_azul) {
+            $params['penalizaciones_azul'] = input('penalizaciones_azul');
         }
         if (count($params) < 1) {
             $response = [
@@ -1011,7 +1085,61 @@ class Competiciones extends CI_Controller
 
                     $refresh = 1;
                 }
+            }else{
+                $competicion_torneo_id= $match->competicion_torneo_id;
+                $competicion = $this->database->getCompeticion($competicion_torneo_id);
+
+                if ($competicion->tipo == 'rey') {
+                    $match_updated = $this->database->getMatch(input('match_id'));
+                
+                    $estado_anterior = $match->estado;
+                    $estado_nuevo = input('estado');
+                    $puntos_rojo_old = intval($match->puntos_rojo);
+                    $puntos_azul_old = intval($match->puntos_azul);
+                    $winner_old = intval($match->winner);
+                    $winner_new = intval($match_updated->winner);
+                
+                    $user_azul = intval($match->user_azul);
+                    $user_rojo = intval($match->user_rojo);
+                
+                    if ($estado_anterior == 'pendiente' && $estado_nuevo == 'completado') {
+                        $victoria_azul = ($winner_new == $user_azul) ? 1 : 0;
+                        $empate_azul = ($winner_new == 0) ? 1 : 0;
+                        $derrota_azul = ($winner_new == $user_rojo) ? 1 : 0;
+                
+                        $victoria_rojo = ($winner_new == $user_rojo) ? 1 : 0;
+                        $empate_rojo = ($winner_new == 0) ? 1 : 0;
+                        $derrota_rojo = ($winner_new == $user_azul) ? 1 : 0;
+                
+                        $this->database->actualizarPuntosReyAll($user_azul, intval($match_updated->puntos_azul), $victoria_azul, $empate_azul, $derrota_azul);
+                        $this->database->actualizarPuntosReyAll($user_rojo, intval($match_updated->puntos_rojo), $victoria_rojo, $empate_rojo, $derrota_rojo);
+                    } elseif ($estado_anterior == 'completado' && $estado_nuevo == 'completado') {
+                        $victoria_azul_old = ($winner_old == $user_azul) ? -1 : 0;
+                        $empate_azul_old = ($winner_old == 0) ? -1 : 0;
+                        $derrota_azul_old = ($winner_old == $user_rojo) ? -1 : 0;
+                
+                        $victoria_rojo_old = ($winner_old == $user_rojo) ? -1 : 0;
+                        $empate_rojo_old = ($winner_old == 0) ? -1 : 0;
+                        $derrota_rojo_old = ($winner_old == $user_azul) ? -1 : 0;
+                
+                        $this->database->actualizarPuntosReyAll($user_azul, -intval($puntos_azul_old), $victoria_azul_old, $empate_azul_old, $derrota_azul_old);
+                        $this->database->actualizarPuntosReyAll($user_rojo, -intval($puntos_rojo_old), $victoria_rojo_old, $empate_rojo_old, $derrota_rojo_old);
+
+                        $victoria_azul_new = ($winner_new == $user_azul) ? 1 : 0;
+                        $empate_azul_new = ($winner_new == 0) ? 1 : 0;
+                        $derrota_azul_new = ($winner_new == $user_rojo) ? 1 : 0;
+                
+                        $victoria_rojo_new = ($winner_new == $user_rojo) ? 1 : 0;
+                        $empate_rojo_new = ($winner_new == 0) ? 1 : 0;
+                        $derrota_rojo_new = ($winner_new == $user_azul) ? 1 : 0;
+                
+                        $this->database->actualizarPuntosReyAll($user_azul, intval($match_updated->puntos_azul), $victoria_azul_new, $empate_azul_new, $derrota_azul_new);
+                        $this->database->actualizarPuntosReyAll($user_rojo, intval($match_updated->puntos_rojo), $victoria_rojo_new, $empate_rojo_new, $derrota_rojo_new);
+                    }
+                }
+                
             }
+
 
             $response = [
                 'error'     => 0,
@@ -1098,14 +1226,14 @@ class Competiciones extends CI_Controller
             returnAjax($response);
         }
         $players = [];
-        if($competicion->tipo == 'liguilla'){
+        if ($competicion->tipo == 'liguilla') {
             $players = $this->database->clasificacionGrupoKumite(input('competicion_torneo_id'), input('grupo'), $competicion->iniciacion);
         }
 
-        if($competicion->tipo == 'rey'){
+        if ($competicion->tipo == 'rey') {
             $players = $this->database->clasificacionGrupoRey(input('competicion_torneo_id'), input('grupo'));
         }
-        
+
         $matches = $this->database->getEliminatoriasGrupo(input('competicion_torneo_id'), input('grupo'));
         //printr($this->db->last_query());
         $cambios = 0;
@@ -1405,9 +1533,9 @@ class Competiciones extends CI_Controller
         }
     }
 
-    
 
-    
+
+
 
     public function guardar_todas($torneo_id)
     {
@@ -1424,7 +1552,8 @@ class Competiciones extends CI_Controller
         }
     }
 
-    public function finalizar_todas_rey(){
+    public function finalizar_todas_rey()
+    {
         $this->db->where('tipo', 'rey');
         $torneos_competiciones = $this->db->get('torneos_competiciones')->result();
         foreach ($torneos_competiciones as $key => $tc) {
@@ -1432,7 +1561,8 @@ class Competiciones extends CI_Controller
         }
     }
 
-    public function finalizar_todas_torneo($torneo_id){
+    public function finalizar_todas_torneo($torneo_id)
+    {
         $this->db->where('torneo_id', $torneo_id);
         $torneos_competiciones = $this->db->get('torneos_competiciones')->result();
         foreach ($torneos_competiciones as $key => $tc) {

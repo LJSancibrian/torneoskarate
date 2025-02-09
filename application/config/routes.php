@@ -138,6 +138,8 @@ $route = [
     'eventos/calendario' => 'Eventos/calendario',
     'eventos/ver-evento/(:any)' => 'Eventos/nuevo_evento/$1',
     'eventos/editar-evento/(:any)' => 'Eventos/editar_evento/$1',
+
+    'scoreboard' => 'Home/scoreboard',
 ];
 
 

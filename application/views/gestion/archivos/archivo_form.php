@@ -3,7 +3,7 @@
 	<div class="col-md-12">
 		
 		<div class="form-group">
-			<input type="file" name="documento" accept="image/*,video/*,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="visibility: hidden;position: absolute;" text="#filearchivo">
+			<input type="file" name="documento" style="visibility: hidden;position: absolute;" text="#filearchivo">
 			<div class="input-group my-3">
 				<input type="text" class="form-control form-control-sm" disabled placeholder="Selecciona un archivo" id="filearchivo">
 				<div class="input-group-append">

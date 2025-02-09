@@ -104,7 +104,7 @@ class Archivos extends CI_Controller
         ];
         $where = [];
         if ($this->input->get('torneo_id') != '') {
-            $where['documentos.item_rel'] = 'torneos';
+            $where['documentos.item_rel'] = 'torneo';
             $where['documentos.item_id'] = $this->input->get('torneo_id');
         }
         if ($this->input->get('estado') != '') {
@@ -117,6 +117,7 @@ class Archivos extends CI_Controller
         } else {
             $result = json_decode($this->datatable->get_datatable($this->input->get(), $tabla, $join, $campos, $where, $add_rule));
         }
+        $result->last = $this->db->last_query();
         $res = json_encode($result);
         echo $res;
     }
@@ -140,7 +141,7 @@ class Archivos extends CI_Controller
         }
         if($this->input->post('archivo_id') != 'nuevo'){
             $archivo = $this->database->buscarDato('documentos', 'documento_id', input('archivo_id'));
-            if(!archivo){
+            if(!$archivo){
                 $this->session->set_flashdata('error', 'El archivo solicitado no existe.');
                 redirect($_SERVER['HTTP_REFERER'], 'refresh');
             }

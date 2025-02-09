@@ -14,13 +14,19 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between">
         <div class="card-title fw-mediumbold">Tablero competición</div>
-        <button class="btn btn-icon btn-primary btn-round btn-sm" data-ver-clasificacion data-toggle="tooltip" title="Ver clasificacion">
-            <i class="fas fa-list"></i>
-        </button>
+        <?php if ($this->ion_auth->in_group([1, 2, 3])) { ?>
+            <button class="btn btn-icon btn-primary btn-round btn-sm" data-ver-clasificacion data-toggle="tooltip" title="Ver clasificacion">
+                <i class="fas fa-list"></i>
+            </button>
+        <?php } ?>
 
-        <a href="<?php echo base_url(); ?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id; ?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
-            <i class="fas fa-file-pdf"></i>
-        </a>
+        <?php if ($this->ion_auth->in_group([1, 2, 3])) { ?>
+            <a href="<?php echo base_url(); ?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id; ?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
+                <i class="fas fa-file-pdf"></i>
+            </a>
+        <?php } ?>
+
+        <button type="button" id="toggle-marcador-btn" class="btn btn-primary float-right">Abrir marcador en segunda pantalla</button>
     </div>
 
     <div class="card-body" id="tablero-competicion">
@@ -41,9 +47,11 @@
                             <button class="btn btn-primary btn-sm ml-3 mb-2" data-ver-clasificacion data-toggle="tooltip" title="Ver clasificacion" data-grupo="<?php echo $grupo->grupo; ?>" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
                                 <i class="fas fa-list"></i> Clasificación
                             </button>
-                            <button class="btn btn-primary btn-sm ml-3 mb-2" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>" data-toggle="tooltip" title="Confirmar clasificación y enviar clasificados a las eliminatorias">
-                                <i class="fas fa-code-branch"></i> Confirmar clasificados
-                            </button>
+                            <?php if ($this->ion_auth->in_group([1, 2, 3])) { ?>
+                                <button class="btn btn-primary btn-sm ml-3 mb-2" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>" data-toggle="tooltip" title="Confirmar clasificación y enviar clasificados a las eliminatorias">
+                                    <i class="fas fa-code-branch"></i> Confirmar clasificados
+                                </button>
+                            <?php } ?>
                         </div>
                         <div class="card-body">
                             <div class="row text-center flex-nowrap" style=" overflow-x: auto;white-space: nowrap">
@@ -52,7 +60,7 @@
                                         <h4 class="bg-primary text-white p-2 mb-3">Ronda <?php echo $ronda->ronda; ?></h4>
                                         <div>
                                             <?php foreach ($ronda->matches as $match) { ?>
-                                                <ul class="list-group mb-3 p-0 btn btn-link" data-match_id="<?php echo $match->match_id; ?>">
+                                                <ul class="list-group mb-3 p-0 btn btn-link" data-manage-match="<?php echo $match->match_id; ?>">
                                                     <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: red;" data-user="<?php echo $match->user_rojo; ?>">
                                                         <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo $match->rojo->nombre; ?></span>
                                                         <span class="bg-white <?php echo ($match->hantei == 'rojo') ? 'hantei' : ''; ?> <?php echo ($match->senshu == 'rojo') ? 'senshu' : ''; ?>" style="width:25px;"><?php echo $match->puntos_rojo; ?></span>
@@ -75,11 +83,13 @@
                                         </thead>
                                         <tbody class="user" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">
                                         </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <th colspan="4" class="font-weigth-bold"><button type="button" class="btn btn-block btn-sm btn-primary" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">Guardar clasificación para eliminatorias</button></th>
-                                            </tr>
-                                        </tfoot>
+                                        <?php if ($this->ion_auth->in_group([1, 2, 3])) { ?>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="4" class="font-weigth-bold"><button type="button" class="btn btn-block btn-sm btn-primary" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">Guardar clasificación para eliminatorias</button></th>
+                                                </tr>
+                                            </tfoot>
+                                        <?php } ?>
                                     </table>
                                 </div>
                             </div>
@@ -104,9 +114,9 @@
                                 <h4 class="bg-primary text-white p-2 mb-3"><?php echo $ronda; ?></h4>
                                 <div>
                                     <?php foreach ($eliminatoria as $match) { ?>
-                                        <ul class="list-group p-0 match btn btn-link" data-match_id="<?php echo $match->match_id; ?>" <?php if ($match->user_rojo == 0 || $match->user_azul == 0) {
-                                                                                                                                            echo 'style="pointer-events: none"';
-                                                                                                                                        } ?>>
+                                        <ul class="list-group p-0 match btn btn-link" data-manage-match="<?php echo $match->match_id; ?>" <?php if ($match->user_rojo == 0 || $match->user_azul == 0) {
+                                                                                                                                                echo 'style="pointer-events: none"';
+                                                                                                                                            } ?>>
                                             <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: red;" data-user="<?php echo $match->user_rojo; ?>">
                                                 <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo (isset($match->rojo)) ? $match->rojo->nombre : ''; ?></span>
                                                 <span class="bg-white <?php echo ($match->hantei == 'rojo') ? 'hantei' : ''; ?> <?php echo ($match->senshu == 'rojo') ? 'senshu' : ''; ?>" style="width:25px;"><?php echo (isset($match->rojo)) ? $match->puntos_rojo : 0; ?></span>
@@ -128,7 +138,7 @@
                 </div>
             <?php } ?>
 
-            <?php $this->load->view('gestion/competiciones/marcadorauxiliar'); ?>
+            <?php $this->load->view('gestion/competiciones/marcadorauxiliarrey'); ?>
 
             <div class="modal fade" id="clasificaciongrupo" tabindex="-1" role="dialog" aria-labelledby="clasificaciongrupoLabel">
                 <div class="modal-dialog modal-dialog-centered modal-lg">

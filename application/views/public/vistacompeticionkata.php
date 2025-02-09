@@ -22,16 +22,20 @@
             <li class="nav-item">
                 <a class="nav-link" role="tab" id="competiciones-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#competiciones">Competiciones</a>
             </li>
+            <?php if ($competicion->iniciacion == 0) { ?>
             <li class="nav-item">
                 <a class="nav-link" id="medallero-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#medallero" role="tab">Medallero</a>
             </li>
+            <?php } ?>
         </ul>
         <?php $this->load->view('public/sponsors');?>
         <div class="blog-slider">
             <div class="blog-slider__content w-100 p-0 pb-3">
                 <div class="price-title d-flex justify-content-between">
                     <strong class="value p-0"><?php echo $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'masculino' : (($competicion->genero == 'F') ? 'femenino' : 'mixto'); ?></strong>
+                    <?php if ($competicion->iniciacion == 0) { ?>
                     <button class="btn btn-info" data-clasificacion="<?php echo $competicion->competicion_torneo_id; ?>">Ver la clasificación</button>
+                    <?php } ?>
                 </div>
 
                 <?php $grupo = 0;
@@ -52,8 +56,8 @@
                                         <?php for ($i=1; $i <= $rondaspuntos; $i++) { 
                                             echo '<th class="bg-white text-primary" colspan="3">Ronda'.$i.'</th>';
                                         }?>
-                                        <th class="bg-white text-primary">Total</th>
-                                        <th class="bg-white text-primary">Media</th>
+                                        <th class="bg-white text-primary" <?=($competicion->torneo_id == 20) ? 'style="display: none;"' :''?>>Total</th>
+                                        <th class="bg-white text-primary" <?=($competicion->torneo_id == 20) ? 'style="display: none;"' :''?>>Media</th>
                                     </tr>
 
                                     <tr>
@@ -64,8 +68,8 @@
                                             <th>P2</th>
                                             <th>T1</th>
                                         <?php } ?>
-                                        <th>Total</th>
-                                        <th>Media</th>
+                                        <th <?=($competicion->iniciacion == 0) ? 'style="display: none;"' :''?>>Total</th>
+                                        <th <?=($competicion->iniciacion == 0) ? 'style="display: none;"' :''?>>Media</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -80,8 +84,8 @@
                             <td data-ronda="<?=$i?>" data-j="2"></td>
                             <td data-media="<?=$i?>" class="bg-success text-white">0</td>
                         <?php } ?>
-                        <td data-total></td>
-                        <td data-media-total class="bg-primary text-white">0</td>
+                        <td data-total <?=($competicion->iniciacion == 0) ? 'style="display: none;"' :''?>></td>
+                        <td data-media-total class="bg-primary text-white" <?=($competicion->iniciacion == 0) ? 'style="display: none;"' :''?>>0</td>
                     </tr>
                     <?php if($key == count($ordenparticipacion['ordenados']) - 1){ ?>
                                 </tbody>

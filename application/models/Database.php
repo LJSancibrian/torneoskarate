@@ -542,6 +542,39 @@ class Database extends CI_Model
     /**
      * 
      */
+
+    public function getMatchesRey($competicion_torneo_id, $grupo = '')
+    {
+        
+        $this->db->select('
+            matches.*, 
+            user_rojo.first_name AS first_name_rojo, user_rojo.last_name AS last_name_rojo, club_rojo.nombre AS club_rojo,
+            user_azul.first_name AS first_name_azul, user_azul.last_name AS last_name_azul, club_azul.nombre AS club_azul
+        ');
+        $this->db->where('matches.deletedAt', '0000-00-00 00:00:00');
+        $this->db->where('competicion_torneo_id', $competicion_torneo_id);
+        if($grupo != ''){
+            $this->db->where('grupo', $grupo);
+        }
+        $this->db->from('matches');
+        // Unión con la tabla users (para user_rojo)
+        $this->db->join('users AS user_rojo', 'matches.user_rojo = user_rojo.id', 'left');
+        $this->db->join('clubs AS club_rojo', 'user_rojo.club_id = club_rojo.club_id', 'left');
+
+        // Unión con la tabla users (para user_azul)
+        $this->db->join('users AS user_azul', 'matches.user_azul = user_azul.id', 'left');
+        $this->db->join('clubs AS club_azul', 'user_azul.club_id = club_azul.club_id', 'left');
+
+        $this->db->order_by('ncombate', 'desc');
+        $this->db->order_by('grupo', 'asc');
+
+        // Obtener los resultados
+        $query = $this->db->get();
+        $result = $query->result();
+
+        return $result;
+    }
+
     public function actualizarPuntosRey($competicion_torneo_id, $user_id, $field, $valor)
     {
         $this->db->where('competicion_torneo_id', $competicion_torneo_id);
@@ -579,6 +612,24 @@ class Database extends CI_Model
         $this->db->update('puntosrey', $data);
         return $puntos_id;
     }
+
+    public function actualizarPuntosReyAll($user_id, $puntos, $victoria, $empate, $derrota)
+    {
+        $this->db->where('user_id', $user_id);
+        $this->db->set('puntos_favor', 'puntos_favor + ' . intval($puntos), false);
+        $this->db->set('victorias', 'victorias + ' . intval($victoria), false);
+        $this->db->set('empates', 'empates + ' . intval($empate), false);
+        $this->db->set('derrotas', 'derrotas + ' . intval($derrota), false);
+    
+        // 📢 Total de combates = victorias + empates + derrotas
+        $this->db->set('total_combates', 'victorias + empates + derrotas', false);
+    
+        // 📢 Puntos totales = (victorias * 100) + (empates * 50)
+        $this->db->set('puntos_total', '(victorias * 100) + (empates * 50)', false);
+    
+        $this->db->update('puntosrey');
+    }
+    
 
     public function clasificacionGrupoRey($competicion_torneo_id, $grupo)
     {

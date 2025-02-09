@@ -14,18 +14,18 @@
 <div class="card">
 	<div class="card-header d-flex justify-content-between">
 		<div class="card-title fw-mediumbold">Tablero competición</div>
-		<button class="btn btn-icon btn-primary btn-round btn-sm" data-ver-clasificacion data-toggle="tooltip" title="Ver clasificacion">
-			<i class="fas fa-list"></i>
-		</button>
 
-		<a href="<?php echo base_url(); ?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id; ?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
-			<i class="fas fa-file-pdf"></i>
-		</a>
+		<?php if ($this->ion_auth->in_group([1, 2, 3])) { ?>
+			<button class="btn btn-icon btn-primary btn-round btn-sm" data-ver-clasificacion data-toggle="tooltip" title="Ver clasificacion">
+				<i class="fas fa-list"></i>
+			</button>
+
+			<a href="<?php echo base_url(); ?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id; ?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
+				<i class="fas fa-file-pdf"></i>
+			</a>
+		<?php } ?>
 	</div>
 	<div class="card-body p-1 bg-white" id="tablero-competicion">
-
-
-		
 			<?php $grupo = 0;
 			foreach ($ordenparticipacion['ordenados'] as $key => $value) { ?>
 				<?php if($value->grupo != $grupo){ ?>
@@ -79,122 +79,80 @@
                     </div>
                 <?php }
 			} ?>
-
-
-			<?php /*
-			<div class="table-responsive">
-			<table class="table table-striped table-bordered text-center" id="tablakata" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
-				<thead>
-					<tr>
-						<th class="bg-white text-primary">#</th>
-						<th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
-						<?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
-							<th class="bg-white text-primary" colspan="2">Ronda <?=$i?></th>
-						<?php } ?>
-						<th class="bg-white text-primary">Total</th>
-						<th class="bg-white text-primary">Media</th>
-					</tr>
-					<tr>
-						<th class="">#</th>
-						<th colspan="2" class="text-left columnfixed">Deportista</th>
-						<?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
-							<th>J1</th>
-							<th>J2</th>
-						<?php } ?>
-						<th>Total</th>
-						<th>Media</th>
-					</tr>
-				</thead>
-				<tbody>
-					
-						<tr data-user_id="<?php echo $value->user_id; ?>">
-							<td class=""><?php echo $value->orden; ?></td>
-							<td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
-
-							<?php for ($i=1; $i <= $rondaspuntos; $i++) { ?>
-								
-								<td data-ronda="<?=$i?>" data-j="1"></td>
-								<td data-ronda="<?=$i?>" data-j="2"></td>
-								<td data-media="<?=$i?>" class="bg-success text-white d-none">0</td>
-							<?php } ?>
-
-							<td data-total></td>
-							<td data-media-total class="bg-primary text-white">0</td>
-						</tr>
-					<?php } ?>
-				</tbody>
-			</table>
-			</div>
-			*/?>
-		
 	</div>
-
-	<div class="card-header d-flex justify-content-between">
-		<div class="card-title fw-mediumbold">RONDA FINAL</div>
-		<button class="btn btn-primary btn-round btn-sm" onclick="openFullscreenWindow()"><i class="fas fa-desktop"></i> Abrir ventana en pantalla secundaria</button>
-	</div>
-
-	<div class="card-body p-1 bg-white" id="tablero-competicion-2">
-		<div class="row">
-			<div class="col-md-4">
-				<div class="table-responsive">
-					<table class="table table-striped table-bordered text-center" style="max-width:500px;" id="tablakatafinal" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
-						<thead>
-							<tr>
-								<th class="bg-white text-primary">#</th>
-								<th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
-								<th class="bg-white text-primary" colspan="3">Ronda Final</th>
-								<th class="bg-white text-primary">Total</th>
-								<th class="bg-white text-primary">Media</th>
-							</tr>
-							<tr>
-								<th class="">#</th>
-								<th colspan="2" class="text-left columnfixed">Deportista</th>
-								<th>J1</th>
-								<th>J2</th>
-								<th>J3</th>
-								<th>Total</th>
-								<th>Media</th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php foreach ($finalistas as $key => $value) { ?>
-								<tr data-user_id="<?php echo $value->user_id; ?>">
-									<td class=""><?php echo $value->orden; ?></td>
-									<td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
-									<td data-ronda="<?= $rondaspuntos + 1 ?>" data-j="1"></td>
-									<td data-ronda="<?= $rondaspuntos + 1 ?>" data-j="2"></td>
-									<td data-ronda="<?= $rondaspuntos + 1 ?>" data-j="3"></td>
-									<td data-total></td>
-									<td data-media-total class="bg-primary text-white">0</td>
-								</tr>
-							<?php } ?>
-						</tbody>
-					</table>
-				</div>
-			</div>
-			<div class="col-md-8">
-				<div class="table-responsive">
-					<table class="table table-striped w-100" id="clasificaionkatafinal">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th class="columnfixed">Deportista</th>
-								<th>Equipo</th>
-								<th>Puntos</th>
-								<th>Max 1</th>
-								<th>Max.2</th>
-								<th>Max 3</th>
-								<th>Media</th>
-							</tr>
-						</thead>
-						<tbody id="clasificacion_final_competicion"></tbody>
-					</table>
-				</div>
-			</div>
+	<?php if ($this->ion_auth->in_group([1, 2, 3])) { ?>
+		<div class="card-header d-flex justify-content-between">
+			<div class="card-title fw-mediumbold">RONDA FINAL</div>
+			<button class="btn btn-primary btn-round btn-sm" onclick="openFullscreenWindow()"><i class="fas fa-desktop"></i> Abrir ventana en pantalla secundaria</button>
 		</div>
 
-	</div>
+		<div class="card-body p-1 bg-white" id="tablero-competicion-2">
+			<div class="row">
+				<div class="col-md-4">
+					<div class="table-responsive">
+						<table class="table table-striped table-bordered text-center" style="max-width:500px;" id="tablakatafinal" data-competicion="<?php echo $competicion->competicion_torneo_id; ?>">
+							<thead>
+								<tr>
+									<th class="bg-white text-primary">#</th>
+									<th class="bg-white text-primary text-left columnfixed" colspan="2">Deportista</th>
+									<th class="bg-white text-primary" colspan="3">Ronda Final</th>
+									<th class="bg-white text-primary">Total</th>
+									<th class="bg-white text-primary">Media</th>
+								</tr>
+								<tr>
+									<th class="">#</th>
+									<th colspan="2" class="text-left columnfixed">Deportista</th>
+									<th>J1</th>
+									<th>J2</th>
+									<th>J3</th>
+									<th>Total</th>
+									<th>Media</th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach ($finalistas as $key => $value) { ?>
+									<tr data-user_id="<?php echo $value->user_id; ?>">
+										<td class=""><?php echo $value->orden; ?></td>
+										<td colspan="2" class="text-left text-nowrap columnfixed"><button type="button" class="btn btn-default p-1 rounded btn-block" data-inscripcion="<?php echo $value->inscripcion_id; ?>"><?php echo $value->first_name; ?> <?php echo $value->last_name; ?></button></td>
+										<td data-ronda="<?= $rondaspuntos + 1 ?>" data-j="1"></td>
+										<td data-ronda="<?= $rondaspuntos + 1 ?>" data-j="2"></td>
+										<td data-ronda="<?= $rondaspuntos + 1 ?>" data-j="3"></td>
+										<td data-total></td>
+										<td data-media-total class="bg-primary text-white">0</td>
+									</tr>
+								<?php } ?>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-md-8">
+					<div class="table-responsive">
+						<table class="table table-striped w-100" id="clasificaionkatafinal">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th class="columnfixed">Deportista</th>
+									<th>Equipo</th>
+									<th>Puntos</th>
+									<th>Max 1</th>
+									<th>Max.2</th>
+									<th>Max 3</th>
+									<th>Media</th>
+								</tr>
+							</thead>
+							<tbody id="clasificacion_final_competicion"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="card-header d-flex justify-content-between">
+			<div class="card-title fw-mediumbold w-100"><a data-finalizar-competicion href="<?php echo base_url(); ?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
+		</div>
+
+	<?php } ?>
 
 	<div class="modal fade" id="clasificaciongrupo" tabindex="-1" role="dialog" aria-labelledby="clasificaciongrupoLabel">
 		<div class="modal-dialog modal-dialog-centered modal-lg">
@@ -243,11 +201,6 @@
 			</div>
 		</div>
 	</div>
-
-	<div class="card-header d-flex justify-content-between">
-		<div class="card-title fw-mediumbold w-100"><a data-finalizar-competicion href="<?php echo base_url(); ?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
-	</div>
-
 
 </div>
 

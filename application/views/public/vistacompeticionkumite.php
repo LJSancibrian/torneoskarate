@@ -4,11 +4,13 @@
         <div class="row ">
             <div class="title text-center w-100">
                 <h2 class="text-uppercase"><?php echo $competicion->modalidad; ?></h2>
+                <?php if($competicion->torneo_id <> 20){?>
                 <?php if ($competicion->tipo == 'liguilla') { ?>
                     <p>Fase inicial de grupos y fase eliminatoria con los clasificados de cada grupo.</p>
                 <?php } else { ?>
                     <p>Competición eliminatoria. El ganador pasa a la siguiente ronda.</p>
                 <?php  } ?>
+                <?php } ?>
                 <div class="border"></div>
             </div>
         </div>
@@ -25,9 +27,11 @@
             <li class="nav-item">
                 <a class="nav-link" role="tab" id="competiciones-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#competiciones">Competiciones</a>
             </li>
+            <?php if ($competicion->iniciacion == 0) { ?>
             <li class="nav-item">
                 <a class="nav-link" id="medallero-tab" href="<?php echo base_url(); ?>torneo/<?php echo $torneo->slug; ?>#medallero" role="tab">Medallero</a>
             </li>
+            <?php } ?>
         </ul>
         <?php $this->load->view('public/sponsors');?>
         <div class="blog-slider">
@@ -109,6 +113,7 @@
                 <?php } ?>
 
                 <?php if (count($eliminatorias) > 0) { ?>
+                    <?php if ($competicion->iniciacion == 0) { ?>
                     <div class="service-item p-3 mb-3">
                         <h4>Eliminatorias</h4>
                         <div class="row">
@@ -156,9 +161,10 @@
                             <?php } ?>
                         </div>
                     </div>
+                    <?php } ?>
                 <?php } ?>
 
-                <?php if ($competicion->iniciacion == 1) { ?>
+                <?php if ($competicion->iniciacion == 0) { ?>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered text-center w-100 fixed2" id="tablakumite_iniciacion">
                             <thead class="bg-primary text-white">

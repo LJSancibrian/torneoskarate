@@ -25,7 +25,7 @@
 
 
                 <div class="table-responsive">
-                    <table class="table table-sortable w-100" id="tabla_archivos" default="<?php echo $torneo->torneo_id;?>"></table>
+                    <table class="table table-sortable w-100" id="tabla_archivos" data-default="<?php echo $torneo->torneo_id;?>"></table>
                 </div>
             </div>
         </div>

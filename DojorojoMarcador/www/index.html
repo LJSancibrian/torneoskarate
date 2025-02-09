@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>Mi App Cordova</title>
+        <script src="cordova.js"></script>
+    </head>
+
+    <body>
+        <h1>¡Hola, Cordova!</h1>
+        <button id="mostrar_segunda_pantalla">Abrir en Segunda Pantalla</button>
+
+        <script>
+            document.addEventListener("deviceready", async function () {
+    console.log("Cordova está listo.");
+
+    if ('getScreens' in navigator) {
+        try {
+            const screens = await navigator.getScreens();
+            console.log("Pantallas detectadas:", screens.length);
+            if (screens.length > 1) {
+                console.log("✅ Segunda pantalla detectada.");
+            } else {
+                console.log("❌ Solo hay una pantalla.");
+            }
+        } catch (error) {
+            console.error("❌ Error al obtener pantallas:", error);
+        }
+    } else {
+        console.log("⚠️ Este dispositivo no soporta `navigator.getScreens()`.");
+    }
+});
+
+        </script>
+    </body>
+
+</html>

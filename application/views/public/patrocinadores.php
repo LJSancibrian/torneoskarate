@@ -7,6 +7,9 @@
 	<title>Sponsors Image Slider</title>
 	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/public/plugins/bootstrap/css/bootstrap.min.css">
 	<style>
+        html {
+            cursor: none;
+        }
 		* {
 			margin: 0;
 			padding: 0;

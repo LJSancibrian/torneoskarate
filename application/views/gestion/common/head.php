@@ -54,6 +54,9 @@
 	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/DataTables/datatables.min.css">
 	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/sweetalert2/dist/sweetalert2.min.css">
 	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/datepicker/tempusdominus-bootstrap-4.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2/css/select2.min.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2/css/select2-bootstrap.min.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/select2/css/custom.css">
 	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/animate/animate.css">
 
 	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/admin/dist/secore.min.css">

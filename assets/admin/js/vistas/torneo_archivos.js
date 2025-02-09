@@ -69,9 +69,9 @@ tabla_archivos = $("#tabla_archivos").DataTable({
         type: "GET",
         datatype: "json",
         data: function (data) {
-            var archivo_id = $("#tabla_archivos").data('default');
-            if (archivo_id != '') {
-                data.archivo_id = archivo_id;
+            var torneo_id = $("#tabla_archivos").data('default');
+            if (torneo_id != '') {
+                data.torneo_id = torneo_id;
             }
             var estado = $('[name="f_estado"]').val();
             console.log(estado);

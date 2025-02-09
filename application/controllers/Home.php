@@ -259,6 +259,10 @@ class Home extends CI_Controller
         $this->load->view('public/patrocinadores');
     }
 
+    public function scoreboard(){
+        $this->load->view('gestion/torneos/scoreboard');
+    }
+
 
     /**************
      * 

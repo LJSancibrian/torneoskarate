@@ -21,6 +21,8 @@
         <a href="<?php echo base_url(); ?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id; ?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
             <i class="fas fa-file-pdf"></i>
         </a>
+
+        <button type="button" id="toggle-marcador-btn" class="btn btn-primary float-right">Abrir marcador en segunda pantalla</button>
     </div>
 
     <div id="faseeliminatoria" competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
@@ -38,7 +40,7 @@
                     <h4 class="bg-primary text-white p-2 mb-3"><?php echo $ronda; ?></h4>
                     <div>
                         <?php foreach ($eliminatoria as $match) { ?>
-                            <ul class="list-group p-0 match btn btn-link" data-match_id="<?php echo $match->match_id; ?>">
+                            <ul class="list-group p-0 match btn btn-link" data-manage-match="<?php echo $match->match_id; ?>">
                                 <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: red;" data-user="<?php echo $match->user_rojo; ?>">
                                     <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo (isset($match->rojo)) ? $match->rojo->nombre : ''; ?></span>
                                     <span class="bg-white <?php echo ($match->hantei == 'rojo') ? 'hantei' : ''; ?> <?php echo ($match->senshu == 'rojo') ? 'senshu' : ''; ?>" style="width:25px;"><?php echo (isset($match->rojo)) ? $match->puntos_rojo : 0; ?></span>
@@ -89,10 +91,12 @@
         </div>
     </div>
 
-    <div class="card-header d-flex justify-content-between">
-        <div class="card-title fw-mediumbold w-100"><a data-finalizar-competicion href="<?php echo base_url(); ?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
-    </div>
-    <?php $this->load->view('gestion/competiciones/marcadorauxiliar'); ?>
+    <?php if ($this->ion_auth->in_group([1, 2, 3])) { ?>
+        <div class="card-header d-flex justify-content-between">
+            <div class="card-title fw-mediumbold w-100"><a data-finalizar-competicion href="<?php echo base_url(); ?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
+        </div>
+    <?php } ?>
+    <?php $this->load->view('gestion/competiciones/marcadorauxiliarrey'); ?>
 
 
 </div>

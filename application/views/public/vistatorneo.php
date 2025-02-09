@@ -11,9 +11,11 @@
                     <li class="nav-item">
                         <a class="nav-link" id="competiciones-tab" data-toggle="tab" href="#competiciones" role="tab" aria-controls="competiciones" aria-selected="false">Competiciones</a>
                     </li>
+                    <?php if($torneo->torneo_id <> 20) { ?>
                     <li class="nav-item">
                         <a class="nav-link" id="medallero-tab" data-toggle="tab" href="#medallero" role="tab" aria-controls="medallero" aria-selected="false">Medallero</a>
                     </li>
+                    <?php } ?>
                 </ul>
                 <?php $this->load->view('public/sponsors');?>
 

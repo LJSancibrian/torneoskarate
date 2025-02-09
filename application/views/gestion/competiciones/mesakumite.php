@@ -4,8 +4,8 @@
 
 <div class="card">
     <div class="card-header d-flex justify-content-between">
-        <div class="card-title fw-mediumbold text-uppercase"><?php echo $competicion->modalidad.' '.$competicion->categoria.' '.$competicion->nivel;?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto');?></div>
-        <a href="<?php echo base_url();?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id;?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
+        <div class="card-title fw-mediumbold text-uppercase"><?php echo $competicion->modalidad . ' ' . $competicion->categoria . ' ' . $competicion->nivel; ?> - <?php echo ($competicion->genero == 'M') ? 'Masculino' : (($competicion->genero == 'F') ? 'Femenino' : 'Mixto'); ?></div>
+        <a href="<?php echo base_url(); ?>Competiciones/pdfdoc/<?php echo $competicion->competicion_torneo_id; ?>" target="_blankl" class="btn btn-icon btn-primary btn-round btn-xs" title="Guardar imagen tablero" target="_blank">
             <i class="fas fa-file-pdf"></i>
         </a>
     </div>
@@ -20,147 +20,111 @@
             </li>
         </ul>
         <div id="content_print">
-        <?php
-        if ($tipo == 'grupos') {
-            foreach ($matches as $grupo) { ?>
-                <div class="card shadow-none border">
-                    <div class="card-header d-flex justify-content-start flex-wrap">
-                        
+            <?php
+            if ($tipo == 'grupos') {
+                foreach ($matches as $grupo) { ?>
+                    <div class="card shadow-none border">
+                        <div class="card-header d-flex justify-content-start flex-wrap">
 
-                        <h4 class="card-title">Grupo <?php echo $grupo->grupo; ?></h4>
 
-                        <button class="btn btn-primary btn-sm ml-3 mb-2" data-ver-clasificacion data-toggle="tooltip" title="Ver clasificacion" data-grupo="<?php echo $grupo->grupo; ?>" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
-                            <i class="fas fa-list"></i> Clasificación
-                        </button>
+                            <h4 class="card-title">Grupo <?php echo $grupo->grupo; ?></h4>
 
-                        <button class="btn btn-primary btn-sm ml-3 mb-2" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>" data-toggle="tooltip" title="Confirmar clasificación y enviar clasificados a las eliminatorias">
-                        <i class="fas fa-code-branch"></i> Confirmar clasificados
-                        </button>
-                        
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center flex-nowrap" style=" overflow-x: auto;white-space: nowrap">
-                            <?php /*<div class="col-md-3 table-responsive">
-                                <table class="table table-striped table-bordered text-center w-100" id="tablakumite_<?php echo intToLetter($grupo->grupo); ?>">
-                                    <thead class="bg-primary text-white">
-                                        <tr>
-                                            <th colspan="4" class="font-weigth-bold">CLASIFICACIÓN</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="user" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">
-                                    </tbody>
-                                    <?php <tfoot>
-                                        <tr>
-                                            <th colspan="4" class="font-weigth-bold"><button type="button" class="btn btn-block btn-sm btn-primary" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">Guardar clasificación para eliminatorias</button></th>
-                                        </tr>
-                                    </tfoot> ?>
-                                </table>
-                            </div>
-                            */ ?>
+                            <button class="btn btn-primary btn-sm ml-3 mb-2" data-ver-clasificacion data-toggle="tooltip" title="Ver clasificacion" data-grupo="<?php echo $grupo->grupo; ?>" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
+                                <i class="fas fa-list"></i> Clasificación
+                            </button>
 
-                            <?php foreach ($grupo->rondas as $ronda) { ?>
-                                <div class="col-md-4 col-lg-3">
-                                    <h4 class="bg-primary text-white p-2 mb-3">Ronda <?php echo $ronda->ronda; ?></h4>
-                                    <div>
-                                        <?php foreach ($ronda->matches as $match) {
-                                            //if ($match->estado == 'pendiente') { ?>
+                            <button class="btn btn-primary btn-sm ml-3 mb-2" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>" data-toggle="tooltip" title="Confirmar clasificación y enviar clasificados a las eliminatorias">
+                                <i class="fas fa-code-branch"></i> Confirmar clasificados
+                            </button>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center flex-nowrap" style=" overflow-x: auto;white-space: nowrap">
+                                <?php foreach ($grupo->rondas as $ronda) { ?>
+                                    <div class="col-md-4 col-lg-3">
+                                        <h4 class="bg-primary text-white p-2 mb-3">Ronda <?php echo $ronda->ronda; ?></h4>
+                                        <div>
+                                            <?php foreach ($ronda->matches as $match) { ?>
                                                 <ul class="list-group mb-3 p-0 btn btn-link" data-match_id="<?php echo $match->match_id; ?>">
                                                     <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: red;" data-user="<?php echo $match->user_rojo; ?>">
                                                         <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo $match->rojo->nombre; ?></span>
-                                                        <span class="bg-white <?php echo ($match->hantei == 'rojo') ? 'hantei' : '';?> <?php echo ($match->senshu == 'rojo') ? 'senshu' : '';?>" style="width:25px;"><?php echo $match->puntos_rojo; ?></span>
+                                                        <span class="bg-white <?php echo ($match->hantei == 'rojo') ? 'hantei' : ''; ?> <?php echo ($match->senshu == 'rojo') ? 'senshu' : ''; ?>" style="width:25px;"><?php echo $match->puntos_rojo; ?></span>
                                                     </li>
                                                     <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: blue;" data-user="<?php echo $match->user_azul; ?>">
                                                         <span class="text-white text-truncate text-left"><?php echo $match->azul->nombre; ?></span>
-                                                        <span class="bg-white <?php echo ($match->hantei == 'azul') ? 'hantei' : '';?> <?php echo ($match->senshu == 'azul') ? 'senshu' : '';?>" style="width:25px;"><?php echo $match->puntos_azul; ?></span>
+                                                        <span class="bg-white <?php echo ($match->hantei == 'azul') ? 'hantei' : ''; ?> <?php echo ($match->senshu == 'azul') ? 'senshu' : ''; ?>" style="width:25px;"><?php echo $match->puntos_azul; ?></span>
                                                     </li>
                                                 </ul>
-                                            <?php /*} else { ?>
-                                                <ul class="list-group mb-3 p-0" style="pointer-events: none;" data-match_id="<?php echo $match->match_id; ?>">
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: red;" data-user="<?php echo $match->user_rojo; ?>">
-                                                        <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo $match->rojo->nombre; ?></span>
-                                                        <span class="text-white" style="width:25px;"><?php echo $match->puntos_rojo; ?></span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: blue;" data-user="<?php echo $match->user_azul; ?>">
-                                                        <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo $match->azul->nombre; ?></span>
-                                                        <span class="text-white" style="width:25px;"><?php echo $match->puntos_azul; ?></span>
-                                                    </li>
-                                                </ul>
-                                            <?php } */?>
-                                        <?php } ?>
+
+                                            <?php } ?>
+                                        </div>
                                     </div>
+                                <?php } ?>
+                                <div class="col">
+                                    <table class="table table-striped table-bordered text-center w-100" id="tablakumite_<?php echo intToLetter($grupo->grupo); ?>">
+                                        <thead class="bg-primary text-white">
+                                            <tr>
+                                                <th colspan="4" class="font-weigth-bold">CLASIFICACIÓN</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="user" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="4" class="font-weigth-bold"><button type="button" class="btn btn-block btn-sm btn-primary" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">Guardar clasificación para eliminatorias</button></th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
                                 </div>
-                            <?php } ?>
-                            <div class="col">
-                            <table class="table table-striped table-bordered text-center w-100" id="tablakumite_<?php echo intToLetter($grupo->grupo); ?>">
-                                    <thead class="bg-primary text-white">
-                                        <tr>
-                                            <th colspan="4" class="font-weigth-bold">CLASIFICACIÓN</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="user" data-competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th colspan="4" class="font-weigth-bold"><button type="button" class="btn btn-block btn-sm btn-primary" data-guardar-clasificaicon="<?php echo $competicion->competicion_torneo_id; ?>" data-grupo="<?php echo $grupo->grupo; ?>">Guardar clasificación para eliminatorias</button></th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
                             </div>
                         </div>
                     </div>
-                </div>
-        <?php }
-        } ?>
+            <?php }
+            } ?>
 
-        <?php if ($tipo == 'eliminatorias') { ?>
-            <div id="faseeliminatoria" competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
-                <div class="brackets"></div>
-                <div class="row text-center flex-nowrap" style=" overflow-x: auto;white-space: nowrap">
-                    <?php foreach ($eliminatorias as $key => $eliminatoria) {
-                        if ($key  == count($eliminatorias)) {
-                            $ronda = 'FINAL';
-                        } elseif ($key  == count($eliminatorias) - 1) {
-                            $ronda = 'SEMI - FINAL';
-                        } else {
-                            $ronda = 'Ronda ' . $key;
-                        } ?>
-                        <div class="col-md-4 col-lg-3 round">
-                            <h4 class="bg-primary text-white p-2 mb-3"><?php echo $ronda; ?></h4>
-                            <div>
-                                <?php foreach ($eliminatoria as $match) {
-                                    //if ($match->estado == 'pendiente') { ?>
-                                        <ul class="list-group p-0 match btn btn-link" data-match_id="<?php echo $match->match_id; ?>" <?php if ($match->user_rojo == 0 || $match->user_azul == 0) {echo 'style="pointer-events: none"';} ?>>
+            <?php if ($tipo == 'eliminatorias') { ?>
+                <div id="faseeliminatoria" competicion_torneo_id="<?php echo $competicion->competicion_torneo_id; ?>">
+                    <div class="brackets"></div>
+                    <div class="row text-center flex-nowrap" style=" overflow-x: auto;white-space: nowrap">
+                        <?php foreach ($eliminatorias as $key => $eliminatoria) {
+                            if ($key  == count($eliminatorias)) {
+                                $ronda = 'FINAL';
+                            } elseif ($key  == count($eliminatorias) - 1) {
+                                $ronda = 'SEMI - FINAL';
+                            } else {
+                                $ronda = 'Ronda ' . $key;
+                            } ?>
+                            <div class="col-md-4 col-lg-3 round">
+                                <h4 class="bg-primary text-white p-2 mb-3"><?php echo $ronda; ?></h4>
+                                <div>
+                                    <?php foreach ($eliminatoria as $match) {
+                                        //if ($match->estado == 'pendiente') { 
+                                    ?>
+                                        <ul class="list-group p-0 match btn btn-link" data-match_id="<?php echo $match->match_id; ?>" <?php if ($match->user_rojo == 0 || $match->user_azul == 0) {
+                                                                                                                                            echo 'style="pointer-events: none"';
+                                                                                                                                        } ?>>
                                             <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: red;" data-user="<?php echo $match->user_rojo; ?>">
                                                 <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo (isset($match->rojo)) ? $match->rojo->nombre : ''; ?></span>
-                                                <span class="bg-white <?php echo ($match->hantei == 'rojo') ? 'hantei' : '';?> <?php echo ($match->senshu == 'rojo') ? 'senshu' : '';?>" style="width:25px;"><?php echo (isset($match->rojo)) ? $match->puntos_rojo : 0; ?></span>
+                                                <span class="bg-white <?php echo ($match->hantei == 'rojo') ? 'hantei' : ''; ?> <?php echo ($match->senshu == 'rojo') ? 'senshu' : ''; ?>" style="width:25px;"><?php echo (isset($match->rojo)) ? $match->puntos_rojo : 0; ?></span>
                                             </li>
                                             <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: blue;" data-user="<?php echo $match->user_azul; ?>">
                                                 <span class="text-white text-truncate text-left"><?php echo (isset($match->azul)) ? $match->azul->nombre : ''; ?></span>
-                                                <span class="bg-white <?php echo ($match->hantei == 'azul') ? 'hantei' : '';?> <?php echo ($match->senshu == 'azul') ? 'senshu' : '';?>" style="width:25px;"><?php echo (isset($match->azul)) ? $match->puntos_azul : 0; ?></span>
+                                                <span class="bg-white <?php echo ($match->hantei == 'azul') ? 'hantei' : ''; ?> <?php echo ($match->senshu == 'azul') ? 'senshu' : ''; ?>" style="width:25px;"><?php echo (isset($match->azul)) ? $match->puntos_azul : 0; ?></span>
                                             </li>
                                         </ul>
-                                    <?php /*} else { ?>
-                                        <ul class="list-group p-0 match bg-succes rounded"  data-match_id="<?php echo $match->match_id; ?>">
-                                            <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: red;" data-user="<?php echo $match->user_rojo; ?>">
-                                                <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo $match->rojo->nombre; ?></span>
-                                                <span class="text-white" style="width:25px;"><?php echo $match->puntos_rojo; ?></span>
-                                            </li>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center px-2 py-1" style="background: blue;" data-user="<?php echo $match->user_azul; ?>">
-                                                <span class="text-white text-truncate text-left" style="width:calc(100% - 30px);"><?php echo $match->azul->nombre; ?></span>
-                                                <span class="text-white" style="width:25px;"><?php echo $match->puntos_azul; ?></span>
-                                            </li>
-                                        </ul>
-                                    <?php } */?>
-                                <?php } ?>
+                                    <?php } ?>
+                                </div>
                             </div>
+                        <?php } ?>
+                    </div>
+
+                    <?php if ($this->ion_auth->in_group([1, 2, 3])) { ?>
+                        <div class="card-header d-flex justify-content-between">
+                            <div class="card-title fw-mediumbold w-100"><a href="<?php echo base_url(); ?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
                         </div>
                     <?php } ?>
                 </div>
-                <div class="card-header d-flex justify-content-between">
-                    <div class="card-title fw-mediumbold w-100"><a href="<?php echo base_url();?>Competiciones/FinalizarCompeticion/<?php echo $competicion->competicion_torneo_id; ?>" class="btn btn-primary text-white rounded">Finalizar competición</a></div>
-                </div>
-            </div>
-        <?php } ?>
+            <?php } ?>
         </div>
     </div>
 </div>

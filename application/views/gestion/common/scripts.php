@@ -16,6 +16,11 @@
 <script src="<?php echo base_url(); ?>assets/admin/js/plugin/jqvmap/jquery.vmap.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/admin/js/plugin/jqvmap/maps/jquery.vmap.world.js"></script>
 <script src="<?php echo base_url(); ?>assets/plugins/sweetalert2/dist/sweetalert2.min.js"></script>
+
+<script src="<?php echo base_url(); ?>assets/plugins/select2/js/select2.full.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/plugins/select2/js/i18n/es.js"></script>
+<script src="<?php echo base_url(); ?>assets/plugins/select2/js/config.js"></script>
+
 <script src="<?php echo base_url(); ?>assets/plugins/html2canvas.js"></script>
 <script src="<?php echo base_url(); ?>assets/plugins/FileSaver.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/admin/js/atlantis.min.js"></script>
